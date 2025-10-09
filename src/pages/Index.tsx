@@ -124,16 +124,16 @@ const Index = () => {
         
         const airdropEstimates = {
           "150M": share > 0 ? {
-            low: `$${(150000000 * share * lowPrice).toFixed(0)}`,
-            high: `$${(150000000 * share * highPrice).toFixed(0)}`
+            low: `$${Math.round(150000000 * share * lowPrice).toLocaleString()}`,
+            high: `$${Math.round(150000000 * share * highPrice).toLocaleString()}`
           } : { low: "-", high: "-" },
           "200M": share > 0 ? {
-            low: `$${(200000000 * share * lowPrice).toFixed(0)}`,
-            high: `$${(200000000 * share * highPrice).toFixed(0)}`
+            low: `$${Math.round(200000000 * share * lowPrice).toLocaleString()}`,
+            high: `$${Math.round(200000000 * share * highPrice).toLocaleString()}`
           } : { low: "-", high: "-" },
           "250M": share > 0 ? {
-            low: `$${(250000000 * share * lowPrice).toFixed(0)}`,
-            high: `$${(250000000 * share * highPrice).toFixed(0)}`
+            low: `$${Math.round(250000000 * share * lowPrice).toLocaleString()}`,
+            high: `$${Math.round(250000000 * share * highPrice).toLocaleString()}`
           } : { low: "-", high: "-" }
         };
 
