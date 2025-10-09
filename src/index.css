@@ -84,7 +84,11 @@ All colors MUST be HSL.
   }
 
   .glass-hover {
-    @apply transition-all duration-300 hover:border-white/10 hover:shadow-[0_8px_32px_hsl(261_100%_70%_/_0.15)];
+    @apply transition-all duration-300 hover:border-white/10;
+  }
+  
+  .glass-hover:hover {
+    box-shadow: 0 8px 32px hsl(261 100% 70% / 0.15);
   }
 
   .text-gradient {
