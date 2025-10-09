@@ -26,15 +26,18 @@ jobs:
           # Install Chrome
           wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
-          # Install ChromeDriver
-          wget -q https://storage.googleapis.com/chrome-for-testing-public/131.0.6778.204/linux64/chromedriver-linux64.zip
-          unzip chromedriver-linux64.zip
-          sudo mv chromedriver-linux64/chromedriver /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
+          # Get Chrome version
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
+          echo "Chrome version: $CHROME_VERSION"
+          # Extract major version
+          CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d. -f1)
+          echo "Chrome major version: $CHROME_MAJOR_VERSION"
+          # Install matching ChromeDriver using webdriver-manager
+          pip install webdriver-manager
 
       - name: Install Python dependencies
         run: |
-          pip install selenium requests
+          pip install selenium requests webdriver-manager
 
       - name: Run scraper
         env:
