@@ -93,6 +93,14 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Validate Ethereum wallet address format
+    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid Ethereum wallet address format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     console.log('Starting scrape for wallet:', walletAddress);
 
     // Scrape the data
@@ -118,7 +126,7 @@ Deno.serve(async (req) => {
     if (!trackResponse.ok) {
       const errorText = await trackResponse.text();
       console.error('Error calling track-wallet:', errorText);
-      throw new Error(`Failed to store data: ${errorText}`);
+      throw new Error('Failed to store scraped data');
     }
 
     const result = await trackResponse.json();
@@ -135,7 +143,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error in scrape-spark-points function:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -184,7 +184,7 @@ serve(async (req) => {
         .rpc('get_latest_wallet_data', { wallet_addr: wallet_address });
 
       if (latestError) {
-        console.error('Error fetching latest data:', latestError);
+        console.error('Database error fetching latest data:', latestError);
       }
 
       // Get historical data for charts
@@ -192,7 +192,7 @@ serve(async (req) => {
         .rpc('get_wallet_history', { wallet_addr: wallet_address, days_back: 30 });
 
       if (historyError) {
-        console.error('Error fetching history:', historyError);
+        console.error('Database error fetching history:', historyError);
       }
 
       return new Response(
@@ -225,9 +225,9 @@ serve(async (req) => {
         .select();
 
       if (error) {
-        console.error('Error storing wallet data:', error);
+        console.error('Database error storing wallet data:', error);
         return new Response(
-          JSON.stringify({ error: 'Failed to store wallet data' }),
+          JSON.stringify({ error: 'An error occurred processing your request' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -243,9 +243,9 @@ serve(async (req) => {
       );
     }
   } catch (error) {
-    console.error('Error in track-wallet function:', error);
+    console.error('Unexpected error in track-wallet function:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'An error occurred processing your request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

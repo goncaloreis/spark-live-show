@@ -266,12 +266,9 @@ def main():
     print("=" * 60)
     
     # Validate environment variables
-    if not SUPABASE_URL or not SUPABASE_ANON_KEY or not WALLET_ADDRESS:
-        print("ERROR: Missing required environment variables!")
-        print(f"SUPABASE_URL: {'✓' if SUPABASE_URL else '✗'}")
-        print(f"SUPABASE_ANON_KEY: {'✓' if SUPABASE_ANON_KEY else '✗'}")
-        print(f"WALLET_ADDRESS: {'✓' if WALLET_ADDRESS else '✗'}")
-        sys.exit(1)
+if not SUPABASE_URL or not SUPABASE_ANON_KEY or not WALLET_ADDRESS:
+    print("ERROR: Missing required environment variables")
+    sys.exit(1)
     
     try:
         # Scrape data

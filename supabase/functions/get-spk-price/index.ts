@@ -28,7 +28,7 @@ serve(async (req) => {
     );
 
     if (!response.ok) {
-      console.error('CoinGecko API error:', response.status, await response.text());
+      console.error('CoinGecko API error:', response.status);
       // Return fallback price if API fails
       return new Response(
         JSON.stringify({ 
@@ -50,7 +50,7 @@ serve(async (req) => {
     const priceData = data.spark;
     
     if (!priceData || !priceData.usd) {
-      console.error('Invalid price data from CoinGecko:', data);
+      console.error('Invalid price data received from CoinGecko');
       return new Response(
         JSON.stringify({ 
           price: 0.0475, // Updated fallback based on current market price
@@ -83,17 +83,14 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error fetching SPK price:', error);
-    
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Unexpected error fetching SPK price:', error);
     
     // Return fallback price on error
     return new Response(
       JSON.stringify({ 
         price: 0.0475,
         change_24h: 0,
-        source: 'fallback',
-        error: errorMessage
+        source: 'fallback'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
