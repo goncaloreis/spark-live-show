@@ -234,18 +234,18 @@ const Index = () => {
 
               {/* Premium Search Interface */}
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-10 group-hover:opacity-20 transition-all duration-700" />
-                <Card className="relative card-premium border shadow-elevated z-10">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-10 group-hover:opacity-20 transition-all duration-700 pointer-events-none" />
+                <Card className="relative card-premium border shadow-elevated">
                   <div className="p-6 sm:p-8">
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                      <div className="flex-1">
-                        <input
+                      <div className="flex-1 relative z-10">
+                        <Input
                           type="text"
                           placeholder="Enter wallet address (0x...)"
                           value={walletAddress}
                           onChange={(e) => setWalletAddress(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && !loading && handleSearch()}
-                          className="flex h-12 sm:h-14 w-full rounded-md border border-input bg-background px-3 py-2 text-sm sm:text-base ring-offset-background placeholder:text-muted-foreground/40 focus-visible:outline-none focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300"
+                          className="h-12 sm:h-14 text-sm sm:text-base focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300"
                           autoComplete="off"
                         />
                       </div>
