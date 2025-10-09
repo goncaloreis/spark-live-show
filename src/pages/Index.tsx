@@ -31,11 +31,10 @@ const Index = () => {
     shareChange: "-",
     shareChangeObj: { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' },
     paceStatus: "NEUTRAL",
-          airdropEstimates: {
-            "150M": { low: "-", high: "-" },
-            "200M": { low: "-", high: "-" },
-            "250M": { low: "-", high: "-" }
-          }
+    airdropEstimates: {
+      conservative: "-",
+      optimistic: "-"
+    }
   });
 
   const handleManualScrape = async () => {
@@ -202,24 +201,15 @@ const Index = () => {
         }
 
         // Financial projections based on market share
-        // Token price range: $0.05 - $0.15 per SPK
+        // Conservative: 150M SPK @ $0.05 | Optimistic: 250M SPK @ $0.15
         const share = parseFloat(marketShare) / 100 || 0;
-        const lowPrice = 0.05;
-        const highPrice = 0.15;
         
-        const airdropEstimates = {
-          "150M": share > 0 ? {
-            low: `$${Math.round(150000000 * share * lowPrice).toLocaleString()}`,
-            high: `$${Math.round(150000000 * share * highPrice).toLocaleString()}`
-          } : { low: "-", high: "-" },
-          "200M": share > 0 ? {
-            low: `$${Math.round(200000000 * share * lowPrice).toLocaleString()}`,
-            high: `$${Math.round(200000000 * share * highPrice).toLocaleString()}`
-          } : { low: "-", high: "-" },
-          "250M": share > 0 ? {
-            low: `$${Math.round(250000000 * share * lowPrice).toLocaleString()}`,
-            high: `$${Math.round(250000000 * share * highPrice).toLocaleString()}`
-          } : { low: "-", high: "-" }
+        const airdropEstimates = share > 0 ? {
+          conservative: `$${Math.round(150000000 * share * 0.05).toLocaleString()}`,
+          optimistic: `$${Math.round(250000000 * share * 0.15).toLocaleString()}`
+        } : {
+          conservative: "-",
+          optimistic: "-"
         };
 
         // Format last updated time
@@ -267,9 +257,8 @@ const Index = () => {
           shareChangeObj: { value: "-", direction: 'neutral' },
           paceStatus: "NEUTRAL",
           airdropEstimates: {
-            "150M": { low: "-", high: "-" },
-            "200M": { low: "-", high: "-" },
-            "250M": { low: "-", high: "-" }
+            conservative: "-",
+            optimistic: "-"
           }
         });
         setHistoryData([]);
@@ -510,19 +499,8 @@ const Index = () => {
                     </div>
                     <div className="space-y-1">
                       <AirdropEstimateCard 
-                        label="150M SPK" 
-                        lowValue={stats.airdropEstimates["150M"].low}
-                        highValue={stats.airdropEstimates["150M"].high}
-                      />
-                      <AirdropEstimateCard 
-                        label="200M SPK" 
-                        lowValue={stats.airdropEstimates["200M"].low}
-                        highValue={stats.airdropEstimates["200M"].high}
-                      />
-                      <AirdropEstimateCard 
-                        label="250M SPK" 
-                        lowValue={stats.airdropEstimates["250M"].low}
-                        highValue={stats.airdropEstimates["250M"].high}
+                        conservativeValue={stats.airdropEstimates.conservative}
+                        optimisticValue={stats.airdropEstimates.optimistic}
                       />
                     </div>
                   </div>
