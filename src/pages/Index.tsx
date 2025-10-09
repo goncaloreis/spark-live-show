@@ -32,9 +32,11 @@ const Index = () => {
     shareChangeObj: { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' },
     paceStatus: "NEUTRAL",
     airdropEstimates: {
-      conservative: "-",
-      optimistic: "-"
-    }
+      "150M": "-",
+      "200M": "-",
+      "250M": "-"
+    },
+    spkPrice: null as number | null
   });
 
   const handleManualScrape = async () => {
@@ -219,16 +221,30 @@ const Index = () => {
           }
         }
 
-        // Financial projections based on market share
-        // Conservative: 150M SPK @ $0.05 | Optimistic: 250M SPK @ $0.15
+        // Fetch SPK price
+        let spkPrice: number | null = null;
+        try {
+          const { data: priceData, error: priceError } = await supabase.functions.invoke('get-spk-price');
+          if (!priceError && priceData?.price) {
+            spkPrice = Number(priceData.price);
+            console.log('SPK price fetched:', spkPrice, 'Source:', priceData.source);
+          }
+        } catch (priceError) {
+          console.error('Error fetching SPK price:', priceError);
+        }
+
+        // Financial projections based on market share and current SPK price
         const share = parseFloat(marketShare) / 100 || 0;
+        const effectivePrice = spkPrice || 0.07; // Fallback to $0.07 if price fetch fails
         
         const airdropEstimates = share > 0 ? {
-          conservative: `$${Math.round(150000000 * share * 0.05).toLocaleString()}`,
-          optimistic: `$${Math.round(250000000 * share * 0.15).toLocaleString()}`
+          "150M": `$${Math.round(150000000 * share * effectivePrice).toLocaleString()}`,
+          "200M": `$${Math.round(200000000 * share * effectivePrice).toLocaleString()}`,
+          "250M": `$${Math.round(250000000 * share * effectivePrice).toLocaleString()}`
         } : {
-          conservative: "-",
-          optimistic: "-"
+          "150M": "-",
+          "200M": "-",
+          "250M": "-"
         };
 
         // Format last updated time
@@ -249,7 +265,8 @@ const Index = () => {
           shareChange,
           shareChangeObj,
           paceStatus,
-          airdropEstimates
+          airdropEstimates,
+          spkPrice
         });
         
         // Update history for chart with global average
@@ -276,9 +293,11 @@ const Index = () => {
           shareChangeObj: { value: "-", direction: 'neutral' },
           paceStatus: "NEUTRAL",
           airdropEstimates: {
-            conservative: "-",
-            optimistic: "-"
-          }
+            "150M": "-",
+            "200M": "-",
+            "250M": "-"
+          },
+          spkPrice: null
         });
         setHistoryData([]);
       }
@@ -518,8 +537,8 @@ const Index = () => {
                     </div>
                     <div className="space-y-1">
                       <AirdropEstimateCard 
-                        conservativeValue={stats.airdropEstimates.conservative}
-                        optimisticValue={stats.airdropEstimates.optimistic}
+                        values={stats.airdropEstimates}
+                        spkPrice={stats.spkPrice}
                       />
                     </div>
                   </div>

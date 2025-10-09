@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.scrape-spark-points]
 verify_jwt = false
+
+[functions.get-spk-price]
+verify_jwt = false

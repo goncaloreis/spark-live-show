@@ -1,69 +1,84 @@
-import { ArrowRight } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 interface AirdropEstimateCardProps {
-  conservativeValue: string;
-  optimisticValue: string;
+  values: {
+    "150M": string;
+    "200M": string;
+    "250M": string;
+  };
+  spkPrice: number | null;
 }
 
-export const AirdropEstimateCard = ({ conservativeValue, optimisticValue }: AirdropEstimateCardProps) => {
+export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardProps) => {
+  const hasData = values["150M"] !== "-";
+  
   return (
-    <div className="group relative">
-      {conservativeValue !== "-" && optimisticValue !== "-" ? (
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
-              Estimated Airdrop Value
-            </p>
-          </div>
+    <div className="space-y-6">
+      {hasData ? (
+        <>
+          {/* SPK Price Display */}
+          {spkPrice && (
+            <div className="flex items-center justify-center gap-2 pb-4 border-b border-white/5">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-primary/60" />
+                <span className="text-xs text-muted-foreground/60 font-medium">Current SPK Price:</span>
+                <span className="text-sm font-bold text-primary">${spkPrice.toFixed(4)}</span>
+              </div>
+            </div>
+          )}
 
-          {/* Main Range Display */}
-          <div className="relative">
-            {/* Connecting Line */}
-            <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-muted via-primary/20 to-muted -translate-y-1/2 z-0" />
-            
-            <div className="relative z-10 flex items-center justify-between gap-4">
-              {/* Conservative Side */}
-              <div className="flex-1 bg-card/50 backdrop-blur-sm rounded-2xl border border-white/5 p-6 hover:border-white/10 transition-all duration-300">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
-                    <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">
-                      Conservative
-                    </span>
+          {/* Three Scenarios */}
+          <div className="grid grid-cols-1 gap-4">
+            {/* 150M SPK */}
+            <div className="group relative p-5 rounded-xl bg-card/40 border border-white/5 hover:border-white/10 hover:bg-card/60 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
+                    150M SPK Supply
                   </div>
-                  <div className="text-3xl font-bold text-foreground/90 tabular-nums">
-                    {conservativeValue}
-                  </div>
-                  <div className="text-xs text-muted-foreground/50 font-medium">
-                    150M SPK @ $0.05
+                  <div className="text-2xl font-bold text-foreground/90 tabular-nums">
+                    {values["150M"]}
                   </div>
                 </div>
+                <div className="px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20">
+                  <span className="text-xs font-bold text-primary">Conservative</span>
+                </div>
               </div>
+            </div>
 
-              {/* Arrow */}
-              <div className="flex-shrink-0 p-3 rounded-xl bg-primary/10 border border-primary/20">
-                <ArrowRight className="w-5 h-5 text-primary" />
+            {/* 200M SPK */}
+            <div className="group relative p-5 rounded-xl bg-gradient-to-br from-primary/5 via-card/40 to-card/40 border border-primary/10 hover:border-primary/20 hover:from-primary/8 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
+                    200M SPK Supply
+                  </div>
+                  <div className="text-2xl font-bold text-gradient-static tabular-nums">
+                    {values["200M"]}
+                  </div>
+                </div>
+                <div className="px-3 py-1.5 rounded-lg bg-primary/15 border border-primary/25">
+                  <span className="text-xs font-bold text-primary">Moderate</span>
+                </div>
               </div>
+            </div>
 
-              {/* Optimistic Side */}
-              <div className="flex-1 bg-gradient-to-br from-primary/10 via-card/50 to-secondary/10 backdrop-blur-sm rounded-2xl border border-primary/20 p-6 hover:border-primary/30 transition-all duration-300 relative overflow-hidden">
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                
-                <div className="relative space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-primary" />
-                    <span className="text-[10px] font-bold text-muted-foreground/70 uppercase tracking-wider">
-                      Optimistic
-                    </span>
+            {/* 250M SPK */}
+            <div className="group relative p-5 rounded-xl bg-gradient-to-br from-primary/10 via-secondary/10 to-primary/10 border border-primary/20 hover:border-primary/30 hover:from-primary/15 hover:via-secondary/15 hover:to-primary/15 transition-all duration-300 overflow-hidden">
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 shimmer" />
+              
+              <div className="relative flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="text-xs text-muted-foreground/70 font-medium uppercase tracking-wider">
+                    250M SPK Supply
                   </div>
-                  <div className="text-3xl font-bold text-gradient-static tabular-nums">
-                    {optimisticValue}
+                  <div className="text-2xl font-bold text-gradient-static tabular-nums">
+                    {values["250M"]}
                   </div>
-                  <div className="text-xs text-muted-foreground/50 font-medium">
-                    250M SPK @ $0.15
-                  </div>
+                </div>
+                <div className="px-3 py-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
+                  <span className="text-xs font-bold text-primary">Optimistic</span>
                 </div>
               </div>
             </div>
@@ -72,10 +87,10 @@ export const AirdropEstimateCard = ({ conservativeValue, optimisticValue }: Aird
           {/* Footer Note */}
           <div className="text-center pt-4 border-t border-white/5">
             <p className="text-[10px] text-muted-foreground/40 font-medium">
-              Based on your current pool share percentage
+              Estimates based on your current pool share × total supply × live SPK price
             </p>
           </div>
-        </div>
+        </>
       ) : (
         <div className="text-center py-12 space-y-3">
           <div className="text-2xl font-bold text-muted-foreground/20">—</div>
