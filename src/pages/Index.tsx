@@ -327,7 +327,7 @@ const Index = () => {
                       </Button>
                       <Button 
                         onClick={(e) => {
-                          console.log('Manual scrape clicked!');
+                          console.log('Fetch Now clicked!');
                           e.preventDefault();
                           if (!loading) {
                             handleManualScrape();
@@ -342,14 +342,14 @@ const Index = () => {
                         {loading ? (
                           <>
                             <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin mr-2" />
-                            <span className="hidden sm:inline">Testing...</span>
-                            <span className="sm:hidden">Testing</span>
+                            <span className="hidden sm:inline">Fetching...</span>
+                            <span className="sm:hidden">Fetching</span>
                           </>
                         ) : (
                           <>
                             <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">Test Scrape</span>
-                            <span className="sm:hidden">Test</span>
+                            <span className="hidden sm:inline">Fetch Now</span>
+                            <span className="sm:hidden">Fetch</span>
                           </>
                         )}
                       </Button>
