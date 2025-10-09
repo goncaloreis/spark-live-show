@@ -371,12 +371,12 @@ const Index = () => {
                         label="Pool Share" 
                         value={stats.marketShare}
                       />
-                      <KPICard 
+                       <KPICard 
                         label="Share Change" 
                         value={stats.shareChange}
-                        change={stats.shareChange !== "-" && stats.shareChange.startsWith('+') ? {
+                        change={stats.shareChange !== "-" ? {
                           value: stats.shareChange,
-                          direction: 'up'
+                          direction: stats.shareChange.startsWith('+') ? 'up' : stats.shareChange.startsWith('-') ? 'down' : 'neutral'
                         } : undefined}
                       />
                       <KPICard 

@@ -63,7 +63,10 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
     );
   }
 
-  const avgPoints = data.length > 0 ? data[data.length - 1].total_points * 0.4 : 0;
+  // Calculate actual average of all data points
+  const avgPoints = data.length > 0 
+    ? data.reduce((sum, item) => sum + Number(item.total_points), 0) / data.length 
+    : 0;
 
   const chartData = data.map(item => ({
     date: format(new Date(item.created_at), 'MMM dd HH:mm'),
