@@ -8,9 +8,10 @@ interface KPICardProps {
     direction: 'up' | 'down' | 'neutral';
   };
   suffix?: string;
+  valueColor?: 'green' | 'red' | 'default';
 }
 
-export const KPICard = ({ label, value, change, suffix }: KPICardProps) => {
+export const KPICard = ({ label, value, change, suffix, valueColor = 'default' }: KPICardProps) => {
   return (
     <div className="group relative py-5 px-3 -mx-3 border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-all duration-300 rounded-xl">
       {/* Hover gradient effect */}
@@ -27,7 +28,13 @@ export const KPICard = ({ label, value, change, suffix }: KPICardProps) => {
         <div className="flex items-center gap-3">
           <div className="text-right">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-bold text-foreground tabular-nums tracking-tight">
+              <span className={`text-xl font-bold tabular-nums tracking-tight ${
+                valueColor === 'green' 
+                  ? 'text-[hsl(142_76%_45%)]' 
+                  : valueColor === 'red' 
+                    ? 'text-[hsl(0_72%_55%)]' 
+                    : 'text-foreground'
+              }`}>
                 {value}
               </span>
               {suffix && (

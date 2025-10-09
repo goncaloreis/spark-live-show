@@ -487,13 +487,14 @@ const Index = () => {
                         value={stats.marketShare}
                         change={stats.shareChangeObj.value !== "-" ? stats.shareChangeObj : undefined}
                       />
-                       <KPICard 
-                        label="Share Change" 
-                        value={stats.shareChange}
-                      />
                       <KPICard 
                         label="Pace Status" 
                         value={stats.paceStatus}
+                        valueColor={
+                          stats.paceStatus === "GAINING" ? 'green' : 
+                          stats.paceStatus === "LOSING" ? 'red' : 
+                          'default'
+                        }
                       />
                     </div>
                   </div>
