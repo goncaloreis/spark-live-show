@@ -14,13 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      wallet_tracking: {
+        Row: {
+          created_at: string | null
+          id: string
+          percentile: string | null
+          rank: number | null
+          total_points: number
+          total_wallets: number | null
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          percentile?: string | null
+          rank?: number | null
+          total_points: number
+          total_wallets?: number | null
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          percentile?: string | null
+          rank?: number | null
+          total_points?: number
+          total_wallets?: number | null
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_latest_wallet_data: {
+        Args: { wallet_addr: string }
+        Returns: {
+          created_at: string
+          percentile: string
+          rank: number
+          total_points: number
+          total_wallets: number
+        }[]
+      }
+      get_wallet_history: {
+        Args: { days_back?: number; wallet_addr: string }
+        Returns: {
+          created_at: string
+          rank: number
+          total_points: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
