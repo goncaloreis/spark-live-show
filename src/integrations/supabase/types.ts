@@ -48,6 +48,7 @@ export type Database = {
           percentile: string | null
           rank: number | null
           total_points: number
+          total_points_pool: number | null
           total_wallets: number | null
           wallet_address: string
         }
@@ -57,6 +58,7 @@ export type Database = {
           percentile?: string | null
           rank?: number | null
           total_points: number
+          total_points_pool?: number | null
           total_wallets?: number | null
           wallet_address: string
         }
@@ -66,6 +68,7 @@ export type Database = {
           percentile?: string | null
           rank?: number | null
           total_points?: number
+          total_points_pool?: number | null
           total_wallets?: number | null
           wallet_address?: string
         }
@@ -87,6 +90,7 @@ export type Database = {
           percentile: string
           rank: number
           total_points: number
+          total_points_pool: number
           total_wallets: number
         }[]
       }
@@ -96,6 +100,7 @@ export type Database = {
           created_at: string
           rank: number
           total_points: number
+          total_points_pool: number
         }[]
       }
     }

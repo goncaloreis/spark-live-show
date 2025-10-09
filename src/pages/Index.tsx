@@ -107,43 +107,25 @@ const Index = () => {
           }
         }
 
-        // Calculate global average based on market position
-        // Using the wallet's rank and points to estimate total pool
+        // Calculate global average from actual total points pool
         const currentPoints = Number(data.latest.total_points);
         const totalWallets = data.latest.total_wallets || 0;
-        const walletRank = data.latest.rank || 0;
+        const totalPointsPool = data.latest.total_points_pool ? Number(data.latest.total_points_pool) : null;
         
-        // Estimate total points pool: if this wallet is at rank X with Y points,
-        // estimate total based on distribution (assuming power law distribution)
-        // A rough estimate: top wallets have more points, use exponential decay
-        let estimatedTotalPoints = totalWallets * 1000000; // fallback estimate
-        let globalAverage = 1000000; // fallback: 1M per wallet
+        // Calculate global average: total pool / total wallets
+        const globalAverage = totalPointsPool && totalWallets > 0 
+          ? totalPointsPool / totalWallets 
+          : 0;
         
-        if (walletRank > 0 && totalWallets > 0) {
-          // Better estimate: use the wallet's position to extrapolate
-          // If wallet at rank 1855 has 2.89M points and is at top 15.34%,
-          // we can estimate lower ranks have fewer points
-          const percentileDecimal = parseFloat(data.latest.percentile?.replace('%', '') || '50') / 100;
-          
-          // Estimate: wallets above this one average ~3x more, wallets below average ~0.5x less
-          const walletsAbove = walletRank - 1;
-          const walletsBelow = totalWallets - walletRank;
-          
-          const estimatedPointsAbove = walletsAbove * currentPoints * 1.5; // wallets above have more
-          const estimatedPointsBelow = walletsBelow * currentPoints * 0.4; // wallets below have less
-          
-          estimatedTotalPoints = estimatedPointsAbove + currentPoints + estimatedPointsBelow;
-          globalAverage = estimatedTotalPoints / totalWallets;
-        }
-        
-        if (totalWallets > 0) {
-          const share = (currentPoints / estimatedTotalPoints) * 100;
+        if (totalWallets > 0 && totalPointsPool) {
+          const share = (currentPoints / totalPointsPool) * 100;
           marketShare = share.toFixed(6) + "%";
           
           // Share change (if we have history)
-          if (history.length >= 2) {
+          if (history.length >= 2 && history[history.length - 2].total_points_pool) {
             const prevPoints = Number(history[history.length - 2].total_points);
-            const prevShare = (prevPoints / estimatedTotalPoints) * 100;
+            const prevPool = Number(history[history.length - 2].total_points_pool);
+            const prevShare = (prevPoints / prevPool) * 100;
             const shareDiff = share - prevShare;
             shareChange = shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`;
           }

@@ -12,6 +12,7 @@ interface WalletData {
   rank?: number;
   total_wallets?: number;
   percentile?: string;
+  total_points_pool?: number;
 }
 
 // Rate limiting configuration
@@ -123,7 +124,7 @@ serve(async (req) => {
 
     // Parse request body ONCE
     const body = await req.json();
-    const { wallet_address, action = 'get', total_points, rank, total_wallets, percentile } = body;
+    const { wallet_address, action = 'get', total_points, rank, total_wallets, percentile, total_points_pool } = body;
 
     if (!wallet_address) {
       return new Response(
@@ -218,7 +219,8 @@ serve(async (req) => {
           total_points,
           rank,
           total_wallets,
-          percentile
+          percentile,
+          total_points_pool
         })
         .select();
 

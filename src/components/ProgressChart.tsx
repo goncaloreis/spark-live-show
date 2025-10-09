@@ -8,6 +8,7 @@ interface HistoryData {
   rank: number;
   created_at: string;
   globalAverage?: number;
+  total_points_pool?: number;
 }
 
 interface ProgressChartProps {
