@@ -132,39 +132,54 @@ def scrape_spark_points(wallet_address):
             print(f"Error finding total wallets: {e}")
             total_wallets = 0
         
-        # Find the user's wallet in the leaderboard table
+        # Use the search box to find the wallet
         try:
-            print(f"Searching for wallet {wallet_address} in leaderboard...")
+            print(f"Using search box to find wallet {wallet_address}...")
             
-            # Shortened wallet address format (e.g., "0x6E65...9Cf6")
-            short_wallet = f"{wallet_address[:6].lower()}...{wallet_address[-4:].lower()}"
-            print(f"Looking for shortened format: {short_wallet}")
+            # Find the search input box
+            search_input = wait.until(
+                EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Search by wallet' or contains(@placeholder, 'Search')]"))
+            )
             
-            # Find all table rows
-            rows = driver.find_elements(By.XPATH, "//table//tr")
-            print(f"Found {len(rows)} table rows")
+            print("✓ Found search input")
             
+            # Clear and enter wallet address
+            search_input.clear()
+            search_input.send_keys(wallet_address)
+            print(f"✓ Entered wallet address: {wallet_address}")
+            
+            # Wait for search results to load
+            time.sleep(5)
+            print("Waiting for search results...")
+            
+            # Take another screenshot after search
+            driver.save_screenshot('/tmp/spark_page_search.png')
+            print("Screenshot saved to /tmp/spark_page_search.png")
+            
+            # Now find the wallet in the filtered results
             total_points = 0
             rank = 0
             
-            for row in rows:
-                try:
-                    row_text = row.text.lower()
-                    # Check if this row contains our wallet (check both full and shortened)
-                    if wallet_address.lower() in row_text or short_wallet in row_text:
-                        print(f"✓ Found wallet in row: {row.text[:100]}")
-                        
-                        # Extract cells from this row
+            # Find all table rows after search
+            rows = driver.find_elements(By.XPATH, "//table//tbody//tr")
+            print(f"Found {len(rows)} table rows after search")
+            
+            if len(rows) > 0:
+                # Should only be 1-2 rows after search
+                for row in rows:
+                    try:
                         cells = row.find_elements(By.TAG_NAME, "td")
                         
                         if len(cells) >= 3:
+                            print(f"Row text: {row.text}")
+                            
                             # First cell is rank
                             try:
                                 rank_text = cells[0].text.strip()
                                 rank = int(rank_text)
                                 print(f"✓ Found rank: {rank}")
                             except (ValueError, IndexError) as e:
-                                print(f"Could not parse rank: {e}")
+                                print(f"Could not parse rank from '{cells[0].text}': {e}")
                             
                             # Last cell should be points
                             points_text = cells[-1].text.strip()
@@ -186,18 +201,25 @@ def scrape_spark_points(wallet_address):
                                 
                                 print(f"✓ Found total points: {total_points}")
                             except ValueError as e:
-                                print(f"Could not parse points: {e}")
-                        
-                        break
-                except Exception as e:
-                    continue
+                                print(f"Could not parse points from '{points_text}': {e}")
+                            
+                            # Found the data, break
+                            if total_points > 0:
+                                break
+                    except Exception as e:
+                        print(f"Error processing row: {e}")
+                        continue
+            else:
+                print("Warning: No rows found after search")
             
-            if total_points == 0:
-                print("Warning: Could not find wallet in leaderboard")
-                print("This might mean the wallet needs to be searched for manually")
+            if total_points == 0 or rank == 0:
+                print("Warning: Could not extract valid wallet data after search")
+                print(f"Current values - Points: {total_points}, Rank: {rank}")
                 
         except Exception as e:
-            print(f"Error finding wallet in leaderboard: {e}")
+            print(f"Error searching for wallet: {e}")
+            import traceback
+            traceback.print_exc()
             total_points = 0
             rank = 0
         
