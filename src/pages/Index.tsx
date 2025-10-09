@@ -196,16 +196,15 @@ const Index = () => {
           }
         }
 
-        // Fetch SPK price
+        // Fetch SPK price with caching
         let spkPrice: number | null = null;
         try {
           const { data: priceData, error: priceError } = await supabase.functions.invoke('get-spk-price');
           if (!priceError && priceData?.price) {
             spkPrice = Number(priceData.price);
-            console.log('SPK price fetched:', spkPrice, 'Source:', priceData.source);
           }
         } catch (priceError) {
-          console.error('Error fetching SPK price:', priceError);
+          console.error('Error code: PRICE_FETCH_FAILED');
         }
 
         // Financial projections based on market share and current SPK price

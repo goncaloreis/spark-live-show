@@ -41,6 +41,30 @@ export type Database = {
         }
         Relationships: []
       }
+      spk_price_cache: {
+        Row: {
+          change_24h: number | null
+          created_at: string | null
+          id: string
+          price: number
+          source: string
+        }
+        Insert: {
+          change_24h?: number | null
+          created_at?: string | null
+          id?: string
+          price: number
+          source: string
+        }
+        Update: {
+          change_24h?: number | null
+          created_at?: string | null
+          id?: string
+          price?: number
+          source?: string
+        }
+        Relationships: []
+      }
       wallet_tracking: {
         Row: {
           created_at: string | null
@@ -79,9 +103,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_price_cache: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       cleanup_old_rate_limits: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      get_latest_spk_price: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          change_24h: number
+          created_at: string
+          price: number
+          source: string
+        }[]
       }
       get_latest_wallet_data: {
         Args: { wallet_addr: string }
