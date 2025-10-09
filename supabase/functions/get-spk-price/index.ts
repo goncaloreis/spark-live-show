@@ -14,15 +14,15 @@ serve(async (req) => {
   try {
     console.log('Fetching SPK price from CoinGecko...');
     
-    // Try multiple approaches to get the most accurate SPK price
-    // First, try the simple price API with cache-busting
+    // Use the coins/markets endpoint for more accurate real-time pricing
     const timestamp = Date.now();
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=spark&vs_currencies=usd&include_24hr_change=true&precision=6&_=${timestamp}`,
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=spark&order=market_cap_desc&per_page=1&page=1&sparkline=false&price_change_percentage=24h&_=${timestamp}`,
       {
         headers: {
           'Accept': 'application/json',
           'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
         },
       }
     );
@@ -46,14 +46,12 @@ serve(async (req) => {
     const data = await response.json();
     console.log('CoinGecko response:', JSON.stringify(data));
 
-    // Extract price data from simple price endpoint
-    const priceData = data.spark;
-    
-    if (!priceData || !priceData.usd) {
+    // Extract price data from markets endpoint (returns an array)
+    if (!Array.isArray(data) || data.length === 0) {
       console.error('Invalid price data received from CoinGecko');
       return new Response(
         JSON.stringify({ 
-          price: 0.0475, // Updated fallback based on current market price
+          price: 0.0475,
           change_24h: 0,
           source: 'fallback'
         }),
@@ -64,8 +62,9 @@ serve(async (req) => {
       );
     }
 
-    const currentPrice = priceData.usd;
-    const priceChange24h = priceData.usd_24h_change || 0;
+    const coinData = data[0];
+    const currentPrice = coinData.current_price;
+    const priceChange24h = coinData.price_change_percentage_24h || 0;
 
     console.log(`SPK Price: $${currentPrice}, 24h Change: ${priceChange24h}%`);
 
@@ -85,10 +84,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error fetching SPK price:', error);
     
-    // Return fallback price on error
+    // Return fallback price on error (updated to current approximate price)
     return new Response(
       JSON.stringify({ 
-        price: 0.0475,
+        price: 0.0477,
         change_24h: 0,
         source: 'fallback'
       }),
