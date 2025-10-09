@@ -31,6 +31,9 @@ def setup_firefox_driver():
     firefox_options.add_argument('--window-size=1920,1080')
     firefox_options.set_preference('general.useragent.override', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0')
     
+    # Set Firefox binary location (GitHub Actions path)
+    firefox_options.binary_location = '/usr/bin/firefox'
+    
     driver = webdriver.Firefox(options=firefox_options)
     return driver
 
