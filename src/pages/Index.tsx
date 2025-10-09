@@ -219,7 +219,7 @@ const Index = () => {
         setStats({
           totalPoints: Number(data.latest.total_points).toLocaleString(),
           rank: data.latest.rank ? `${data.latest.rank}` : '-',
-          percentile: data.latest.percentile || '-',
+          percentile: data.latest.percentile ? data.latest.percentile.replace('Top ', '') : '-',
           totalWallets: data.latest.total_wallets ? data.latest.total_wallets.toLocaleString() : '-',
           pointsGrowth,
           lastUpdated,

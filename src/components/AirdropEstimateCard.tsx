@@ -18,10 +18,13 @@ export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardPro
         <>
           {/* SPK Price Display */}
           {spkPrice && (
-            <div className="flex items-center justify-center gap-2 pb-4 border-b border-white/5">
+            <div className="flex items-center justify-center gap-3 pb-4 border-b border-white/5">
               <div className="flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-primary/60" />
-                <span className="text-xs text-muted-foreground/60 font-medium">Current SPK Price:</span>
+                <div className="relative">
+                  <TrendingUp className="w-4 h-4 text-primary/60" />
+                  <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                </div>
+                <span className="text-xs text-muted-foreground/60 font-medium">Live SPK Price:</span>
                 <span className="text-sm font-bold text-primary">${spkPrice.toFixed(4)}</span>
               </div>
             </div>

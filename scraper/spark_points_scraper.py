@@ -205,7 +205,7 @@ def scrape_spark_points(wallet_address):
         # Calculate percentile if we have rank and total wallets
         if rank > 0 and total_wallets > 0:
             percentile_value = ((total_wallets - rank) / total_wallets) * 100
-            percentile = f"Top {100 - percentile_value:.2f}%"
+            percentile = f"{100 - percentile_value:.2f}%"
         else:
             percentile = "N/A"
         
