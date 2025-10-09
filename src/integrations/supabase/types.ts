@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      rate_limits: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          identifier: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          identifier: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          identifier?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       wallet_tracking: {
         Row: {
           created_at: string | null
@@ -49,6 +76,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_rate_limits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_latest_wallet_data: {
         Args: { wallet_addr: string }
         Returns: {

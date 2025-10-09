@@ -14,6 +14,69 @@ interface WalletData {
   percentile?: string;
 }
 
+// Rate limiting configuration
+const RATE_LIMITS = {
+  get: { requests: 20, windowMinutes: 1 },  // 20 requests per minute for GET
+  store: { requests: 10, windowMinutes: 1 }, // 10 requests per minute for STORE
+  global: { requests: 100, windowMinutes: 60 } // 100 requests per hour per IP
+};
+
+async function checkRateLimit(
+  supabaseClient: any,
+  identifier: string,
+  action: string,
+  limit: number,
+  windowMinutes: number
+): Promise<{ allowed: boolean; retryAfter?: number }> {
+  const windowStart = new Date();
+  windowStart.setMinutes(windowStart.getMinutes() - windowMinutes);
+
+  // Get current count for this identifier and action
+  const { data: existingLimits, error: fetchError } = await supabaseClient
+    .from('rate_limits')
+    .select('request_count, window_start')
+    .eq('identifier', identifier)
+    .eq('action', action)
+    .gte('window_start', windowStart.toISOString())
+    .order('window_start', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = no rows returned
+    console.error('Error fetching rate limit:', fetchError);
+    return { allowed: true }; // Fail open to avoid blocking legitimate requests
+  }
+
+  if (!existingLimits) {
+    // First request in this window
+    await supabaseClient.from('rate_limits').insert({
+      identifier,
+      action,
+      request_count: 1,
+      window_start: new Date().toISOString()
+    });
+    return { allowed: true };
+  }
+
+  const currentCount = existingLimits.request_count;
+
+  if (currentCount >= limit) {
+    const windowStartTime = new Date(existingLimits.window_start);
+    const retryAfter = Math.ceil((windowStartTime.getTime() + windowMinutes * 60000 - Date.now()) / 1000);
+    return { allowed: false, retryAfter };
+  }
+
+  // Increment counter
+  await supabaseClient
+    .from('rate_limits')
+    .update({ request_count: currentCount + 1 })
+    .eq('identifier', identifier)
+    .eq('action', action)
+    .eq('window_start', existingLimits.window_start);
+
+  return { allowed: true };
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -21,6 +84,43 @@ serve(async (req) => {
   }
 
   try {
+    // Initialize Supabase client early for rate limiting
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Get client IP for rate limiting
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+
+    // Check global IP rate limit
+    const globalLimit = await checkRateLimit(
+      supabaseClient,
+      clientIP,
+      'global',
+      RATE_LIMITS.global.requests,
+      RATE_LIMITS.global.windowMinutes
+    );
+
+    if (!globalLimit.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Rate limit exceeded. Too many requests from your IP address.',
+          retry_after: globalLimit.retryAfter 
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': String(globalLimit.retryAfter || 60)
+          } 
+        }
+      );
+    }
+
     // Parse request body ONCE
     const body = await req.json();
     const { wallet_address, action = 'get', total_points, rank, total_wallets, percentile } = body;
@@ -40,11 +140,42 @@ serve(async (req) => {
       );
     }
 
-    // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    // Check action-specific rate limits
+    const actionLimit = RATE_LIMITS[action as keyof typeof RATE_LIMITS];
+    if (actionLimit) {
+      const identifier = action === 'get' ? wallet_address : clientIP;
+      const limitCheck = await checkRateLimit(
+        supabaseClient,
+        identifier,
+        action,
+        actionLimit.requests,
+        actionLimit.windowMinutes
+      );
+
+      if (!limitCheck.allowed) {
+        return new Response(
+          JSON.stringify({ 
+            error: `Rate limit exceeded for ${action} action. Please try again later.`,
+            retry_after: limitCheck.retryAfter 
+          }),
+          { 
+            status: 429, 
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json',
+              'Retry-After': String(limitCheck.retryAfter || 60)
+            } 
+          }
+        );
+      }
+    }
+
+    // Periodically cleanup old rate limit records (1% chance per request)
+    if (Math.random() < 0.01) {
+      supabaseClient.rpc('cleanup_old_rate_limits').then(() => {
+        console.log('Rate limit cleanup triggered');
+      });
+    }
 
     if (action === 'get') {
       // Get latest data for wallet
