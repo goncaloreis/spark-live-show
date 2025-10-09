@@ -28,12 +28,11 @@ const Index = () => {
     marketShare: "-",
     shareChange: "-",
     paceStatus: "NEUTRAL",
-    airdropEstimates: {
-      "150M": "-",
-      "200M": "-",
-      "250M": "-",
-      "300M": "-"
-    }
+          airdropEstimates: {
+            "150M": "-",
+            "200M": "-",
+            "250M": "-"
+          }
   });
 
   const handleSearch = async () => {
@@ -117,12 +116,12 @@ const Index = () => {
         }
 
         // Financial projections based on market share
+        // Assuming SPK token price of €1 per token
         const share = parseFloat(marketShare) / 100 || 0;
         const airdropEstimates = {
-          "150M": share > 0 ? `€${(150000000 * share * 0.001).toFixed(2)}` : "-",
-          "200M": share > 0 ? `€${(200000000 * share * 0.001).toFixed(2)}` : "-",
-          "250M": share > 0 ? `€${(250000000 * share * 0.001).toFixed(2)}` : "-",
-          "300M": share > 0 ? `€${(300000000 * share * 0.001).toFixed(2)}` : "-"
+          "150M": share > 0 ? `€${(150000000 * share * 1).toFixed(2)}` : "-",
+          "200M": share > 0 ? `€${(200000000 * share * 1).toFixed(2)}` : "-",
+          "250M": share > 0 ? `€${(250000000 * share * 1).toFixed(2)}` : "-",
         };
 
         // Format last updated time
@@ -165,8 +164,7 @@ const Index = () => {
           airdropEstimates: {
             "150M": "-",
             "200M": "-",
-            "250M": "-",
-            "300M": "-"
+            "250M": "-"
           }
         });
         setHistoryData([]);
@@ -358,20 +356,16 @@ const Index = () => {
                     </div>
                     <div className="space-y-1">
                       <KPICard 
-                        label="150M Airdrop Est." 
+                        label="150M SPK Airdrop" 
                         value={stats.airdropEstimates["150M"]}
                       />
                       <KPICard 
-                        label="200M Airdrop Est." 
+                        label="200M SPK Airdrop" 
                         value={stats.airdropEstimates["200M"]}
                       />
                       <KPICard 
-                        label="250M Airdrop Est." 
+                        label="250M SPK Airdrop" 
                         value={stats.airdropEstimates["250M"]}
-                      />
-                      <KPICard 
-                        label="300M Airdrop Est." 
-                        value={stats.airdropEstimates["300M"]}
                       />
                     </div>
                   </div>
