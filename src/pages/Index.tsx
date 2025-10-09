@@ -26,8 +26,10 @@ const Index = () => {
     lastUpdated: "-",
     pointsChange: "-",
     rankChange: { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' },
+    percentileChange: { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' },
     marketShare: "-",
     shareChange: "-",
+    shareChangeObj: { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' },
     paceStatus: "NEUTRAL",
           airdropEstimates: {
             "150M": { low: "-", high: "-" },
@@ -116,8 +118,10 @@ const Index = () => {
         let pointsGrowth = "-";
         let pointsChange = "-";
         let rankChange = { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' };
+        let percentileChange = { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' };
         let marketShare = "-";
         let shareChange = "-";
+        let shareChangeObj = { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' };
         let paceStatus = "NEUTRAL";
         
         if (history.length >= 2) {
@@ -151,6 +155,25 @@ const Index = () => {
         const totalWallets = data.latest.total_wallets || 0;
         const totalPointsPool = data.latest.total_points_pool ? Number(data.latest.total_points_pool) : null;
         
+        // Calculate percentile change if we have history and rank data
+        if (history.length >= 2 && totalWallets > 0) {
+          const latestRank = history[history.length - 1].rank;
+          const previousRank = history[history.length - 2].rank;
+          
+          if (latestRank && previousRank) {
+            const currentPercentile = ((totalWallets - latestRank) / totalWallets) * 100;
+            const previousPercentile = ((totalWallets - previousRank) / totalWallets) * 100;
+            const percentileDiff = currentPercentile - previousPercentile;
+            
+            if (Math.abs(percentileDiff) > 0.01) {
+              percentileChange = {
+                value: `${Math.abs(percentileDiff).toFixed(2)}%`,
+                direction: percentileDiff > 0 ? 'up' : 'down'
+              };
+            }
+          }
+        }
+        
         // Calculate global average: total pool / total wallets
         const globalAverage = totalPointsPool && totalWallets > 0 
           ? totalPointsPool / totalWallets 
@@ -167,6 +190,14 @@ const Index = () => {
             const prevShare = (prevPoints / prevPool) * 100;
             const shareDiff = share - prevShare;
             shareChange = shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`;
+            
+            // Create change object for Pool Share indicator
+            if (Math.abs(shareDiff) > 0.0000001) {
+              shareChangeObj = {
+                value: shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`,
+                direction: shareDiff > 0 ? 'up' : shareDiff < 0 ? 'down' : 'neutral'
+              };
+            }
           }
         }
 
@@ -204,8 +235,10 @@ const Index = () => {
           lastUpdated,
           pointsChange,
           rankChange,
+          percentileChange,
           marketShare,
           shareChange,
+          shareChangeObj,
           paceStatus,
           airdropEstimates
         });
@@ -228,8 +261,10 @@ const Index = () => {
           lastUpdated: "-",
           pointsChange: "-",
           rankChange: { value: "-", direction: 'neutral' },
+          percentileChange: { value: "-", direction: 'neutral' },
           marketShare: "-",
           shareChange: "-",
+          shareChangeObj: { value: "-", direction: 'neutral' },
           paceStatus: "NEUTRAL",
           airdropEstimates: {
             "150M": { low: "-", high: "-" },
@@ -432,6 +467,7 @@ const Index = () => {
                       <KPICard 
                         label="Percentile" 
                         value={stats.percentile !== "-" ? `Top ${stats.percentile}` : "-"}
+                        change={stats.percentileChange.value !== "-" ? stats.percentileChange : undefined}
                       />
                     </div>
                   </div>
@@ -449,25 +485,15 @@ const Index = () => {
                       <KPICard 
                         label="Pool Share" 
                         value={stats.marketShare}
+                        change={stats.shareChangeObj.value !== "-" ? stats.shareChangeObj : undefined}
                       />
                        <KPICard 
                         label="Share Change" 
                         value={stats.shareChange}
-                        change={stats.shareChange !== "-" ? {
-                          value: stats.shareChange,
-                          direction: stats.shareChange.startsWith('+') ? 'up' : stats.shareChange.startsWith('-') ? 'down' : 'neutral'
-                        } : undefined}
                       />
                       <KPICard 
                         label="Pace Status" 
                         value={stats.paceStatus}
-                        change={stats.paceStatus === "GAINING" ? {
-                          value: "GAINING",
-                          direction: 'up'
-                        } : stats.paceStatus === "LOSING" ? {
-                          value: "LOSING",
-                          direction: 'down'
-                        } : undefined}
                       />
                     </div>
                   </div>
