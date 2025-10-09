@@ -11,26 +11,31 @@ interface StatsCardProps {
 
 export const StatsCard = ({ title, value, icon: Icon, trend, loading }: StatsCardProps) => {
   return (
-    <Card className="relative overflow-hidden border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_30px_hsl(var(--primary)/0.2)] hover:border-primary/30">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      <div className="relative p-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            {loading ? (
-              <div className="h-8 w-32 animate-pulse rounded bg-muted" />
-            ) : (
-              <h3 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-                {value}
-              </h3>
-            )}
-            {trend && (
-              <p className="text-xs text-secondary font-medium">{trend}</p>
-            )}
+    <Card className="group relative overflow-hidden glass glass-hover shadow-card">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700" />
+      
+      <div className="relative p-8">
+        <div className="flex items-start justify-between mb-6">
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 group-hover:scale-110 group-hover:border-primary/30 transition-all duration-300">
+            <Icon className="h-5 w-5 text-primary" />
           </div>
-          <div className="rounded-full bg-primary/10 p-3 ring-1 ring-primary/20">
-            <Icon className="h-6 w-6 text-primary" />
-          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{title}</p>
+          {loading ? (
+            <div className="h-10 w-32 animate-pulse rounded-lg bg-muted/30" />
+          ) : (
+            <h3 className="text-4xl font-bold text-gradient leading-none">
+              {value}
+            </h3>
+          )}
+          {trend && (
+            <p className="text-sm text-secondary/90 font-medium flex items-center gap-1">
+              {trend}
+            </p>
+          )}
         </div>
       </div>
     </Card>

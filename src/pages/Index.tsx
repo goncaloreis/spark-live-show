@@ -191,112 +191,120 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Gradient Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-primary/20 rounded-full blur-[150px] opacity-30" />
-        <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-secondary/20 rounded-full blur-[150px] opacity-20" />
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Modern mesh gradient background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0" style={{ background: 'var(--gradient-mesh)' }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-primary/20 rounded-full blur-[150px] animate-float" />
+        <div className="absolute bottom-0 right-1/4 w-[800px] h-[800px] bg-secondary/15 rounded-full blur-[120px]" style={{ animationDelay: '3s' }} />
       </div>
 
-      <div className="relative">
-        {/* Hero Section with Search */}
-        <header className="border-b border-border/50 backdrop-blur-xl bg-background/80">
-          <div className="container mx-auto px-4 py-12">
-            <div className="max-w-4xl mx-auto">
-              {/* Logo and Title */}
-              <div className="flex items-center justify-center gap-3 mb-8">
-                <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary shadow-glow animate-in zoom-in duration-500">
-                  <Sparkles className="w-8 h-8 text-white" />
+      <div className="relative z-10">
+        {/* Sleek Header */}
+        <header className="border-b border-white/5 backdrop-blur-2xl bg-card/30">
+          <div className="container mx-auto px-6 py-8">
+            <div className="max-w-5xl mx-auto">
+              {/* Modern Logo Section */}
+              <div className="flex items-center justify-center gap-4 mb-10">
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-3xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl glass border border-white/10 group-hover:scale-110 transition-transform duration-300">
+                    <Sparkles className="w-8 h-8 text-primary" />
+                  </div>
                 </div>
-                <div className="text-center">
-                  <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-primary-glow to-secondary bg-clip-text text-transparent">
+                <div>
+                  <h1 className="text-5xl font-bold text-gradient tracking-tight">
                     Spark Points Tracker
                   </h1>
-                  <p className="text-muted-foreground mt-2">Monitor your DeFi rewards in real-time</p>
+                  <p className="text-muted-foreground/70 mt-1 font-medium">Real-time DeFi performance analytics</p>
                 </div>
               </div>
 
-              {/* Prominent Search Bar */}
-              <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur-xl" />
-                  <Card className="relative border-2 border-primary/20 bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm shadow-2xl">
-                    <div className="p-8">
-                      <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
-                          <Input
-                            placeholder="Enter wallet address (0x...)"
-                            value={walletAddress}
-                            onChange={(e) => setWalletAddress(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            className="h-14 text-lg bg-input/50 border-border/50 focus-visible:ring-2 focus-visible:ring-primary"
-                          />
-                        </div>
-                        <Button 
-                          onClick={handleSearch}
-                          disabled={loading}
-                          size="lg"
-                          className="h-14 px-12 text-lg bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-all hover:scale-105"
-                        >
-                          {loading ? (
-                            <>
-                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                              Searching...
-                            </>
-                          ) : (
-                            <>
-                              <Search className="w-5 h-5 mr-2" />
-                              Track Wallet
-                            </>
-                          )}
-                        </Button>
+              {/* Premium Search Card */}
+              <div className="relative group">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
+                <Card className="relative glass border-white/10 shadow-2xl">
+                  <div className="p-8">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex-1">
+                        <Input
+                          placeholder="Enter wallet address (0x...)"
+                          value={walletAddress}
+                          onChange={(e) => setWalletAddress(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                          className="h-14 text-base glass border-white/5 focus-visible:border-primary/50 focus-visible:ring-primary/30 transition-all duration-300"
+                        />
                       </div>
-                      <p className="text-xs text-center mt-4 text-muted-foreground">
-                        Data sourced from{" "}
-                        <a 
-                          href="https://points.spark.fi/" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary hover:text-primary-glow transition-colors font-medium"
-                        >
-                          points.spark.fi
-                        </a>
-                      </p>
+                      <Button 
+                        onClick={handleSearch}
+                        disabled={loading}
+                        size="lg"
+                        className="h-14 px-10 text-base bg-gradient-to-r from-primary to-secondary hover:opacity-90 border-0 shadow-glow transition-all duration-300 hover:scale-[1.02]"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                            Searching...
+                          </>
+                        ) : (
+                          <>
+                            <Search className="w-5 h-5 mr-2" />
+                            Track Wallet
+                          </>
+                        )}
+                      </Button>
                     </div>
-                  </Card>
-                </div>
+                    <p className="text-xs text-center mt-5 text-muted-foreground/60">
+                      Data powered by{" "}
+                      <a 
+                        href="https://points.spark.fi/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:text-primary-glow transition-colors font-medium"
+                      >
+                        points.spark.fi
+                      </a>
+                    </p>
+                  </div>
+                </Card>
               </div>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="container mx-auto px-4 py-12">
+        <main className="container mx-auto px-6 py-16 max-w-7xl">
 
           {/* Stats Grid */}
           {hasSearched && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              {/* Last Updated Badge */}
+            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              {/* Live Status Badge */}
               {stats.lastUpdated !== "-" && (
                 <div className="flex justify-center">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    <span className="text-sm text-muted-foreground">
-                      Last updated: <span className="text-foreground font-medium">{stats.lastUpdated}</span>
-                    </span>
+                  <div className="glass border border-white/10 px-5 py-2.5 rounded-full shadow-sm backdrop-blur-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                        <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-primary animate-ping" />
+                      </div>
+                      <span className="text-sm font-medium">
+                        <span className="text-muted-foreground/70">Last update:</span>{" "}
+                        <span className="text-foreground">{stats.lastUpdated}</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* KPIs Section */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Award className="w-4 h-4 text-primary" />
+                <Card className="glass glass-hover border-white/10 shadow-card">
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2.5 rounded-xl glass border border-primary/20">
+                        <Award className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="font-bold text-lg">Your KPIs</h3>
+                      <h3 className="font-bold text-lg tracking-tight">Your KPIs</h3>
                     </div>
                     <div className="space-y-1">
                       <KPICard 
@@ -323,13 +331,13 @@ const Index = () => {
                   </div>
                 </Card>
 
-                <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
-                        <PieChart className="w-4 h-4 text-secondary" />
+                <Card className="glass glass-hover border-white/10 shadow-card">
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2.5 rounded-xl glass border border-secondary/20">
+                        <PieChart className="w-5 h-5 text-secondary" />
                       </div>
-                      <h3 className="font-bold text-lg">Market Share</h3>
+                      <h3 className="font-bold text-lg tracking-tight">Market Share</h3>
                     </div>
                     <div className="space-y-1">
                       <KPICard 
@@ -359,13 +367,13 @@ const Index = () => {
                   </div>
                 </Card>
 
-                <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <DollarSign className="w-4 h-4 text-primary" />
+                <Card className="glass glass-hover border-white/10 shadow-card">
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-2.5 rounded-xl glass border border-primary/20">
+                        <DollarSign className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="font-bold text-lg">Financial Projections</h3>
+                      <h3 className="font-bold text-lg tracking-tight">Financial Projections</h3>
                     </div>
                     <div className="space-y-1">
                       <AirdropEstimateCard 
