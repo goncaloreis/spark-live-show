@@ -19,15 +19,21 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Firefox and geckodriver
+      - name: Setup Firefox
         run: |
-          sudo apt-get update
-          sudo apt-get install -y firefox
+          # Firefox is pre-installed on ubuntu-latest, but let's ensure it's available
+          firefox --version || sudo apt-get install -y firefox
+          
           # Install geckodriver
-          wget -q https://github.com/mozilla/geckodriver/releases/download/v0.35.0/geckodriver-v0.35.0-linux64.tar.gz
-          tar -xzf geckodriver-v0.35.0-linux64.tar.gz
+          GECKODRIVER_VERSION="0.35.0"
+          wget -q "https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
+          tar -xzf "geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
           sudo mv geckodriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/geckodriver
+          
+          # Verify installations
+          firefox --version
+          geckodriver --version
 
       - name: Install Python dependencies
         run: |

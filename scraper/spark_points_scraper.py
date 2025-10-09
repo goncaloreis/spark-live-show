@@ -28,17 +28,33 @@ def setup_firefox_driver():
     firefox_options.add_argument('--headless')
     firefox_options.add_argument('--no-sandbox')
     firefox_options.add_argument('--disable-dev-shm-usage')
+    firefox_options.add_argument('--disable-gpu')
     firefox_options.add_argument('--window-size=1920,1080')
-    firefox_options.set_preference('general.useragent.override', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0')
     
-    # Set Firefox binary location (GitHub Actions path)
-    firefox_options.binary_location = '/usr/bin/firefox'
+    # Set user agent
+    firefox_options.set_preference('general.useragent.override', 
+                                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0')
     
-    # Explicitly set geckodriver service
-    service = Service('/usr/local/bin/geckodriver')
+    # Disable automation flags
+    firefox_options.set_preference('dom.webdriver.enabled', False)
+    firefox_options.set_preference('useAutomationExtension', False)
     
-    driver = webdriver.Firefox(service=service, options=firefox_options)
-    return driver
+    # Set log level to reduce noise
+    service = Service('/usr/local/bin/geckodriver', log_path='/tmp/geckodriver.log')
+    
+    try:
+        driver = webdriver.Firefox(service=service, options=firefox_options)
+        print(f"Firefox driver initialized successfully")
+        return driver
+    except Exception as e:
+        print(f"Failed to initialize Firefox driver: {e}")
+        print("Attempting with explicit binary path...")
+        
+        # Try with explicit binary path as fallback
+        firefox_options.binary_location = '/usr/bin/firefox'
+        driver = webdriver.Firefox(service=service, options=firefox_options)
+        print(f"Firefox driver initialized with explicit binary path")
+        return driver
 
 def scrape_spark_points(wallet_address):
     """Scrape Spark Points data for the given wallet"""
