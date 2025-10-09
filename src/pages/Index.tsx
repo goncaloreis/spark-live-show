@@ -36,6 +36,45 @@ const Index = () => {
           }
   });
 
+  const handleManualScrape = async () => {
+    if (!walletAddress) {
+      toast.error("Please enter a wallet address first");
+      return;
+    }
+
+    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+      toast.error("Invalid wallet address format");
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      console.log('Triggering manual scrape...');
+      const { data, error } = await supabase.functions.invoke('scrape-spark-points', {
+        body: { walletAddress }
+      });
+
+      console.log('Scrape response:', { data, error });
+
+      if (error) {
+        console.error('Scrape error:', error);
+        throw error;
+      }
+
+      toast.success("Manual scrape completed! Refreshing data...");
+      
+      // Wait a moment then fetch the updated data
+      setTimeout(() => {
+        handleSearch();
+      }, 2000);
+    } catch (error) {
+      console.error('Error triggering scrape:', error);
+      toast.error(`Failed to trigger scrape: ${error.message || 'Please try again'}`);
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async () => {
     console.log('handleSearch called with address:', walletAddress);
     
@@ -283,6 +322,34 @@ const Index = () => {
                             <Search className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                             <span className="hidden sm:inline">Track Wallet</span>
                             <span className="sm:hidden">Track</span>
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        onClick={(e) => {
+                          console.log('Manual scrape clicked!');
+                          e.preventDefault();
+                          if (!loading) {
+                            handleManualScrape();
+                          }
+                        }}
+                        disabled={loading}
+                        type="button"
+                        variant="outline"
+                        size="lg"
+                        className="h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin mr-2" />
+                            <span className="hidden sm:inline">Testing...</span>
+                            <span className="sm:hidden">Testing</span>
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                            <span className="hidden sm:inline">Test Scrape</span>
+                            <span className="sm:hidden">Test</span>
                           </>
                         )}
                       </Button>
