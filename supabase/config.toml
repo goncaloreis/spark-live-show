@@ -1,1 +1,4 @@
 project_id = "jubjoxthawbxyxajvlcv"
+
+[functions.track-wallet]
+verify_jwt = false

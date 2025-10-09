@@ -3,20 +3,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { StatsCard } from "@/components/StatsCard";
+import { ProgressChart } from "@/components/ProgressChart";
 import { Sparkles, TrendingUp, Users, Award, Search } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [walletAddress, setWalletAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [historyData, setHistoryData] = useState<any[]>([]);
   
-  // Mock data - will be replaced with real API calls
   const [stats, setStats] = useState({
-    totalPoints: "1,234,567",
-    rank: "#142",
-    percentile: "Top 2.3%",
-    totalWallets: "6,180"
+    totalPoints: "0",
+    rank: "-",
+    percentile: "-",
+    totalWallets: "-"
   });
 
   const handleSearch = async () => {
@@ -33,11 +35,48 @@ const Index = () => {
     setLoading(true);
     setHasSearched(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Call the backend function to get wallet data
+      const { data, error } = await supabase.functions.invoke('track-wallet', {
+        body: { 
+          wallet_address: walletAddress,
+          action: 'get'
+        }
+      });
+
+      if (error) throw error;
+
+      console.log('Received wallet data:', data);
+
+      if (data.has_data && data.latest) {
+        // Update stats with real data
+        setStats({
+          totalPoints: Number(data.latest.total_points).toLocaleString(),
+          rank: data.latest.rank ? `#${data.latest.rank}` : '-',
+          percentile: data.latest.percentile || '-',
+          totalWallets: data.latest.total_wallets ? data.latest.total_wallets.toLocaleString() : '-'
+        });
+        
+        // Update history for chart
+        setHistoryData(data.history || []);
+        
+        toast.success("Wallet data loaded successfully");
+      } else {
+        toast.info("No data found for this wallet yet. Connect your Python agent to start tracking!");
+        setStats({
+          totalPoints: "0",
+          rank: "-",
+          percentile: "-",
+          totalWallets: "-"
+        });
+        setHistoryData([]);
+      }
+    } catch (error) {
+      console.error('Error fetching wallet data:', error);
+      toast.error("Failed to load wallet data. Please try again.");
+    } finally {
       setLoading(false);
-      toast.success("Wallet data loaded successfully");
-    }, 1500);
+    }
   };
 
   return (
@@ -155,40 +194,40 @@ const Index = () => {
                 />
               </div>
 
-              {/* Progress Chart Placeholder */}
-              <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
-                <div className="p-8">
-                  <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-primary" />
-                    Points Progress
-                  </h3>
-                  <div className="h-[300px] flex items-center justify-center border border-dashed border-border/50 rounded-lg bg-muted/20">
-                    <div className="text-center space-y-2">
-                      <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                        <TrendingUp className="w-8 h-8 text-primary" />
-                      </div>
-                      <p className="text-muted-foreground">Chart visualization coming soon</p>
-                      <p className="text-xs text-muted-foreground/60">
-                        Historical data will be displayed here
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              {/* Progress Chart */}
+              <ProgressChart data={historyData} loading={loading} />
 
-              {/* Info Card */}
+              {/* Integration Info Card */}
               <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-sm">
                 <div className="p-6">
                   <div className="flex gap-4">
                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
                       <Sparkles className="w-5 h-5 text-primary" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold mb-1">Need Backend Integration?</h4>
-                      <p className="text-sm text-muted-foreground">
-                        This is currently displaying mock data. Connect the Python agent to enable real-time tracking, 
-                        data persistence, and historical charts.
-                      </p>
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="font-semibold mb-1">Connect Your Python Agent</h4>
+                        <p className="text-sm text-muted-foreground">
+                          To enable real-time tracking, modify your Python agent to send data to this backend API.
+                        </p>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-4 text-xs font-mono">
+                        <p className="text-muted-foreground mb-2">Add this to your Python script:</p>
+                        <code className="block text-foreground">
+                          import requests<br/>
+                          <br/>
+                          url = "{import.meta.env.VITE_SUPABASE_URL}/functions/v1/track-wallet"<br/>
+                          data = {'{'}  <br/>
+                          &nbsp;&nbsp;"wallet_address": "0x...",<br/>
+                          &nbsp;&nbsp;"action": "store",<br/>
+                          &nbsp;&nbsp;"total_points": 1234567,<br/>
+                          &nbsp;&nbsp;"rank": 142,<br/>
+                          &nbsp;&nbsp;"total_wallets": 6180,<br/>
+                          &nbsp;&nbsp;"percentile": "Top 2.3%"<br/>
+                          {'}'}<br/>
+                          requests.post(url, json=data)
+                        </code>
+                      </div>
                     </div>
                   </div>
                 </div>
