@@ -83,36 +83,43 @@ def scrape_spark_points(wallet_address):
         
         wait = WebDriverWait(driver, 30)
         
-        # Extract Wallet Points (Total Points)
-        # Using more flexible XPath that looks for specific text patterns
+        # Extract all numeric values first
+        print("Extracting all numeric values from page...")
+        all_numbers = []
         try:
-            print("Searching for wallet points...")
-            # Look for large numbers that could be points (with commas, typically 5+ digits)
-            points_elements = driver.find_elements(By.XPATH, "//span[contains(@class, 'sc-') or contains(@class, 'text-')]")
+            numeric_elements = driver.find_elements(By.XPATH, "//*[contains(@class, 'sc-') or contains(@class, 'text-')]")
             
-            candidates = []
-            for elem in points_elements:
+            for elem in numeric_elements:
                 text = elem.text.strip()
-                # Look for numbers with commas (e.g., "1,234,567")
-                if text and ',' in text:
+                if text and (',' in text or text.replace('.', '').isdigit()):
                     try:
-                        # Remove commas and try to convert to float
                         cleaned = text.replace(',', '').replace(' ', '')
-                        if cleaned.replace('.', '').isdigit():
-                            value = float(cleaned)
-                            if value > 100:  # Points are typically > 100
-                                candidates.append((value, elem))
-                                print(f"Found candidate points value: {value}")
+                        if cleaned.replace('.', '').replace('#', '').isdigit():
+                            value = float(cleaned.replace('#', ''))
+                            if value > 0:
+                                all_numbers.append(value)
+                                print(f"Found numeric value: {value}")
                     except ValueError:
                         continue
+        except Exception as e:
+            print(f"Error extracting numbers: {e}")
+        
+        # Sort numbers to identify different metrics
+        all_numbers.sort()
+        print(f"All numbers found (sorted): {all_numbers}")
+        
+        # Extract Wallet Points (user's points - typically in millions, 1-10M range)
+        try:
+            print("Searching for wallet points...")
+            total_points = 0
+            for num in all_numbers:
+                if 100000 < num < 50000000:  # Between 100K and 50M (user points range)
+                    total_points = num
+                    print(f"✓ Found wallet points: {total_points}")
+                    break
             
-            if candidates:
-                # Take the largest value as total points
-                total_points = max(candidates, key=lambda x: x[0])[0]
-                print(f"✓ Found wallet points: {total_points}")
-            else:
-                print("No points found, defaulting to 0")
-                total_points = 0
+            if total_points == 0:
+                print("No valid points found, defaulting to 0")
                 
         except Exception as e:
             print(f"Error finding wallet points: {e}")
@@ -143,53 +150,35 @@ def scrape_spark_points(wallet_address):
             print(f"Error finding rank: {e}")
             rank = 0
         
-        # Extract Total Wallets
+        # Extract Total Wallets (typically 10,000-20,000 range)
         try:
             print("Searching for total wallets...")
-            # Look for medium-sized numbers (typically 3-5 digits)
-            all_text_elements = driver.find_elements(By.XPATH, "//*[contains(@class, 'sc-') or contains(@class, 'text-')]")
+            total_wallets = 0
+            for num in all_numbers:
+                if 5000 <= num <= 50000:  # Between 5K and 50K (wallet count range)
+                    total_wallets = int(num)
+                    print(f"✓ Found total wallets: {total_wallets}")
+                    break
             
-            for elem in all_text_elements:
-                text = elem.text.strip()
-                # Look for numbers between 1,000 and 999,999 (typical wallet counts)
-                if text.replace(',', '').isdigit():
-                    try:
-                        value = int(text.replace(',', ''))
-                        if 1000 <= value <= 999999 and value != total_points:
-                            total_wallets = value
-                            print(f"✓ Found total wallets: {total_wallets}")
-                            break
-                    except ValueError:
-                        continue
-            else:
+            if total_wallets == 0:
                 print("No total wallets found, defaulting to 0")
-                total_wallets = 0
                 
         except Exception as e:
             print(f"Error finding total wallets: {e}")
             total_wallets = 0
         
-        # Extract Total Points Pool
+        # Extract Total Points Pool (very large number, typically 100B+ range)
         try:
             print("Searching for total points pool...")
-            # Look for very large numbers (typically in millions or billions)
-            pool_elements = driver.find_elements(By.XPATH, "//span[contains(@class, 'sc-') or contains(@class, 'text-')]")
+            total_points_pool = 0
+            for num in reversed(all_numbers):  # Start from largest
+                if num > 1000000000:  # Larger than 1 billion (pool range)
+                    total_points_pool = num
+                    print(f"✓ Found total points pool: {total_points_pool}")
+                    break
             
-            for elem in pool_elements:
-                text = elem.text.strip()
-                if text.replace(',', '').replace('.', '').isdigit():
-                    try:
-                        value = float(text.replace(',', ''))
-                        # Pool is typically much larger than individual points
-                        if value > total_points * 100:
-                            total_points_pool = value
-                            print(f"✓ Found total points pool: {total_points_pool}")
-                            break
-                    except ValueError:
-                        continue
-            else:
+            if total_points_pool == 0:
                 print("No total points pool found, defaulting to 0")
-                total_points_pool = 0
                 
         except Exception as e:
             print(f"Error finding total points pool: {e}")
