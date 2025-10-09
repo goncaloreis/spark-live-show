@@ -14,13 +14,15 @@ serve(async (req) => {
   try {
     console.log('Fetching SPK price from CoinGecko...');
     
-    // Fetch SPK token price from CoinGecko using the detailed endpoint for real-time pricing
-    // Using "spark" as the ID for Spark Protocol's SPK token
+    // Try multiple approaches to get the most accurate SPK price
+    // First, try the simple price API with cache-busting
+    const timestamp = Date.now();
     const response = await fetch(
-      'https://api.coingecko.com/api/v3/coins/spark?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false',
+      `https://api.coingecko.com/api/v3/simple/price?ids=spark&vs_currencies=usd&include_24hr_change=true&precision=6&_=${timestamp}`,
       {
         headers: {
           'Accept': 'application/json',
+          'Cache-Control': 'no-cache',
         },
       }
     );
@@ -30,7 +32,7 @@ serve(async (req) => {
       // Return fallback price if API fails
       return new Response(
         JSON.stringify({ 
-          price: 0.07, // Fallback price based on recent data
+          price: 0.0475, // Updated fallback based on current market price
           change_24h: 0,
           source: 'fallback'
         }),
@@ -42,16 +44,16 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('CoinGecko detailed response received');
+    console.log('CoinGecko response:', JSON.stringify(data));
 
-    // Extract price data from the detailed market_data object
-    const marketData = data.market_data;
+    // Extract price data from simple price endpoint
+    const priceData = data.spark;
     
-    if (!marketData || !marketData.current_price || !marketData.current_price.usd) {
-      console.error('Invalid price data from CoinGecko');
+    if (!priceData || !priceData.usd) {
+      console.error('Invalid price data from CoinGecko:', data);
       return new Response(
         JSON.stringify({ 
-          price: 0.07,
+          price: 0.0475, // Updated fallback based on current market price
           change_24h: 0,
           source: 'fallback'
         }),
@@ -62,16 +64,16 @@ serve(async (req) => {
       );
     }
 
-    const currentPrice = marketData.current_price.usd;
-    const priceChange24h = marketData.price_change_percentage_24h || 0;
+    const currentPrice = priceData.usd;
+    const priceChange24h = priceData.usd_24h_change || 0;
 
-    console.log(`Real-time SPK Price: $${currentPrice}, 24h Change: ${priceChange24h.toFixed(2)}%`);
+    console.log(`SPK Price: $${currentPrice}, 24h Change: ${priceChange24h}%`);
 
     return new Response(
       JSON.stringify({
         price: currentPrice,
         change_24h: priceChange24h,
-        source: 'coingecko-realtime',
+        source: 'coingecko',
         timestamp: new Date().toISOString()
       }),
       { 
@@ -88,7 +90,7 @@ serve(async (req) => {
     // Return fallback price on error
     return new Response(
       JSON.stringify({ 
-        price: 0.07,
+        price: 0.0475,
         change_24h: 0,
         source: 'fallback',
         error: errorMessage
