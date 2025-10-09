@@ -68,76 +68,131 @@ def scrape_spark_points(wallet_address):
         print(f"Navigating to: {url}")
         driver.get(url)
         
-        # Wait for page to load and content to render
-        time.sleep(8)
+        # Wait longer for page to fully load and JavaScript to execute
+        print("Waiting for page to load...")
+        time.sleep(15)  # Increased wait time for complex React app
+        
+        # Save a screenshot for debugging
+        driver.save_screenshot('/tmp/spark_page.png')
+        print("Screenshot saved to /tmp/spark_page.png")
+        
+        # Get page source for debugging
+        page_source = driver.page_source
+        print(f"Page title: {driver.title}")
+        print(f"Page source length: {len(page_source)} characters")
         
         wait = WebDriverWait(driver, 30)
         
         # Extract Wallet Points (Total Points)
+        # Using more flexible XPath that looks for specific text patterns
         try:
-            wallet_points_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.gtSipa > div.sc-Qotzb.eMnBgD > div > div:nth-child(2) > div.sc-Qotzb.bASAzC > div > div > div > div > div > span:nth-child(3)"
-            wallet_points_element = wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, wallet_points_selector))
-            )
-            total_points = float(wallet_points_element.text.replace(',', '').strip())
-            print(f"Found wallet points: {total_points}")
-        except Exception as e:
-            print(f"Could not find wallet points with primary selector: {e}")
-            # Fallback: try to find by text content
-            try:
-                elements = driver.find_elements(By.XPATH, "//span[contains(@class, 'sc-Qotzb')]")
-                for elem in elements:
-                    text = elem.text.strip()
-                    if text and ',' in text and text.replace(',', '').replace('.', '').isdigit():
-                        total_points = float(text.replace(',', ''))
-                        print(f"Found wallet points via fallback: {total_points}")
-                        break
-                else:
-                    total_points = 0
-            except:
+            print("Searching for wallet points...")
+            # Look for large numbers that could be points (with commas, typically 5+ digits)
+            points_elements = driver.find_elements(By.XPATH, "//span[contains(@class, 'sc-') or contains(@class, 'text-')]")
+            
+            candidates = []
+            for elem in points_elements:
+                text = elem.text.strip()
+                # Look for numbers with commas (e.g., "1,234,567")
+                if text and ',' in text:
+                    try:
+                        # Remove commas and try to convert to float
+                        cleaned = text.replace(',', '').replace(' ', '')
+                        if cleaned.replace('.', '').isdigit():
+                            value = float(cleaned)
+                            if value > 100:  # Points are typically > 100
+                                candidates.append((value, elem))
+                                print(f"Found candidate points value: {value}")
+                    except ValueError:
+                        continue
+            
+            if candidates:
+                # Take the largest value as total points
+                total_points = max(candidates, key=lambda x: x[0])[0]
+                print(f"✓ Found wallet points: {total_points}")
+            else:
+                print("No points found, defaulting to 0")
                 total_points = 0
+                
+        except Exception as e:
+            print(f"Error finding wallet points: {e}")
+            total_points = 0
         
         # Extract Rank
         try:
-            rank_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.gtSipa > div.sc-Qotzb.eMnBgD > div > div:nth-child(2) > div.sc-Qotzb.elVobP > div"
-            rank_element = driver.find_element(By.CSS_SELECTOR, rank_selector)
-            rank_text = rank_element.text.replace(',', '').replace('#', '').strip()
-            rank = int(rank_text)
-            print(f"Found rank: {rank}")
-        except Exception as e:
-            print(f"Could not find rank with primary selector: {e}")
-            # Fallback: look for elements containing rank-like numbers
-            try:
-                elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'sc-Qotzb')]")
-                for elem in elements:
-                    text = elem.text.strip()
-                    if text.startswith('#') or (text.isdigit() and len(text) <= 6):
-                        rank = int(text.replace('#', '').replace(',', ''))
-                        print(f"Found rank via fallback: {rank}")
-                        break
-                else:
-                    rank = 0
-            except:
+            print("Searching for rank...")
+            # Look for numbers with # prefix or standalone numbers (typically 4-6 digits)
+            rank_elements = driver.find_elements(By.XPATH, "//*[contains(text(), '#') or contains(@class, 'rank')]")
+            
+            for elem in rank_elements:
+                text = elem.text.strip()
+                if '#' in text:
+                    try:
+                        rank_text = text.replace('#', '').replace(',', '').strip()
+                        if rank_text.isdigit():
+                            rank = int(rank_text)
+                            print(f"✓ Found rank: {rank}")
+                            break
+                    except ValueError:
+                        continue
+            else:
+                print("No rank found, defaulting to 0")
                 rank = 0
+                
+        except Exception as e:
+            print(f"Error finding rank: {e}")
+            rank = 0
         
         # Extract Total Wallets
         try:
-            total_wallets_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.kKIjLn > div:nth-child(2) > div > div > div.sc-Qotzb.fdPbwR > div > div.sc-Qotzb.fPnMAI > div > div > div > div > div > div.sc-Qotzb.bsZMvR > span"
-            total_wallets_element = driver.find_element(By.CSS_SELECTOR, total_wallets_selector)
-            total_wallets = int(total_wallets_element.text.replace(',', '').strip())
-            print(f"Found total wallets: {total_wallets}")
+            print("Searching for total wallets...")
+            # Look for medium-sized numbers (typically 3-5 digits)
+            all_text_elements = driver.find_elements(By.XPATH, "//*[contains(@class, 'sc-') or contains(@class, 'text-')]")
+            
+            for elem in all_text_elements:
+                text = elem.text.strip()
+                # Look for numbers between 1,000 and 999,999 (typical wallet counts)
+                if text.replace(',', '').isdigit():
+                    try:
+                        value = int(text.replace(',', ''))
+                        if 1000 <= value <= 999999 and value != total_points:
+                            total_wallets = value
+                            print(f"✓ Found total wallets: {total_wallets}")
+                            break
+                    except ValueError:
+                        continue
+            else:
+                print("No total wallets found, defaulting to 0")
+                total_wallets = 0
+                
         except Exception as e:
-            print(f"Could not find total wallets: {e}")
+            print(f"Error finding total wallets: {e}")
             total_wallets = 0
         
         # Extract Total Points Pool
         try:
-            total_points_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.kKIjLn > div:nth-child(1) > div > div > div.sc-Qotzb.fdPbwR > div > div.sc-Qotzb.fPnMAI > div > div > div > div > div > div.sc-Qotzb.bsZMvR > span.sc-Qotzb.jLxnRH"
-            total_pool_element = driver.find_element(By.CSS_SELECTOR, total_points_selector)
-            total_points_pool = float(total_pool_element.text.replace(',', '').strip())
-            print(f"Found total points pool: {total_points_pool}")
+            print("Searching for total points pool...")
+            # Look for very large numbers (typically in millions or billions)
+            pool_elements = driver.find_elements(By.XPATH, "//span[contains(@class, 'sc-') or contains(@class, 'text-')]")
+            
+            for elem in pool_elements:
+                text = elem.text.strip()
+                if text.replace(',', '').replace('.', '').isdigit():
+                    try:
+                        value = float(text.replace(',', ''))
+                        # Pool is typically much larger than individual points
+                        if value > total_points * 100:
+                            total_points_pool = value
+                            print(f"✓ Found total points pool: {total_points_pool}")
+                            break
+                    except ValueError:
+                        continue
+            else:
+                print("No total points pool found, defaulting to 0")
+                total_points_pool = 0
+                
         except Exception as e:
-            print(f"Could not find total points pool: {e}")
+            print(f"Error finding total points pool: {e}")
             total_points_pool = 0
         
         # Calculate percentile if we have rank and total wallets
@@ -179,7 +234,7 @@ def store_data_in_supabase(wallet_address, data):
     
     payload = {
         'action': 'store',
-        'walletAddress': wallet_address,
+        'wallet_address': wallet_address,  # Use snake_case to match edge function
         **data
     }
     
