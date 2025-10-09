@@ -286,8 +286,8 @@ const Index = () => {
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-10 group-hover:opacity-20 transition-all duration-700 pointer-events-none" />
                 <Card className="relative card-premium border shadow-elevated">
                   <div className="p-6 sm:p-8">
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                      <div className="flex-1 relative z-10">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-30">
+                      <div className="flex-1">
                         <Input
                           type="text"
                           placeholder="Enter wallet address (0x...)"
@@ -298,61 +298,63 @@ const Index = () => {
                           autoComplete="off"
                         />
                       </div>
-                      <Button 
-                        onClick={(e) => {
-                          console.log('Button clicked!', { loading, walletAddress });
-                          e.preventDefault();
-                          if (!loading) {
-                            handleSearch();
-                          }
-                        }}
-                        disabled={loading}
-                        type="button"
-                        size="lg"
-                        className="relative z-20 h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        {loading ? (
-                          <>
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
-                            <span className="hidden sm:inline">Analyzing...</span>
-                            <span className="sm:hidden">Loading...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Search className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">Track Wallet</span>
-                            <span className="sm:hidden">Track</span>
-                          </>
-                        )}
-                      </Button>
-                      <Button 
-                        onClick={(e) => {
-                          console.log('Fetch Now clicked!');
-                          e.preventDefault();
-                          if (!loading) {
-                            handleManualScrape();
-                          }
-                        }}
-                        disabled={loading}
-                        type="button"
-                        variant="outline"
-                        size="lg"
-                        className="h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
-                      >
-                        {loading ? (
-                          <>
-                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin mr-2" />
-                            <span className="hidden sm:inline">Fetching...</span>
-                            <span className="sm:hidden">Fetching</span>
-                          </>
-                        ) : (
-                          <>
-                            <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                            <span className="hidden sm:inline">Fetch Now</span>
-                            <span className="sm:hidden">Fetch</span>
-                          </>
-                        )}
-                      </Button>
+                      <div className="flex gap-3">
+                        <Button 
+                          onClick={(e) => {
+                            console.log('Track Wallet clicked!', { loading, walletAddress });
+                            e.preventDefault();
+                            if (!loading) {
+                              handleSearch();
+                            }
+                          }}
+                          disabled={loading}
+                          type="button"
+                          size="lg"
+                          className="flex-1 sm:flex-none h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        >
+                          {loading ? (
+                            <>
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                              <span className="hidden sm:inline">Analyzing...</span>
+                              <span className="sm:hidden">Loading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Search className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                              <span className="hidden sm:inline">Track Wallet</span>
+                              <span className="sm:hidden">Track</span>
+                            </>
+                          )}
+                        </Button>
+                        <Button 
+                          onClick={(e) => {
+                            console.log('Fetch Now clicked!');
+                            e.preventDefault();
+                            if (!loading) {
+                              handleManualScrape();
+                            }
+                          }}
+                          disabled={loading}
+                          type="button"
+                          variant="outline"
+                          size="lg"
+                          className="flex-1 sm:flex-none h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                        >
+                          {loading ? (
+                            <>
+                              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin mr-2" />
+                              <span className="hidden sm:inline">Fetching...</span>
+                              <span className="sm:hidden">Fetching</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                              <span className="hidden sm:inline">Fetch Now</span>
+                              <span className="sm:hidden">Fetch</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
                     <div className="flex items-center justify-center gap-2 mt-5">
                       <div className="h-px w-8 bg-gradient-to-r from-transparent via-border to-transparent" />
