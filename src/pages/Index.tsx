@@ -402,54 +402,6 @@ const Index = () => {
                 <RankChart data={historyData} loading={loading} />
               </div>
 
-              {/* Automation Info Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Integration Info */}
-                <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent backdrop-blur-sm">
-                  <div className="p-6">
-                    <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-primary" />
-                      </div>
-                      <div className="space-y-3 flex-1">
-                        <div>
-                          <h4 className="font-semibold mb-1">Python Agent Connected ✓</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Your tracking agent is sending data to this dashboard automatically.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Automation Setup */}
-                <Card className="border-secondary/20 bg-gradient-to-br from-secondary/5 to-transparent backdrop-blur-sm">
-                  <div className="p-6">
-                    <div className="flex gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 text-secondary" />
-                      </div>
-                      <div className="space-y-3 flex-1">
-                        <div>
-                          <h4 className="font-semibold mb-1">Automate Tracking (Cron Job)</h4>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            Run your script every hour automatically with a cron job:
-                          </p>
-                          <div className="bg-muted/30 rounded-lg p-3 text-xs font-mono overflow-x-auto">
-                            <code className="block text-foreground whitespace-nowrap">
-                              0 * * * * cd /path/to/spark_agent && python3 spark_points_agent.py
-                            </code>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Run <code className="text-primary">crontab -e</code> to add this line
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </div>
             </div>
           )}
 
