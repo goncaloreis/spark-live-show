@@ -110,9 +110,6 @@ const Index = () => {
                 direction: rankDiff > 0 ? 'up' : 'down'
               };
             }
-            
-            // Pace calculation (improving rank = gaining)
-            paceStatus = rankDiff > 0 ? "GAINING" : rankDiff < 0 ? "LOSING" : "STABLE";
           }
         }
 
@@ -182,6 +179,16 @@ const Index = () => {
                 value: `${Math.abs(shareDiff).toFixed(7)}%`,
                 direction: shareDiff > 0 ? 'up' : shareDiff < 0 ? 'down' : 'neutral'
               };
+            }
+            
+            // Pace Status calculation based on pool share changes (more accurate than rank)
+            // Increasing share = gaining ground, decreasing share = losing ground
+            if (shareDiff > 0.0000001) {
+              paceStatus = "GAINING";
+            } else if (shareDiff < -0.0000001) {
+              paceStatus = "LOSING";
+            } else {
+              paceStatus = "STABLE";
             }
           }
         }
