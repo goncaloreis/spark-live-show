@@ -34,7 +34,10 @@ def setup_firefox_driver():
     # Set Firefox binary location (GitHub Actions path)
     firefox_options.binary_location = '/usr/bin/firefox'
     
-    driver = webdriver.Firefox(options=firefox_options)
+    # Explicitly set geckodriver service
+    service = Service('/usr/local/bin/geckodriver')
+    
+    driver = webdriver.Firefox(service=service, options=firefox_options)
     return driver
 
 def scrape_spark_points(wallet_address):
