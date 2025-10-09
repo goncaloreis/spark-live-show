@@ -19,25 +19,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Chrome and ChromeDriver
+      - name: Install Firefox and geckodriver
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget unzip
-          # Install Chrome
-          wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
-          # Get Chrome version
-          CHROME_VERSION=$(google-chrome --version | awk '{print $3}')
-          echo "Chrome version: $CHROME_VERSION"
-          # Extract major version
-          CHROME_MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d. -f1)
-          echo "Chrome major version: $CHROME_MAJOR_VERSION"
-          # Install matching ChromeDriver using webdriver-manager
-          pip install webdriver-manager
+          sudo apt-get install -y firefox
+          # Install geckodriver
+          wget -q https://github.com/mozilla/geckodriver/releases/download/v0.35.0/geckodriver-v0.35.0-linux64.tar.gz
+          tar -xzf geckodriver-v0.35.0-linux64.tar.gz
+          sudo mv geckodriver /usr/local/bin/
+          sudo chmod +x /usr/local/bin/geckodriver
 
       - name: Install Python dependencies
         run: |
-          pip install selenium requests webdriver-manager
+          pip install selenium requests
 
       - name: Run scraper
         env:

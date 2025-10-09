@@ -11,11 +11,10 @@ import time
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 
 # Configuration from environment variables
@@ -23,27 +22,23 @@ SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
 WALLET_ADDRESS = os.environ.get('WALLET_ADDRESS')
 
-def setup_chrome_driver():
-    """Configure Chrome driver for headless operation"""
-    chrome_options = Options()
-    chrome_options.add_argument('--headless=new')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--window-size=1920,1080')
-    chrome_options.add_argument('--disable-blink-features=AutomationControlled')
-    chrome_options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+def setup_firefox_driver():
+    """Configure Firefox driver for headless operation"""
+    firefox_options = Options()
+    firefox_options.add_argument('--headless')
+    firefox_options.add_argument('--no-sandbox')
+    firefox_options.add_argument('--disable-dev-shm-usage')
+    firefox_options.add_argument('--window-size=1920,1080')
+    firefox_options.set_preference('general.useragent.override', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0')
     
-    # Use webdriver-manager to automatically download matching ChromeDriver
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver = webdriver.Firefox(options=firefox_options)
     return driver
 
 def scrape_spark_points(wallet_address):
     """Scrape Spark Points data for the given wallet"""
     print(f"Starting scrape for wallet: {wallet_address}")
     
-    driver = setup_chrome_driver()
+    driver = setup_firefox_driver()
     
     try:
         # Navigate to Spark Points page
