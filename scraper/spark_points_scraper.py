@@ -83,106 +83,123 @@ def scrape_spark_points(wallet_address):
         
         wait = WebDriverWait(driver, 30)
         
-        # Extract all numeric values first
-        print("Extracting all numeric values from page...")
-        all_numbers = []
+        # Extract Total Points Pool from the header
         try:
-            numeric_elements = driver.find_elements(By.XPATH, "//*[contains(@class, 'sc-') or contains(@class, 'text-')]")
+            print("Searching for total points pool...")
+            total_points_pool = 0
+            pool_elements = driver.find_elements(By.XPATH, "//*[contains(text(), 'Total Points')]/following-sibling::*")
             
-            for elem in numeric_elements:
-                text = elem.text.strip()
-                if text and (',' in text or text.replace('.', '').isdigit()):
-                    try:
-                        cleaned = text.replace(',', '').replace(' ', '')
-                        if cleaned.replace('.', '').replace('#', '').isdigit():
-                            value = float(cleaned.replace('#', ''))
-                            if value > 0:
-                                all_numbers.append(value)
-                                print(f"Found numeric value: {value}")
-                    except ValueError:
-                        continue
-        except Exception as e:
-            print(f"Error extracting numbers: {e}")
-        
-        # Sort numbers to identify different metrics
-        all_numbers.sort()
-        print(f"All numbers found (sorted): {all_numbers}")
-        
-        # Extract Wallet Points (user's points - typically in millions, 1-10M range)
-        try:
-            print("Searching for wallet points...")
-            total_points = 0
-            for num in all_numbers:
-                if 100000 < num < 50000000:  # Between 100K and 50M (user points range)
-                    total_points = num
-                    print(f"✓ Found wallet points: {total_points}")
-                    break
-            
-            if total_points == 0:
-                print("No valid points found, defaulting to 0")
-                
-        except Exception as e:
-            print(f"Error finding wallet points: {e}")
-            total_points = 0
-        
-        # Extract Rank
-        try:
-            print("Searching for rank...")
-            # Look for numbers with # prefix or standalone numbers (typically 4-6 digits)
-            rank_elements = driver.find_elements(By.XPATH, "//*[contains(text(), '#') or contains(@class, 'rank')]")
-            
-            for elem in rank_elements:
-                text = elem.text.strip()
-                if '#' in text:
-                    try:
-                        rank_text = text.replace('#', '').replace(',', '').strip()
-                        if rank_text.isdigit():
-                            rank = int(rank_text)
-                            print(f"✓ Found rank: {rank}")
+            for elem in pool_elements:
+                text = elem.text.strip().replace(',', '')
+                try:
+                    # The pool is a very large number (145B+)
+                    if text.replace('.', '').isdigit():
+                        value = float(text)
+                        if value > 1000000000:  # Greater than 1 billion
+                            total_points_pool = value
+                            print(f"✓ Found total points pool: {total_points_pool}")
                             break
-                    except ValueError:
-                        continue
-            else:
-                print("No rank found, defaulting to 0")
-                rank = 0
-                
+                except ValueError:
+                    continue
+                    
+            if total_points_pool == 0:
+                print("Warning: Total points pool not found")
         except Exception as e:
-            print(f"Error finding rank: {e}")
-            rank = 0
+            print(f"Error finding total points pool: {e}")
+            total_points_pool = 0
         
-        # Extract Total Wallets (typically 10,000-20,000 range)
+        # Extract Total Wallets from the header
         try:
             print("Searching for total wallets...")
             total_wallets = 0
-            for num in all_numbers:
-                if 5000 <= num <= 50000:  # Between 5K and 50K (wallet count range)
-                    total_wallets = int(num)
-                    print(f"✓ Found total wallets: {total_wallets}")
-                    break
+            wallet_elements = driver.find_elements(By.XPATH, "//*[contains(text(), 'N° of Wallets') or contains(text(), 'of Wallets')]/following-sibling::*")
             
+            for elem in wallet_elements:
+                text = elem.text.strip().replace(',', '')
+                try:
+                    if text.isdigit():
+                        value = int(text)
+                        if 1000 <= value <= 100000:  # Between 1K and 100K
+                            total_wallets = value
+                            print(f"✓ Found total wallets: {total_wallets}")
+                            break
+                except ValueError:
+                    continue
+                    
             if total_wallets == 0:
-                print("No total wallets found, defaulting to 0")
-                
+                print("Warning: Total wallets not found")
         except Exception as e:
             print(f"Error finding total wallets: {e}")
             total_wallets = 0
         
-        # Extract Total Points Pool (very large number, typically 100B+ range)
+        # Find the user's wallet in the leaderboard table
         try:
-            print("Searching for total points pool...")
-            total_points_pool = 0
-            for num in reversed(all_numbers):  # Start from largest
-                if num > 1000000000:  # Larger than 1 billion (pool range)
-                    total_points_pool = num
-                    print(f"✓ Found total points pool: {total_points_pool}")
-                    break
+            print(f"Searching for wallet {wallet_address} in leaderboard...")
             
-            if total_points_pool == 0:
-                print("No total points pool found, defaulting to 0")
+            # Shortened wallet address format (e.g., "0x6E65...9Cf6")
+            short_wallet = f"{wallet_address[:6].lower()}...{wallet_address[-4:].lower()}"
+            print(f"Looking for shortened format: {short_wallet}")
+            
+            # Find all table rows
+            rows = driver.find_elements(By.XPATH, "//table//tr")
+            print(f"Found {len(rows)} table rows")
+            
+            total_points = 0
+            rank = 0
+            
+            for row in rows:
+                try:
+                    row_text = row.text.lower()
+                    # Check if this row contains our wallet (check both full and shortened)
+                    if wallet_address.lower() in row_text or short_wallet in row_text:
+                        print(f"✓ Found wallet in row: {row.text[:100]}")
+                        
+                        # Extract cells from this row
+                        cells = row.find_elements(By.TAG_NAME, "td")
+                        
+                        if len(cells) >= 3:
+                            # First cell is rank
+                            try:
+                                rank_text = cells[0].text.strip()
+                                rank = int(rank_text)
+                                print(f"✓ Found rank: {rank}")
+                            except (ValueError, IndexError) as e:
+                                print(f"Could not parse rank: {e}")
+                            
+                            # Last cell should be points
+                            points_text = cells[-1].text.strip()
+                            print(f"Points text: {points_text}")
+                            
+                            # Handle formats like "2.98M", "1.5B", "123,456"
+                            try:
+                                if 'B' in points_text.upper():
+                                    value = float(points_text.upper().replace('B', '').replace(',', '').strip())
+                                    total_points = value * 1000000000
+                                elif 'M' in points_text.upper():
+                                    value = float(points_text.upper().replace('M', '').replace(',', '').strip())
+                                    total_points = value * 1000000
+                                elif 'K' in points_text.upper():
+                                    value = float(points_text.upper().replace('K', '').replace(',', '').strip())
+                                    total_points = value * 1000
+                                else:
+                                    total_points = float(points_text.replace(',', '').strip())
+                                
+                                print(f"✓ Found total points: {total_points}")
+                            except ValueError as e:
+                                print(f"Could not parse points: {e}")
+                        
+                        break
+                except Exception as e:
+                    continue
+            
+            if total_points == 0:
+                print("Warning: Could not find wallet in leaderboard")
+                print("This might mean the wallet needs to be searched for manually")
                 
         except Exception as e:
-            print(f"Error finding total points pool: {e}")
-            total_points_pool = 0
+            print(f"Error finding wallet in leaderboard: {e}")
+            total_points = 0
+            rank = 0
         
         # Calculate percentile if we have rank and total wallets
         if rank > 0 and total_wallets > 0:
