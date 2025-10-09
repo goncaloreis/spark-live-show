@@ -7,7 +7,7 @@ import { ProgressChart } from "@/components/ProgressChart";
 import { RankChart } from "@/components/RankChart";
 import { KPICard } from "@/components/KPICard";
 import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
-import { Star, TrendingUp, Users, Award, Search, DollarSign, PieChart, Zap } from "lucide-react";
+import { Star, TrendingUp, Users, Award, Search, DollarSign, PieChart } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -38,45 +38,6 @@ const Index = () => {
     },
     spkPrice: null as number | null
   });
-
-  const handleManualScrape = async () => {
-    if (!walletAddress) {
-      toast.error("Please enter a wallet address first");
-      return;
-    }
-
-    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
-      toast.error("Invalid wallet address format");
-      return;
-    }
-
-    setLoading(true);
-    
-    try {
-      console.log('Triggering manual scrape...');
-      const { data, error } = await supabase.functions.invoke('scrape-spark-points', {
-        body: { walletAddress }
-      });
-
-      console.log('Scrape response:', { data, error });
-
-      if (error) {
-        console.error('Scrape error:', error);
-        throw error;
-      }
-
-      toast.success("Manual scrape completed! Refreshing data...");
-      
-      // Wait a moment then fetch the updated data
-      setTimeout(() => {
-        handleSearch();
-      }, 2000);
-    } catch (error) {
-      console.error('Error triggering scrape:', error);
-      toast.error(`Failed to trigger scrape: ${error.message || 'Please try again'}`);
-      setLoading(false);
-    }
-  };
 
   const handleSearch = async () => {
     console.log('handleSearch called with address:', walletAddress);
@@ -392,34 +353,6 @@ const Index = () => {
                             </>
                           )}
                         </Button>
-                        <Button 
-                          onClick={(e) => {
-                            console.log('Fetch Now clicked!');
-                            e.preventDefault();
-                            if (!loading) {
-                              handleManualScrape();
-                            }
-                          }}
-                          disabled={loading}
-                          type="button"
-                          variant="outline"
-                          size="lg"
-                          className="flex-1 sm:flex-none h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
-                        >
-                          {loading ? (
-                            <>
-                              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin mr-2" />
-                              <span className="hidden sm:inline">Fetching...</span>
-                              <span className="sm:hidden">Fetching</span>
-                            </>
-                          ) : (
-                            <>
-                              <Zap className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                              <span className="hidden sm:inline">Fetch Now</span>
-                              <span className="sm:hidden">Fetch</span>
-                            </>
-                          )}
-                        </Button>
                       </div>
                     </div>
                     <div className="flex items-center justify-center gap-2 mt-5">
@@ -585,10 +518,10 @@ const Index = () => {
                 
                 <Card className="p-6 text-center border-border/50 hover:border-primary/30 transition-colors">
                   <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-primary" />
+                    <TrendingUp className="w-6 h-6 text-primary" />
                   </div>
                   <h4 className="font-semibold mb-2">Automated Updates</h4>
-                  <p className="text-sm text-muted-foreground">Set up hourly tracking with our Python agent</p>
+                  <p className="text-sm text-muted-foreground">Hourly tracking via GitHub Actions automation</p>
                 </Card>
               </div>
             </div>
