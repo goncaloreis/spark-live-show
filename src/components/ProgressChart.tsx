@@ -20,14 +20,14 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
   if (loading) {
     return (
       <Card className="card-premium border">
-        <div className="p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-              <TrendingUp className="w-5 h-5 text-primary" />
+        <div className="p-4 sm:p-8">
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight">Points Growth</h3>
+            <h3 className="text-base sm:text-lg font-semibold tracking-tight">Points Growth</h3>
           </div>
-          <div className="h-[320px] flex items-center justify-center">
+          <div className="h-[250px] sm:h-[320px] flex items-center justify-center">
             <div className="relative w-12 h-12">
               <div className="absolute inset-0 border-3 border-primary/20 border-t-primary rounded-full animate-spin" />
             </div>
@@ -40,21 +40,21 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
   if (!data || data.length === 0) {
     return (
       <Card className="card-premium border">
-        <div className="p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-              <TrendingUp className="w-5 h-5 text-primary" />
+        <div className="p-4 sm:p-8">
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight">Points Growth</h3>
+            <h3 className="text-base sm:text-lg font-semibold tracking-tight">Points Growth</h3>
           </div>
-          <div className="h-[320px] flex items-center justify-center border border-dashed border-border rounded-xl bg-primary/5">
+          <div className="h-[250px] sm:h-[320px] flex items-center justify-center border border-dashed border-border rounded-xl bg-primary/5">
             <div className="text-center space-y-3">
-              <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-                <TrendingUp className="w-8 h-8 text-primary" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">No historical data</p>
-                <p className="text-xs text-muted-foreground/50 mt-1">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">No historical data</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground/50 mt-1">
                   Data will appear as it's tracked
                 </p>
               </div>
@@ -78,26 +78,26 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
 
   return (
     <Card className="card-premium border">
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-              <TrendingUp className="w-5 h-5 text-primary" />
+      <div className="p-4 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight">Points Growth</h3>
+            <h3 className="text-base sm:text-lg font-semibold tracking-tight">Points Growth</h3>
           </div>
-          <div className="flex items-center gap-4 text-xs font-medium">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-primary" />
+          <div className="flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs font-medium">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-primary" />
               <span className="text-muted-foreground">Your Points</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-muted-foreground/40" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-muted-foreground/40" />
               <span className="text-muted-foreground">Average</span>
             </div>
           </div>
         </div>
-        <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height={250} className="sm:!h-[320px]">
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="colorPoints" x1="0" y1="0" x2="0" y2="1">
@@ -113,16 +113,18 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
             <XAxis 
               dataKey="date" 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '11px', fontWeight: 500 }}
+              style={{ fontSize: '10px', fontWeight: 500 }}
               tickLine={false}
               axisLine={{ stroke: 'hsl(var(--border))' }}
+              interval="preserveStartEnd"
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '11px', fontWeight: 500 }}
+              style={{ fontSize: '10px', fontWeight: 500 }}
               tickFormatter={(value) => (value / 1000000).toFixed(1) + 'M'}
               tickLine={false}
               axisLine={{ stroke: 'hsl(var(--border))' }}
+              width={45}
             />
             <Tooltip 
               contentStyle={{ 
