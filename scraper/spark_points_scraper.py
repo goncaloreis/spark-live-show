@@ -47,50 +47,84 @@ def scrape_spark_points(wallet_address):
         print(f"Navigating to: {url}")
         driver.get(url)
         
-        # Wait for page to load
-        time.sleep(5)
+        # Wait for page to load and content to render
+        time.sleep(8)
         
-        # Wait for key elements to be present
-        wait = WebDriverWait(driver, 20)
+        wait = WebDriverWait(driver, 30)
         
-        # Extract data - adjust selectors based on actual HTML structure
-        # These are example selectors - you'll need to inspect the page to get the correct ones
+        # Extract Wallet Points (Total Points)
         try:
-            total_points_element = wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '[data-testid="total-points"], .points-value, .total-points'))
+            wallet_points_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.gtSipa > div.sc-Qotzb.eMnBgD > div > div:nth-child(2) > div.sc-Qotzb.bASAzC > div > div > div > div > div > span:nth-child(3)"
+            wallet_points_element = wait.until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, wallet_points_selector))
             )
-            total_points = float(total_points_element.text.replace(',', '').strip())
-        except:
-            print("Could not find total points element")
-            total_points = 0
+            total_points = float(wallet_points_element.text.replace(',', '').strip())
+            print(f"Found wallet points: {total_points}")
+        except Exception as e:
+            print(f"Could not find wallet points with primary selector: {e}")
+            # Fallback: try to find by text content
+            try:
+                elements = driver.find_elements(By.XPATH, "//span[contains(@class, 'sc-Qotzb')]")
+                for elem in elements:
+                    text = elem.text.strip()
+                    if text and ',' in text and text.replace(',', '').replace('.', '').isdigit():
+                        total_points = float(text.replace(',', ''))
+                        print(f"Found wallet points via fallback: {total_points}")
+                        break
+                else:
+                    total_points = 0
+            except:
+                total_points = 0
         
+        # Extract Rank
         try:
-            rank_element = driver.find_element(By.CSS_SELECTOR, '[data-testid="rank"], .rank-value, .rank')
-            rank = int(rank_element.text.replace(',', '').replace('#', '').strip())
-        except:
-            print("Could not find rank element")
-            rank = 0
+            rank_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.gtSipa > div.sc-Qotzb.eMnBgD > div > div:nth-child(2) > div.sc-Qotzb.elVobP > div"
+            rank_element = driver.find_element(By.CSS_SELECTOR, rank_selector)
+            rank_text = rank_element.text.replace(',', '').replace('#', '').strip()
+            rank = int(rank_text)
+            print(f"Found rank: {rank}")
+        except Exception as e:
+            print(f"Could not find rank with primary selector: {e}")
+            # Fallback: look for elements containing rank-like numbers
+            try:
+                elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'sc-Qotzb')]")
+                for elem in elements:
+                    text = elem.text.strip()
+                    if text.startswith('#') or (text.isdigit() and len(text) <= 6):
+                        rank = int(text.replace('#', '').replace(',', ''))
+                        print(f"Found rank via fallback: {rank}")
+                        break
+                else:
+                    rank = 0
+            except:
+                rank = 0
         
+        # Extract Total Wallets
         try:
-            percentile_element = driver.find_element(By.CSS_SELECTOR, '[data-testid="percentile"], .percentile-value, .percentile')
-            percentile = percentile_element.text.strip()
-        except:
-            print("Could not find percentile element")
-            percentile = "N/A"
-        
-        try:
-            total_wallets_element = driver.find_element(By.CSS_SELECTOR, '[data-testid="total-wallets"], .total-wallets-value, .total-wallets')
+            total_wallets_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.kKIjLn > div:nth-child(2) > div > div > div.sc-Qotzb.fdPbwR > div > div.sc-Qotzb.fPnMAI > div > div > div > div > div > div.sc-Qotzb.bsZMvR > span"
+            total_wallets_element = driver.find_element(By.CSS_SELECTOR, total_wallets_selector)
             total_wallets = int(total_wallets_element.text.replace(',', '').strip())
-        except:
-            print("Could not find total wallets element")
+            print(f"Found total wallets: {total_wallets}")
+        except Exception as e:
+            print(f"Could not find total wallets: {e}")
             total_wallets = 0
         
+        # Extract Total Points Pool
         try:
-            total_pool_element = driver.find_element(By.CSS_SELECTOR, '[data-testid="total-pool"], .total-pool-value, .total-points-pool')
+            total_points_selector = "#root > div > div.sc-Qotzb.dRXxJt.sc-gAqISa.gUfpTz > main > div > div.sc-Qotzb.kKIjLn > div:nth-child(1) > div > div > div.sc-Qotzb.fdPbwR > div > div.sc-Qotzb.fPnMAI > div > div > div > div > div > div.sc-Qotzb.bsZMvR > span.sc-Qotzb.jLxnRH"
+            total_pool_element = driver.find_element(By.CSS_SELECTOR, total_points_selector)
             total_points_pool = float(total_pool_element.text.replace(',', '').strip())
-        except:
-            print("Could not find total points pool element")
+            print(f"Found total points pool: {total_points_pool}")
+        except Exception as e:
+            print(f"Could not find total points pool: {e}")
             total_points_pool = 0
+        
+        # Calculate percentile if we have rank and total wallets
+        if rank > 0 and total_wallets > 0:
+            percentile_value = ((total_wallets - rank) / total_wallets) * 100
+            percentile = f"Top {100 - percentile_value:.2f}%"
+        else:
+            percentile = "N/A"
         
         result = {
             'total_points': total_points,
@@ -105,6 +139,8 @@ def scrape_spark_points(wallet_address):
         
     except Exception as e:
         print(f"Error during scraping: {e}")
+        import traceback
+        traceback.print_exc()
         raise
     finally:
         driver.quit()
