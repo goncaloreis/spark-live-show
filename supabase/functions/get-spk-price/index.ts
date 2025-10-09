@@ -114,10 +114,10 @@ serve(async (req) => {
       );
     }
     
-    // Fetch fresh price from CoinGecko
+    // Fetch fresh price from CoinGecko using simple API (more reliable for free tier)
     const timestamp = Date.now();
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=spark&order=market_cap_desc&per_page=1&page=1&sparkline=false&price_change_percentage=24h&_=${timestamp}`,
+      `https://api.coingecko.com/api/v3/simple/price?ids=spark&vs_currencies=usd&include_24hr_change=true&precision=6&_=${timestamp}`,
       {
         headers: {
           'Accept': 'application/json',
@@ -128,26 +128,8 @@ serve(async (req) => {
     );
 
     if (!response.ok) {
-      console.error('Error code: COINGECKO_API_ERROR');
+      console.error('Error code: COINGECKO_API_ERROR', response.status, response.statusText);
       // Return fallback price if API fails
-      return new Response(
-        JSON.stringify({ 
-          price: 0.0475, // Updated fallback based on current market price
-          change_24h: 0,
-          source: 'fallback'
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200
-        }
-      );
-    }
-
-    const data = await response.json();
-
-    // Extract price data from markets endpoint (returns an array)
-    if (!Array.isArray(data) || data.length === 0) {
-      console.error('Error code: INVALID_PRICE_DATA');
       return new Response(
         JSON.stringify({ 
           price: 0.0475,
@@ -161,9 +143,26 @@ serve(async (req) => {
       );
     }
 
-    const coinData = data[0];
-    const currentPrice = coinData.current_price;
-    const priceChange24h = coinData.price_change_percentage_24h || 0;
+    const data = await response.json();
+
+    // Extract price data from simple API (returns object like { "spark": { "usd": 0.04788, "usd_24h_change": 1.6 } })
+    if (!data || !data.spark || typeof data.spark.usd !== 'number') {
+      console.error('Error code: INVALID_PRICE_DATA', 'Data received:', JSON.stringify(data));
+      return new Response(
+        JSON.stringify({ 
+          price: 0.0475,
+          change_24h: 0,
+          source: 'fallback'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        }
+      );
+    }
+
+    const currentPrice = data.spark.usd;
+    const priceChange24h = data.spark.usd_24h_change || 0;
 
     // Store price in cache
     await supabaseClient
