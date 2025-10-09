@@ -192,79 +192,88 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Modern mesh gradient background */}
+      {/* Enhanced mesh gradient background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0" style={{ background: 'var(--gradient-mesh)' }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-primary/20 rounded-full blur-[150px] animate-float" />
-        <div className="absolute bottom-0 right-1/4 w-[800px] h-[800px] bg-secondary/15 rounded-full blur-[120px]" style={{ animationDelay: '3s' }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1400px] h-[700px] bg-primary/10 rounded-full blur-[180px] animate-float" />
+        <div className="absolute bottom-0 right-1/4 w-[900px] h-[900px] bg-secondary/8 rounded-full blur-[160px] animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[140px] animate-float" style={{ animationDelay: '2s' }} />
       </div>
 
       <div className="relative z-10">
-        {/* Sleek Header */}
-        <header className="border-b border-white/5 backdrop-blur-2xl bg-card/30">
-          <div className="container mx-auto px-6 py-8">
+        {/* Refined Header */}
+        <header className="border-b border-white/5 backdrop-blur-3xl bg-gradient-to-b from-card/40 to-transparent">
+          <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <div className="max-w-5xl mx-auto">
-              {/* Modern Logo Section */}
-              <div className="flex items-center justify-center gap-4 mb-10">
+              {/* Logo and Title */}
+              <div className="flex items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
                 <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary rounded-3xl blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl glass border border-white/10 group-hover:scale-110 transition-transform duration-300">
-                    <Sparkles className="w-8 h-8 text-primary" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-secondary rounded-2xl sm:rounded-3xl blur-2xl opacity-40 group-hover:opacity-70 transition-all duration-700" />
+                  <div className="relative flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl card-premium border border-primary/20 group-hover:scale-110 transition-all duration-500 group-hover:border-primary/40">
+                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary animate-pulse" />
                   </div>
                 </div>
-                <div>
-                  <h1 className="text-5xl font-bold text-gradient tracking-tight">
+                <div className="text-center sm:text-left">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient tracking-tight">
                     Spark Points Tracker
                   </h1>
-                  <p className="text-muted-foreground/70 mt-1 font-medium">Real-time DeFi performance analytics</p>
+                  <p className="text-muted-foreground/60 text-xs sm:text-sm mt-1 font-medium tracking-wide">
+                    Advanced DeFi Performance Analytics
+                  </p>
                 </div>
               </div>
 
-              {/* Premium Search Card */}
+              {/* Premium Search Interface */}
               <div className="relative group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-secondary rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500" />
-                <Card className="relative glass border-white/10 shadow-2xl">
-                  <div className="p-8">
-                    <div className="flex flex-col md:flex-row gap-4">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl sm:rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-all duration-700" />
+                <Card className="relative card-premium border-white/10 shadow-elevated">
+                  <div className="p-6 sm:p-8">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                       <div className="flex-1">
                         <Input
                           placeholder="Enter wallet address (0x...)"
                           value={walletAddress}
                           onChange={(e) => setWalletAddress(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                          className="h-14 text-base glass border-white/5 focus-visible:border-primary/50 focus-visible:ring-primary/30 transition-all duration-300"
+                          className="h-12 sm:h-14 text-sm sm:text-base glass border-white/5 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-500 placeholder:text-muted-foreground/40"
                         />
                       </div>
                       <Button 
                         onClick={handleSearch}
                         disabled={loading}
                         size="lg"
-                        className="h-14 px-10 text-base bg-gradient-to-r from-primary to-secondary hover:opacity-90 border-0 shadow-glow transition-all duration-300 hover:scale-[1.02]"
+                        className="h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-secondary hover:from-primary-glow hover:to-secondary border-0 shadow-glow transition-all duration-500 hover:scale-[1.03] active:scale-[0.98]"
                       >
                         {loading ? (
                           <>
-                            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
-                            Searching...
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                            <span className="hidden sm:inline">Analyzing...</span>
+                            <span className="sm:hidden">Loading...</span>
                           </>
                         ) : (
                           <>
-                            <Search className="w-5 h-5 mr-2" />
-                            Track Wallet
+                            <Search className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                            <span className="hidden sm:inline">Track Wallet</span>
+                            <span className="sm:hidden">Track</span>
                           </>
                         )}
                       </Button>
                     </div>
-                    <p className="text-xs text-center mt-5 text-muted-foreground/60">
-                      Data powered by{" "}
-                      <a 
-                        href="https://points.spark.fi/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary-glow transition-colors font-medium"
-                      >
-                        points.spark.fi
-                      </a>
-                    </p>
+                    <div className="flex items-center justify-center gap-2 mt-5">
+                      <div className="h-px w-8 bg-gradient-to-r from-transparent to-border" />
+                      <p className="text-[10px] sm:text-xs text-muted-foreground/50 font-medium">
+                        Powered by{" "}
+                        <a 
+                          href="https://points.spark.fi/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary/80 hover:text-primary transition-colors font-semibold"
+                        >
+                          points.spark.fi
+                        </a>
+                      </p>
+                      <div className="h-px w-8 bg-gradient-to-l from-transparent to-border" />
+                    </div>
                   </div>
                 </Card>
               </div>
@@ -273,38 +282,38 @@ const Index = () => {
         </header>
 
         {/* Main Content */}
-        <main className="container mx-auto px-6 py-16 max-w-7xl">
+        <main className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-7xl">
 
           {/* Stats Grid */}
           {hasSearched && (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              {/* Live Status Badge */}
+              {/* Live Status Indicator */}
               {stats.lastUpdated !== "-" && (
-                <div className="flex justify-center">
-                  <div className="glass border border-white/10 px-5 py-2.5 rounded-full shadow-sm backdrop-blur-xl">
-                    <div className="flex items-center gap-3">
+                <div className="flex justify-center animate-in fade-in duration-700">
+                  <div className="glass border border-primary/20 px-6 py-3 rounded-full shadow-elevated backdrop-blur-3xl group hover:border-primary/40 transition-all duration-500">
+                    <div className="flex items-center gap-4">
                       <div className="relative">
-                        <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                        <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-primary animate-ping" />
+                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-primary to-secondary" />
+                        <div className="absolute inset-0 w-3 h-3 rounded-full bg-gradient-to-r from-primary to-secondary animate-ping opacity-75" />
                       </div>
-                      <span className="text-sm font-medium">
-                        <span className="text-muted-foreground/70">Last update:</span>{" "}
-                        <span className="text-foreground">{stats.lastUpdated}</span>
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs sm:text-sm font-semibold text-muted-foreground/70">Live Update:</span>
+                        <span className="text-xs sm:text-sm font-bold text-foreground tabular-nums">{stats.lastUpdated}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* KPIs Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card className="glass glass-hover border-white/10 shadow-card">
-                  <div className="p-8">
+              {/* KPI Cards Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500">
+                  <div className="p-6 sm:p-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2.5 rounded-xl glass border border-primary/20">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500">
                         <Award className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="font-bold text-lg tracking-tight">Your KPIs</h3>
+                      <h3 className="font-bold text-base sm:text-lg tracking-tight">Performance</h3>
                     </div>
                     <div className="space-y-1">
                       <KPICard 
@@ -324,24 +333,24 @@ const Index = () => {
                         } : undefined}
                       />
                       <KPICard 
-                        label="Rank Percentile" 
+                        label="Percentile" 
                         value={stats.percentile !== "-" ? `Top ${stats.percentile}` : "-"}
                       />
                     </div>
                   </div>
                 </Card>
 
-                <Card className="glass glass-hover border-white/10 shadow-card">
-                  <div className="p-8">
+                <Card className="card-premium border-white/5 group hover:border-secondary/20 transition-all duration-500">
+                  <div className="p-6 sm:p-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2.5 rounded-xl glass border border-secondary/20">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5 border border-secondary/20 group-hover:scale-110 group-hover:border-secondary/40 transition-all duration-500">
                         <PieChart className="w-5 h-5 text-secondary" />
                       </div>
-                      <h3 className="font-bold text-lg tracking-tight">Market Share</h3>
+                      <h3 className="font-bold text-base sm:text-lg tracking-tight">Market Position</h3>
                     </div>
                     <div className="space-y-1">
                       <KPICard 
-                        label="Your Share of Pool" 
+                        label="Pool Share" 
                         value={stats.marketShare}
                       />
                       <KPICard 
@@ -353,7 +362,7 @@ const Index = () => {
                         } : undefined}
                       />
                       <KPICard 
-                        label="Pace vs. Ecosystem" 
+                        label="Pace Status" 
                         value={stats.paceStatus}
                         change={stats.paceStatus === "GAINING" ? {
                           value: "GAINING",
@@ -367,27 +376,27 @@ const Index = () => {
                   </div>
                 </Card>
 
-                <Card className="glass glass-hover border-white/10 shadow-card">
-                  <div className="p-8">
+                <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500">
+                  <div className="p-6 sm:p-8">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2.5 rounded-xl glass border border-primary/20">
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500 shimmer">
                         <DollarSign className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="font-bold text-lg tracking-tight">Financial Projections</h3>
+                      <h3 className="font-bold text-base sm:text-lg tracking-tight">Projections</h3>
                     </div>
                     <div className="space-y-1">
                       <AirdropEstimateCard 
-                        label="150M SPK Airdrop" 
+                        label="150M SPK" 
                         lowValue={stats.airdropEstimates["150M"].low}
                         highValue={stats.airdropEstimates["150M"].high}
                       />
                       <AirdropEstimateCard 
-                        label="200M SPK Airdrop" 
+                        label="200M SPK" 
                         lowValue={stats.airdropEstimates["200M"].low}
                         highValue={stats.airdropEstimates["200M"].high}
                       />
                       <AirdropEstimateCard 
-                        label="250M SPK Airdrop" 
+                        label="250M SPK" 
                         lowValue={stats.airdropEstimates["250M"].low}
                         highValue={stats.airdropEstimates["250M"].high}
                       />
@@ -397,7 +406,7 @@ const Index = () => {
               </div>
 
               {/* Charts Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 animate-in fade-in duration-700 delay-200">
                 <ProgressChart data={historyData} loading={loading} />
                 <RankChart data={historyData} loading={loading} />
               </div>

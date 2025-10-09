@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
-import { TrendingDown } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { TrendingDown, Trophy } from "lucide-react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { format } from "date-fns";
 
 interface HistoryData {
@@ -24,46 +24,75 @@ export const RankChart = ({ data, loading }: RankChartProps) => {
     rank: item.rank
   }));
 
+  const latestRank = data[data.length - 1]?.rank;
+  const earliestRank = data[0]?.rank;
+  const rankImprovement = earliestRank - latestRank;
+
   return (
-    <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
+    <Card className="card-premium border-white/5">
       <div className="p-8">
-        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <TrendingDown className="w-5 h-5 text-primary" />
-          Your Rank Over Time
-        </h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/10 border border-secondary/10">
+              <Trophy className="w-5 h-5 text-secondary" />
+            </div>
+            <h3 className="text-lg font-bold tracking-tight">Rank Progress</h3>
+          </div>
+          {rankImprovement > 0 && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/10 border border-success/20">
+              <TrendingDown className="w-4 h-4 text-success" />
+              <span className="text-xs font-bold text-success tabular-nums">
+                +{rankImprovement.toLocaleString()} positions
+              </span>
+            </div>
+          )}
+        </div>
+        <ResponsiveContainer width="100%" height={320}>
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id="colorRank" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--secondary))" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="hsl(var(--secondary))" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.2} vertical={false} />
             <XAxis 
               dataKey="date" 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: '11px', fontWeight: 500 }}
+              tickLine={false}
+              axisLine={{ stroke: 'hsl(var(--border))' }}
             />
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: '11px', fontWeight: 500 }}
               reversed={true}
               tickFormatter={(value) => `#${value.toLocaleString()}`}
+              tickLine={false}
+              axisLine={{ stroke: 'hsl(var(--border))' }}
             />
             <Tooltip 
               contentStyle={{ 
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
-                color: 'hsl(var(--foreground))'
+                borderRadius: '12px',
+                boxShadow: 'var(--shadow-card)',
+                color: 'hsl(var(--foreground))',
+                padding: '12px'
               }}
               formatter={(value: number) => [`#${value.toLocaleString()}`, 'Rank']}
             />
-            <Line 
+            <Area 
               type="monotone" 
               dataKey="rank" 
-              stroke="hsl(var(--destructive))" 
+              stroke="hsl(var(--secondary))" 
               strokeWidth={3}
-              strokeDasharray="5 5"
-              dot={{ fill: 'hsl(var(--destructive))', strokeWidth: 2, r: 4 }}
-              activeDot={{ r: 6 }}
+              fill="url(#colorRank)"
+              fillOpacity={1}
+              dot={{ fill: 'hsl(var(--secondary))', strokeWidth: 2, r: 4, stroke: 'hsl(var(--background))' }}
+              activeDot={{ r: 6, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </Card>
