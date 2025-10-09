@@ -37,7 +37,7 @@ export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardPro
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <div className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
-                    150M SPK Supply
+                    150M SPK Airdrop
                   </div>
                   <div className="text-2xl font-bold text-foreground/90 tabular-nums">
                     {values["150M"]}
@@ -54,7 +54,7 @@ export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardPro
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <div className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
-                    200M SPK Supply
+                    200M SPK Airdrop
                   </div>
                   <div className="text-2xl font-bold text-gradient-static tabular-nums">
                     {values["200M"]}
@@ -74,7 +74,7 @@ export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardPro
               <div className="relative flex items-center justify-between">
                 <div className="space-y-1">
                   <div className="text-xs text-muted-foreground/70 font-medium uppercase tracking-wider">
-                    250M SPK Supply
+                    250M SPK Airdrop
                   </div>
                   <div className="text-2xl font-bold text-gradient-static tabular-nums">
                     {values["250M"]}
@@ -90,7 +90,7 @@ export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardPro
           {/* Footer Note */}
           <div className="text-center pt-4 border-t border-white/5">
             <p className="text-[10px] text-muted-foreground/40 font-medium">
-              Estimates based on your current pool share × total supply × live SPK price
+              Estimates based on your current pool share × total airdrop × live SPK price
             </p>
           </div>
         </>
