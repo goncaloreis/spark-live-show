@@ -217,8 +217,8 @@ const Index = () => {
               {/* Logo and Title */}
               <div className="flex items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
                 <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-secondary rounded-2xl sm:rounded-3xl blur-2xl opacity-40 group-hover:opacity-70 transition-all duration-700" />
-                  <div className="relative flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl card-premium border border-primary/20 group-hover:scale-110 transition-all duration-500 group-hover:border-primary/40">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-30 group-hover:opacity-50 transition-all duration-700" />
+                  <div className="relative flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl card-premium border border-border group-hover:scale-110 transition-all duration-500">
                     <Star className="w-6 h-6 sm:w-8 sm:h-8 text-foreground fill-foreground" />
                   </div>
                 </div>
@@ -226,7 +226,7 @@ const Index = () => {
                   <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
                     Spark Points | Season 2
                   </h1>
-                  <p className="text-muted-foreground text-xs sm:text-sm mt-1 font-medium tracking-wide">
+                  <p className="text-muted-foreground text-xs sm:text-sm mt-1 font-normal">
                     Track Your DeFi Performance
                   </p>
                 </div>
@@ -234,8 +234,8 @@ const Index = () => {
 
               {/* Premium Search Interface */}
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl sm:rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-all duration-700" />
-                <Card className="relative card-premium border-white/10 shadow-elevated">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-10 group-hover:opacity-20 transition-all duration-700" />
+                <Card className="relative card-premium border shadow-elevated z-10">
                   <div className="p-6 sm:p-8">
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                       <div className="flex-1">
@@ -243,15 +243,22 @@ const Index = () => {
                           placeholder="Enter wallet address (0x...)"
                           value={walletAddress}
                           onChange={(e) => setWalletAddress(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                          className="h-12 sm:h-14 text-sm sm:text-base glass border-white/5 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-500 placeholder:text-muted-foreground/40"
+                          onKeyDown={(e) => e.key === 'Enter' && !loading && handleSearch()}
+                          className="h-12 sm:h-14 text-sm sm:text-base bg-input border-border focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300 placeholder:text-muted-foreground/40"
                         />
                       </div>
                       <Button 
-                        onClick={handleSearch}
+                        onClick={(e) => {
+                          console.log('Button clicked!', { loading, walletAddress });
+                          e.preventDefault();
+                          if (!loading) {
+                            handleSearch();
+                          }
+                        }}
                         disabled={loading}
+                        type="button"
                         size="lg"
-                        className="h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold bg-gradient-to-r from-primary to-secondary hover:from-primary-glow hover:to-secondary border-0 shadow-glow transition-all duration-500 hover:scale-[1.03] active:scale-[0.98]"
+                        className="relative z-20 h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
                         {loading ? (
                           <>
@@ -269,7 +276,7 @@ const Index = () => {
                       </Button>
                     </div>
                     <div className="flex items-center justify-center gap-2 mt-5">
-                      <div className="h-px w-8 bg-gradient-to-r from-transparent to-border" />
+                      <div className="h-px w-8 bg-gradient-to-r from-transparent via-border to-transparent" />
                       <p className="text-[10px] sm:text-xs text-muted-foreground/50 font-medium">
                         Powered by{" "}
                         <a 
@@ -281,7 +288,7 @@ const Index = () => {
                           points.spark.fi
                         </a>
                       </p>
-                      <div className="h-px w-8 bg-gradient-to-l from-transparent to-border" />
+                      <div className="h-px w-8 bg-gradient-to-l from-transparent via-border to-transparent" />
                     </div>
                   </div>
                 </Card>
