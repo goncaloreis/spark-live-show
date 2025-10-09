@@ -7,6 +7,7 @@ interface HistoryData {
   total_points: number;
   rank: number;
   created_at: string;
+  globalAverage?: number;
 }
 
 interface ProgressChartProps {
@@ -63,9 +64,9 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
     );
   }
 
-  // Calculate actual average of all data points
-  const avgPoints = data.length > 0 
-    ? data.reduce((sum, item) => sum + Number(item.total_points), 0) / data.length 
+  // Use global average from data (average points per wallet across all wallets)
+  const avgPoints = data.length > 0 && data[0].globalAverage 
+    ? data[0].globalAverage
     : 0;
 
   const chartData = data.map(item => ({

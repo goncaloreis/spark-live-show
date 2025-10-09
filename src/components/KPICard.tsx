@@ -39,8 +39,8 @@ export const KPICard = ({ label, value, change, suffix }: KPICardProps) => {
           {change && change.direction !== 'neutral' && (
             <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg backdrop-blur-sm transition-all duration-300 border ${
               change.direction === 'up' 
-                ? 'bg-success/10 text-success border-success/20 group-hover:bg-success/15 group-hover:border-success/30' 
-                : 'bg-destructive/10 text-destructive border-destructive/20 group-hover:bg-destructive/15 group-hover:border-destructive/30'
+                ? 'bg-[hsl(142_76%_45%_/_0.15)] text-[hsl(142_76%_45%)] border-[hsl(142_76%_45%_/_0.3)] shadow-[0_0_12px_hsl(142_76%_45%_/_0.2)]' 
+                : 'bg-[hsl(0_72%_55%_/_0.15)] text-[hsl(0_72%_55%)] border-[hsl(0_72%_55%_/_0.3)] shadow-[0_0_12px_hsl(0_72%_55%_/_0.2)]'
             }`}>
               {change.direction === 'up' ? (
                 <ArrowUp className="w-3.5 h-3.5" strokeWidth={2.5} />

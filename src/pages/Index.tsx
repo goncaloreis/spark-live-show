@@ -107,11 +107,13 @@ const Index = () => {
           }
         }
 
-        // Market share calculation (approximate)
+        // Market share and global average calculation
         const currentPoints = Number(data.latest.total_points);
         const totalWallets = data.latest.total_wallets || 0;
+        const estimatedTotalPoints = totalWallets * 1000000; // rough estimate of total points pool
+        const globalAverage = totalWallets > 0 ? estimatedTotalPoints / totalWallets : 0; // global average per wallet
+        
         if (totalWallets > 0) {
-          const estimatedTotalPoints = totalWallets * 1000000; // rough estimate
           const share = (currentPoints / estimatedTotalPoints) * 100;
           marketShare = share.toFixed(6) + "%";
           
@@ -164,8 +166,11 @@ const Index = () => {
           airdropEstimates
         });
         
-        // Update history for chart
-        setHistoryData(history);
+        // Update history for chart with global average
+        setHistoryData(history.map(item => ({
+          ...item,
+          globalAverage
+        })));
         
         toast.success("Wallet data loaded successfully");
       } else {
