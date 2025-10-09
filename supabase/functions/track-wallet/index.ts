@@ -21,7 +21,9 @@ serve(async (req) => {
   }
 
   try {
-    const { wallet_address, action = 'get' } = await req.json();
+    // Parse request body ONCE
+    const body = await req.json();
+    const { wallet_address, action = 'get', total_points, rank, total_wallets, percentile } = body;
 
     if (!wallet_address) {
       return new Response(
@@ -71,8 +73,6 @@ serve(async (req) => {
       );
     } else if (action === 'store') {
       // Store wallet data (called by Python agent or manual entry)
-      const { total_points, rank, total_wallets, percentile } = await req.json();
-
       if (!total_points) {
         return new Response(
           JSON.stringify({ error: 'total_points is required' }),
