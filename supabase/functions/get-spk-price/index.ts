@@ -14,10 +14,10 @@ serve(async (req) => {
   try {
     console.log('Fetching SPK price from CoinGecko...');
     
-    // Fetch SPK token price from CoinGecko
-    // Using "spark" as the ID based on spark.fi protocol
+    // Fetch SPK token price from CoinGecko using the detailed endpoint for real-time pricing
+    // Using "spark" as the ID for Spark Protocol's SPK token
     const response = await fetch(
-      'https://api.coingecko.com/api/v3/simple/price?ids=spark&vs_currencies=usd&include_24hr_change=true',
+      'https://api.coingecko.com/api/v3/coins/spark?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false',
       {
         headers: {
           'Accept': 'application/json',
@@ -42,12 +42,12 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('CoinGecko response:', data);
+    console.log('CoinGecko detailed response received');
 
-    // Extract price data
-    const priceData = data.spark;
+    // Extract price data from the detailed market_data object
+    const marketData = data.market_data;
     
-    if (!priceData || !priceData.usd) {
+    if (!marketData || !marketData.current_price || !marketData.current_price.usd) {
       console.error('Invalid price data from CoinGecko');
       return new Response(
         JSON.stringify({ 
@@ -62,11 +62,16 @@ serve(async (req) => {
       );
     }
 
+    const currentPrice = marketData.current_price.usd;
+    const priceChange24h = marketData.price_change_percentage_24h || 0;
+
+    console.log(`Real-time SPK Price: $${currentPrice}, 24h Change: ${priceChange24h.toFixed(2)}%`);
+
     return new Response(
       JSON.stringify({
-        price: priceData.usd,
-        change_24h: priceData.usd_24h_change || 0,
-        source: 'coingecko',
+        price: currentPrice,
+        change_24h: priceChange24h,
+        source: 'coingecko-realtime',
         timestamp: new Date().toISOString()
       }),
       { 
