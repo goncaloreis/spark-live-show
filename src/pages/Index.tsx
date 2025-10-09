@@ -7,7 +7,7 @@ import { ProgressChart } from "@/components/ProgressChart";
 import { RankChart } from "@/components/RankChart";
 import { KPICard } from "@/components/KPICard";
 import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
-import { Sparkles, TrendingUp, Users, Award, Search, DollarSign, PieChart, Zap } from "lucide-react";
+import { Star, TrendingUp, Users, Award, Search, DollarSign, PieChart, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -37,6 +37,8 @@ const Index = () => {
   });
 
   const handleSearch = async () => {
+    console.log('handleSearch called with address:', walletAddress);
+    
     if (!walletAddress) {
       toast.error("Please enter a wallet address");
       return;
@@ -51,6 +53,7 @@ const Index = () => {
     setHasSearched(true);
     
     try {
+      console.log('Calling track-wallet function...');
       // Call the backend function to get wallet data
       const { data, error } = await supabase.functions.invoke('track-wallet', {
         body: { 
@@ -59,7 +62,12 @@ const Index = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('Response received:', { data, error });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
 
       console.log('Received wallet data:', data);
 
@@ -184,7 +192,8 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Error fetching wallet data:', error);
-      toast.error("Failed to load wallet data. Please try again.");
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      toast.error(`Failed to load wallet data: ${error.message || 'Please try again'}`);
     } finally {
       setLoading(false);
     }
@@ -210,15 +219,15 @@ const Index = () => {
                 <div className="relative group">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-secondary rounded-2xl sm:rounded-3xl blur-2xl opacity-40 group-hover:opacity-70 transition-all duration-700" />
                   <div className="relative flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl card-premium border border-primary/20 group-hover:scale-110 transition-all duration-500 group-hover:border-primary/40">
-                    <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary animate-pulse" />
+                    <Star className="w-6 h-6 sm:w-8 sm:h-8 text-foreground fill-foreground" />
                   </div>
                 </div>
                 <div className="text-center sm:text-left">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient tracking-tight">
-                    Spark Points Tracker
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
+                    Spark Points | Season 2
                   </h1>
-                  <p className="text-muted-foreground/60 text-xs sm:text-sm mt-1 font-medium tracking-wide">
-                    Advanced DeFi Performance Analytics
+                  <p className="text-muted-foreground text-xs sm:text-sm mt-1 font-medium tracking-wide">
+                    Track Your DeFi Performance
                   </p>
                 </div>
               </div>
@@ -441,7 +450,7 @@ const Index = () => {
                 
                 <Card className="p-6 text-center border-border/50 hover:border-primary/30 transition-colors">
                   <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-primary" />
+                    <Zap className="w-6 h-6 text-primary" />
                   </div>
                   <h4 className="font-semibold mb-2">Automated Updates</h4>
                   <p className="text-sm text-muted-foreground">Set up hourly tracking with our Python agent</p>

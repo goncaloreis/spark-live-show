@@ -8,23 +8,24 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 222 47% 3%;
-    --foreground: 0 0% 100%;
+    /* Spark.fi inspired color palette */
+    --background: 38 25% 96%;  /* Light beige/cream background */
+    --foreground: 0 0% 10%;     /* Dark text */
 
-    --card: 222 35% 6%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 100%;          /* White cards */
+    --card-foreground: 0 0% 10%;
 
-    --popover: 222 35% 8%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 261 100% 65%;
+    --primary: 347 77% 60%;     /* Coral pink - Spark's primary */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 261 90% 75%;
-    --primary-dark: 261 100% 45%;
+    --primary-glow: 347 77% 70%;
+    --primary-dark: 347 77% 50%;
 
-    --secondary: 185 85% 55%;
+    --secondary: 24 100% 68%;   /* Orange accent */
     --secondary-foreground: 0 0% 100%;
-    --secondary-glow: 185 85% 65%;
+    --secondary-glow: 24 100% 78%;
 
     --success: 142 76% 45%;
     --success-foreground: 0 0% 100%;
@@ -32,46 +33,46 @@ All colors MUST be HSL.
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --muted: 222 25% 12%;
-    --muted-foreground: 215 16% 65%;
+    --muted: 38 15% 90%;        /* Light gray */
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 261 100% 65%;
+    --accent: 347 77% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 25% 12%;
-    --input: 222 30% 10%;
-    --ring: 261 100% 65%;
+    --border: 38 15% 88%;       /* Subtle borders */
+    --input: 0 0% 100%;
+    --ring: 347 77% 60%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(261 100% 65%) 0%, hsl(185 85% 55%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(185 85% 55%) 0%, hsl(142 76% 45%) 100%);
-    --gradient-mesh: radial-gradient(at 20% 10%, hsl(261 100% 65% / 0.12) 0px, transparent 50%),
-                     radial-gradient(at 80% 90%, hsl(185 85% 55% / 0.12) 0px, transparent 50%),
-                     radial-gradient(at 50% 50%, hsl(261 100% 65% / 0.05) 0px, transparent 50%);
-    --gradient-glass: linear-gradient(135deg, hsl(222 35% 8% / 0.9) 0%, hsl(222 35% 6% / 0.7) 100%);
-    --gradient-card: linear-gradient(to bottom right, hsl(222 35% 7%) 0%, hsl(222 35% 5%) 100%);
+    /* Spark.fi gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(347 77% 60%) 0%, hsl(24 100% 68%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(24 100% 68%) 0%, hsl(40 100% 75%) 100%);
+    --gradient-mesh: radial-gradient(at 20% 10%, hsl(347 77% 60% / 0.08) 0px, transparent 50%),
+                     radial-gradient(at 80% 90%, hsl(24 100% 68% / 0.08) 0px, transparent 50%);
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.9) 0%, hsl(0 0% 100% / 0.7) 100%);
+    --gradient-card: linear-gradient(to bottom right, hsl(0 0% 100%) 0%, hsl(38 25% 98%) 100%);
     
-    --shadow-glow: 0 0 80px hsl(261 100% 65% / 0.2), 0 0 40px hsl(185 85% 55% / 0.1);
-    --shadow-card: 0 24px 64px hsl(222 47% 2% / 0.9), 0 8px 24px hsl(222 47% 2% / 0.5);
-    --shadow-elevated: 0 32px 80px hsl(222 47% 2% / 0.95), 0 12px 32px hsl(222 47% 2% / 0.6);
-    --shadow-sm: 0 2px 12px hsl(222 47% 2% / 0.3);
+    --shadow-glow: 0 0 60px hsl(347 77% 60% / 0.15), 0 0 30px hsl(24 100% 68% / 0.1);
+    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.06), 0 2px 8px hsl(0 0% 0% / 0.04);
+    --shadow-elevated: 0 12px 48px hsl(0 0% 0% / 0.08), 0 4px 16px hsl(0 0% 0% / 0.05);
+    --shadow-sm: 0 1px 8px hsl(0 0% 0% / 0.04);
     
     --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
-    --sidebar-background: 222 35% 6%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 261 100% 65%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 347 77% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 25% 12%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 222 25% 12%;
-    --sidebar-ring: 261 100% 65%;
+    --sidebar-accent: 38 15% 90%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 38 15% 88%;
+    --sidebar-ring: 347 77% 60%;
   }
 }
 
@@ -92,15 +93,14 @@ All colors MUST be HSL.
 
 @layer utilities {
   .glass {
-    @apply backdrop-blur-2xl bg-gradient-to-br from-card/95 to-card/75 border border-white/5;
+    @apply backdrop-blur-xl bg-white/80 border border-border;
   }
 
   .glass-hover {
-    @apply transition-all duration-500 hover:border-primary/20;
+    @apply transition-all duration-500 hover:border-primary/30 hover:shadow-lg;
   }
   
   .glass-hover:hover {
-    box-shadow: 0 12px 48px hsl(261 100% 65% / 0.15), 0 4px 16px hsl(185 85% 55% / 0.1);
     transform: translateY(-2px);
   }
 
@@ -135,15 +135,13 @@ All colors MUST be HSL.
   }
 
   .card-premium {
-    @apply relative overflow-hidden;
-    background: var(--gradient-card);
-    box-shadow: var(--shadow-card);
+    @apply relative overflow-hidden bg-white border border-border shadow-card;
   }
 
   .card-premium::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-500;
-    background: linear-gradient(135deg, hsl(261 100% 65% / 0.1) 0%, transparent 50%, hsl(185 85% 55% / 0.1) 100%);
+    background: linear-gradient(135deg, hsl(347 77% 60% / 0.05) 0%, transparent 50%, hsl(24 100% 68% / 0.05) 100%);
   }
 
   .card-premium:hover::before {
