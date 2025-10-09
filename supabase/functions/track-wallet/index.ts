@@ -124,11 +124,14 @@ serve(async (req) => {
 
     // Parse request body ONCE
     const body = await req.json();
-    const { wallet_address, action = 'get', total_points, rank, total_wallets, percentile, total_points_pool } = body;
+    const { action = 'get', total_points, rank, total_wallets, percentile, total_points_pool } = body;
+    
+    // Sanitize wallet address input
+    const wallet_address = String(body.wallet_address || '').trim().toLowerCase();
 
     if (!wallet_address) {
       return new Response(
-        JSON.stringify({ error: 'Wallet address is required' }),
+        JSON.stringify({ error: 'Invalid request' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -136,7 +139,7 @@ serve(async (req) => {
     // Validate wallet address format
     if (!/^0x[a-fA-F0-9]{40}$/.test(wallet_address)) {
       return new Response(
-        JSON.stringify({ error: 'Invalid wallet address format' }),
+        JSON.stringify({ error: 'Invalid request' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -184,7 +187,7 @@ serve(async (req) => {
         .rpc('get_latest_wallet_data', { wallet_addr: wallet_address });
 
       if (latestError) {
-        console.error('Database error fetching latest data:', latestError);
+        console.error('Error code: DB_QUERY_FAILED');
       }
 
       // Get historical data for charts
@@ -192,7 +195,7 @@ serve(async (req) => {
         .rpc('get_wallet_history', { wallet_addr: wallet_address, days_back: 30 });
 
       if (historyError) {
-        console.error('Database error fetching history:', historyError);
+        console.error('Error code: DB_QUERY_FAILED');
       }
 
       return new Response(
@@ -225,9 +228,9 @@ serve(async (req) => {
         .select();
 
       if (error) {
-        console.error('Database error storing wallet data:', error);
+        console.error('Error code: DB_INSERT_FAILED');
         return new Response(
-          JSON.stringify({ error: 'An error occurred processing your request' }),
+          JSON.stringify({ error: 'Unable to process request' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -243,9 +246,9 @@ serve(async (req) => {
       );
     }
   } catch (error) {
-    console.error('Unexpected error in track-wallet function:', error);
+    console.error('Error code: REQUEST_FAILED');
     return new Response(
-      JSON.stringify({ error: 'An error occurred processing your request' }),
+      JSON.stringify({ error: 'Unable to process request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

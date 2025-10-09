@@ -47,7 +47,10 @@ const Index = () => {
       return;
     }
 
-    if (!/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+    // Sanitize wallet address
+    const sanitizedAddress = walletAddress.trim().toLowerCase();
+
+    if (!/^0x[a-fA-F0-9]{40}$/.test(sanitizedAddress)) {
       toast.error("Invalid wallet address format");
       return;
     }
@@ -60,7 +63,7 @@ const Index = () => {
       // Call the backend function to get wallet data
       const { data, error } = await supabase.functions.invoke('track-wallet', {
         body: { 
-          wallet_address: walletAddress,
+          wallet_address: sanitizedAddress,
           action: 'get'
         }
       });
@@ -275,8 +278,7 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Error fetching wallet data:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
-      toast.error(`Failed to load wallet data: ${error.message || 'Please try again'}`);
+      toast.error('Unable to load wallet data. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -61,11 +61,15 @@ def scrape_spark_points(wallet_address):
     """Scrape Spark Points data for the given wallet"""
     print(f"Starting scrape for wallet: {wallet_address}")
     
+    # Sanitize wallet address
+    from urllib.parse import quote
+    wallet_address = wallet_address.strip().lower()
+    
     driver = setup_firefox_driver()
     
     try:
-        # Navigate to Spark Points page
-        url = f"https://points.spark.fi/?wallet={wallet_address}"
+        # Navigate to Spark Points page with URL encoding
+        url = f"https://points.spark.fi/?wallet={quote(wallet_address)}"
         print(f"Navigating to: {url}")
         driver.get(url)
         
