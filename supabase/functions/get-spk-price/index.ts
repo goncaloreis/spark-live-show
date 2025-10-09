@@ -148,8 +148,10 @@ serve(async (req) => {
 
     // Extract price data from DefiLlama API
     // Returns: { "coins": { "ethereum:0xc20...": { "price": 0.04, "timestamp": 1234567890, "confidence": 0.99 } } }
-    const coinKey = 'ethereum:0xc20059e0317de91738d13af027dfc4a50781b066';
-    const coinData = data?.coins?.[coinKey];
+    // Note: DefiLlama returns addresses in mixed case, so we need to find the key case-insensitively
+    const coinKeyLower = 'ethereum:0xc20059e0317de91738d13af027dfc4a50781b066';
+    const coinKey = Object.keys(data?.coins || {}).find(key => key.toLowerCase() === coinKeyLower);
+    const coinData = coinKey ? data.coins[coinKey] : null;
     
     if (!coinData || typeof coinData.price !== 'number') {
       console.error('Error code: INVALID_PRICE_DATA', 'Data received:', JSON.stringify(data));
