@@ -152,7 +152,16 @@ const Index = () => {
         // Calculate global average from actual total points pool
         const currentPoints = Number(data.latest.total_points);
         const totalWallets = data.latest.total_wallets || 0;
-        const totalPointsPool = data.latest.total_points_pool ? Number(data.latest.total_points_pool) : null;
+        
+        // Find the most recent valid total_points_pool from history (not 0 or null)
+        let totalPointsPool: number | null = null;
+        for (let i = history.length - 1; i >= 0; i--) {
+          const poolValue = history[i].total_points_pool;
+          if (poolValue && Number(poolValue) > 0) {
+            totalPointsPool = Number(poolValue);
+            break;
+          }
+        }
         
         // Calculate percentile change if we have history and rank data
         if (history.length >= 2 && totalWallets > 0) {
@@ -182,11 +191,21 @@ const Index = () => {
           const share = (currentPoints / totalPointsPool) * 100;
           marketShare = share.toFixed(6) + "%";
           
-          // Share change (if we have history)
-          if (history.length >= 2 && history[history.length - 2].total_points_pool) {
-            const prevPoints = Number(history[history.length - 2].total_points);
-            const prevPool = Number(history[history.length - 2].total_points_pool);
-            const prevShare = (prevPoints / prevPool) * 100;
+          // Share change - find previous valid pool data
+          let prevValidPool: number | null = null;
+          let prevValidPoints: number | null = null;
+          
+          for (let i = history.length - 2; i >= 0; i--) {
+            const poolValue = history[i].total_points_pool;
+            if (poolValue && Number(poolValue) > 0) {
+              prevValidPool = Number(poolValue);
+              prevValidPoints = Number(history[i].total_points);
+              break;
+            }
+          }
+          
+          if (prevValidPool && prevValidPoints) {
+            const prevShare = (prevValidPoints / prevValidPool) * 100;
             const shareDiff = share - prevShare;
             shareChange = shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`;
             
