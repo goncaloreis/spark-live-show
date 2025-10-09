@@ -2,3 +2,6 @@ project_id = "jubjoxthawbxyxajvlcv"
 
 [functions.track-wallet]
 verify_jwt = false
+
+[functions.scrape-spark-points]
+verify_jwt = false

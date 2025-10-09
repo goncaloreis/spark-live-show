@@ -103,6 +103,10 @@ export type Database = {
           total_points_pool: number
         }[]
       }
+      trigger_scrape_spark_points: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
