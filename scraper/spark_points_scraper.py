@@ -11,6 +11,7 @@ import time
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -132,88 +133,66 @@ def scrape_spark_points(wallet_address):
             print(f"Error finding total wallets: {e}")
             total_wallets = 0
         
-        # Use the search box to find the wallet
+        # Use the search box to find the wallet (using working approach from original script)
         try:
             print(f"Using search box to find wallet {wallet_address}...")
             
-            # Find the search input box
+            # Find the search input box using a more flexible selector
             search_input = wait.until(
-                EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Search by wallet' or contains(@placeholder, 'Search')]"))
+                EC.visibility_of_element_located((By.CSS_SELECTOR, "input[placeholder*='Search']"))
             )
             
             print("✓ Found search input")
             
-            # Clear and enter wallet address
+            # Clear and enter wallet address, then press Enter
             search_input.clear()
             search_input.send_keys(wallet_address)
-            print(f"✓ Entered wallet address: {wallet_address}")
+            search_input.send_keys(Keys.ENTER)
+            print(f"✓ Entered wallet address and pressed Enter")
             
             # Wait for search results to load
-            time.sleep(5)
-            print("Waiting for search results...")
+            time.sleep(3)
             
-            # Take another screenshot after search
+            # Take screenshot after search
             driver.save_screenshot('/tmp/spark_page_search.png')
             print("Screenshot saved to /tmp/spark_page_search.png")
             
-            # Now find the wallet in the filtered results
-            total_points = 0
+            # Find the wallet row using the shortened format (like original script)
+            wallet_substring = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
+            print(f"Looking for wallet substring: {wallet_substring}")
+            
+            your_row_xpath = f"//div[contains(., '{wallet_substring}')]/ancestor::div[@name='tableRow']"
+            your_row_element = wait.until(
+                EC.visibility_of_element_located((By.XPATH, your_row_xpath))
+            )
+            print(f"✓ Found wallet row")
+            
+            # Extract rank using class selector (from original script)
             rank = 0
+            total_points = 0
             
-            # Find all table rows after search
-            rows = driver.find_elements(By.XPATH, "//table//tbody//tr")
-            print(f"Found {len(rows)} table rows after search")
+            try:
+                rank_element = your_row_element.find_element(By.XPATH, ".//div[contains(@class, 'elVobP')]")
+                rank_text = rank_element.text.strip()
+                rank = int(rank_text.replace('#', '').replace(',', ''))
+                print(f"✓ Found rank: {rank}")
+            except Exception as e:
+                print(f"Could not extract rank: {e}")
             
-            if len(rows) > 0:
-                # Should only be 1-2 rows after search
-                for row in rows:
-                    try:
-                        cells = row.find_elements(By.TAG_NAME, "td")
-                        
-                        if len(cells) >= 3:
-                            print(f"Row text: {row.text}")
-                            
-                            # First cell is rank
-                            try:
-                                rank_text = cells[0].text.strip()
-                                rank = int(rank_text)
-                                print(f"✓ Found rank: {rank}")
-                            except (ValueError, IndexError) as e:
-                                print(f"Could not parse rank from '{cells[0].text}': {e}")
-                            
-                            # Last cell should be points
-                            points_text = cells[-1].text.strip()
-                            print(f"Points text: {points_text}")
-                            
-                            # Handle formats like "2.98M", "1.5B", "123,456"
-                            try:
-                                if 'B' in points_text.upper():
-                                    value = float(points_text.upper().replace('B', '').replace(',', '').strip())
-                                    total_points = value * 1000000000
-                                elif 'M' in points_text.upper():
-                                    value = float(points_text.upper().replace('M', '').replace(',', '').strip())
-                                    total_points = value * 1000000
-                                elif 'K' in points_text.upper():
-                                    value = float(points_text.upper().replace('K', '').replace(',', '').strip())
-                                    total_points = value * 1000
-                                else:
-                                    total_points = float(points_text.replace(',', '').strip())
-                                
-                                print(f"✓ Found total points: {total_points}")
-                            except ValueError as e:
-                                print(f"Could not parse points from '{points_text}': {e}")
-                            
-                            # Found the data, break
-                            if total_points > 0:
-                                break
-                    except Exception as e:
-                        print(f"Error processing row: {e}")
-                        continue
-            else:
-                print("Warning: No rows found after search")
+            # Extract points using class selector (from original script)
+            try:
+                points_element = your_row_element.find_element(By.XPATH, ".//div[contains(@class, 'bASAzC')]")
+                points_text = points_element.text.strip()
+                
+                # Parse using scientific notation method (from original script)
+                points_text_converted = points_text.replace(',', '').replace('\n', '').replace('M', 'e6').replace('K', 'e3').replace('B', 'e9')
+                total_points = float(points_text_converted)
+                print(f"✓ Found total points: {total_points} (from text: {points_text})")
+            except Exception as e:
+                print(f"Could not extract points: {e}")
             
             if total_points == 0 or rank == 0:
-                print("Warning: Could not extract valid wallet data after search")
+                print("Warning: Could not extract valid wallet data")
                 print(f"Current values - Points: {total_points}, Rank: {rank}")
                 
         except Exception as e:
