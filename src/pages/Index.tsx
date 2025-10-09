@@ -240,16 +240,13 @@ const Index = () => {
                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                       <div className="flex-1">
                         <Input
+                          type="text"
                           placeholder="Enter wallet address (0x...)"
                           value={walletAddress}
                           onChange={(e) => setWalletAddress(e.target.value)}
-                          onPaste={(e) => {
-                            e.preventDefault();
-                            const pastedText = e.clipboardData.getData('text');
-                            setWalletAddress(pastedText.trim());
-                          }}
                           onKeyDown={(e) => e.key === 'Enter' && !loading && handleSearch()}
                           className="h-12 sm:h-14 text-sm sm:text-base bg-input border-border focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300 placeholder:text-muted-foreground/40"
+                          autoComplete="off"
                         />
                       </div>
                       <Button 
