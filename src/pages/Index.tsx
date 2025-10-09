@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { StatsCard } from "@/components/StatsCard";
 import { ProgressChart } from "@/components/ProgressChart";
-import { Sparkles, TrendingUp, Users, Award, Search } from "lucide-react";
+import { RankChart } from "@/components/RankChart";
+import { KPICard } from "@/components/KPICard";
+import { Sparkles, TrendingUp, Users, Award, Search, DollarSign, PieChart, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,7 +22,18 @@ const Index = () => {
     percentile: "-",
     totalWallets: "-",
     pointsGrowth: "-",
-    lastUpdated: "-"
+    lastUpdated: "-",
+    pointsChange: "-",
+    rankChange: { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' },
+    marketShare: "-",
+    shareChange: "-",
+    paceStatus: "NEUTRAL",
+    airdropEstimates: {
+      "150M": "-",
+      "200M": "-",
+      "250M": "-",
+      "300M": "-"
+    }
   });
 
   const handleSearch = async () => {
@@ -51,16 +64,66 @@ const Index = () => {
       console.log('Received wallet data:', data);
 
       if (data.has_data && data.latest) {
-        // Calculate points growth
+        // Calculate points growth and advanced metrics
         const history = data.history || [];
         let pointsGrowth = "-";
+        let pointsChange = "-";
+        let rankChange = { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' };
+        let marketShare = "-";
+        let shareChange = "-";
+        let paceStatus = "NEUTRAL";
+        
         if (history.length >= 2) {
           const latest = Number(history[history.length - 1].total_points);
           const previous = Number(history[history.length - 2].total_points);
+          const pointsDiff = latest - previous;
           const growth = ((latest - previous) / previous * 100).toFixed(2);
           const growthNum = parseFloat(growth);
           pointsGrowth = growthNum > 0 ? `+${growth}%` : `${growth}%`;
+          pointsChange = pointsDiff > 0 ? `+${pointsDiff.toLocaleString()}` : pointsDiff.toLocaleString();
+          
+          // Rank change
+          const latestRank = history[history.length - 1].rank;
+          const previousRank = history[history.length - 2].rank;
+          if (latestRank && previousRank) {
+            const rankDiff = previousRank - latestRank;
+            if (rankDiff !== 0) {
+              rankChange = {
+                value: `${Math.abs(rankDiff)}`,
+                direction: rankDiff > 0 ? 'up' : 'down'
+              };
+            }
+            
+            // Pace calculation (improving rank = gaining)
+            paceStatus = rankDiff > 0 ? "GAINING" : rankDiff < 0 ? "LOSING" : "STABLE";
+          }
         }
+
+        // Market share calculation (approximate)
+        const currentPoints = Number(data.latest.total_points);
+        const totalWallets = data.latest.total_wallets || 0;
+        if (totalWallets > 0) {
+          const estimatedTotalPoints = totalWallets * 1000000; // rough estimate
+          const share = (currentPoints / estimatedTotalPoints) * 100;
+          marketShare = share.toFixed(6) + "%";
+          
+          // Share change (if we have history)
+          if (history.length >= 2) {
+            const prevPoints = Number(history[history.length - 2].total_points);
+            const prevShare = (prevPoints / estimatedTotalPoints) * 100;
+            const shareDiff = share - prevShare;
+            shareChange = shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`;
+          }
+        }
+
+        // Financial projections based on market share
+        const share = parseFloat(marketShare) / 100 || 0;
+        const airdropEstimates = {
+          "150M": share > 0 ? `€${(150000000 * share * 0.001).toFixed(2)}` : "-",
+          "200M": share > 0 ? `€${(200000000 * share * 0.001).toFixed(2)}` : "-",
+          "250M": share > 0 ? `€${(250000000 * share * 0.001).toFixed(2)}` : "-",
+          "300M": share > 0 ? `€${(300000000 * share * 0.001).toFixed(2)}` : "-"
+        };
 
         // Format last updated time
         const lastUpdated = new Date(data.latest.created_at).toLocaleString();
@@ -68,11 +131,17 @@ const Index = () => {
         // Update stats with real data
         setStats({
           totalPoints: Number(data.latest.total_points).toLocaleString(),
-          rank: data.latest.rank ? `#${data.latest.rank}` : '-',
+          rank: data.latest.rank ? `${data.latest.rank}` : '-',
           percentile: data.latest.percentile || '-',
           totalWallets: data.latest.total_wallets ? data.latest.total_wallets.toLocaleString() : '-',
           pointsGrowth,
-          lastUpdated
+          lastUpdated,
+          pointsChange,
+          rankChange,
+          marketShare,
+          shareChange,
+          paceStatus,
+          airdropEstimates
         });
         
         // Update history for chart
@@ -87,7 +156,18 @@ const Index = () => {
           percentile: "-",
           totalWallets: "-",
           pointsGrowth: "-",
-          lastUpdated: "-"
+          lastUpdated: "-",
+          pointsChange: "-",
+          rankChange: { value: "-", direction: 'neutral' },
+          marketShare: "-",
+          shareChange: "-",
+          paceStatus: "NEUTRAL",
+          airdropEstimates: {
+            "150M": "-",
+            "200M": "-",
+            "250M": "-",
+            "300M": "-"
+          }
         });
         setHistoryData([]);
       }
@@ -197,31 +277,112 @@ const Index = () => {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatsCard
-                  title="Total Points"
-                  value={stats.totalPoints}
-                  icon={Sparkles}
-                  trend={stats.pointsGrowth !== "-" ? `${stats.pointsGrowth} from last update` : undefined}
-                  loading={loading}
-                />
-                <StatsCard
-                  title="Your Rank"
-                  value={stats.rank}
-                  icon={Award}
-                  trend={stats.percentile}
-                  loading={loading}
-                />
-                <StatsCard
-                  title="Total Wallets"
-                  value={stats.totalWallets}
-                  icon={Users}
-                  loading={loading}
-                />
+              {/* KPIs Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Award className="w-4 h-4 text-primary" />
+                      </div>
+                      <h3 className="font-bold text-lg">Your KPIs</h3>
+                    </div>
+                    <div className="space-y-1">
+                      <KPICard 
+                        label="Current Rank" 
+                        value={stats.rank !== "-" ? `#${stats.rank}` : "-"}
+                        change={stats.rankChange.value !== "-" ? {
+                          value: `${stats.rankChange.value} ${stats.rankChange.direction === 'up' ? 'UP' : 'DOWN'}`,
+                          direction: stats.rankChange.direction
+                        } : undefined}
+                      />
+                      <KPICard 
+                        label="Current Points" 
+                        value={stats.totalPoints}
+                        change={stats.pointsChange !== "-" ? {
+                          value: stats.pointsChange,
+                          direction: stats.pointsChange.startsWith('+') ? 'up' : stats.pointsChange.startsWith('-') ? 'down' : 'neutral'
+                        } : undefined}
+                      />
+                      <KPICard 
+                        label="Rank Percentile" 
+                        value={stats.percentile !== "-" ? `Top ${stats.percentile}` : "-"}
+                      />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                        <PieChart className="w-4 h-4 text-secondary" />
+                      </div>
+                      <h3 className="font-bold text-lg">Market Share</h3>
+                    </div>
+                    <div className="space-y-1">
+                      <KPICard 
+                        label="Your Share of Pool" 
+                        value={stats.marketShare}
+                      />
+                      <KPICard 
+                        label="Share Change" 
+                        value={stats.shareChange}
+                        change={stats.shareChange !== "-" && stats.shareChange.startsWith('+') ? {
+                          value: stats.shareChange,
+                          direction: 'up'
+                        } : undefined}
+                      />
+                      <KPICard 
+                        label="Pace vs. Ecosystem" 
+                        value={stats.paceStatus}
+                        change={stats.paceStatus === "GAINING" ? {
+                          value: "GAINING",
+                          direction: 'up'
+                        } : stats.paceStatus === "LOSING" ? {
+                          value: "LOSING",
+                          direction: 'down'
+                        } : undefined}
+                      />
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="border-border/50 bg-gradient-to-br from-card to-card/80 backdrop-blur-sm shadow-card">
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <DollarSign className="w-4 h-4 text-primary" />
+                      </div>
+                      <h3 className="font-bold text-lg">Financial Projections</h3>
+                    </div>
+                    <div className="space-y-1">
+                      <KPICard 
+                        label="150M Airdrop Est." 
+                        value={stats.airdropEstimates["150M"]}
+                      />
+                      <KPICard 
+                        label="200M Airdrop Est." 
+                        value={stats.airdropEstimates["200M"]}
+                      />
+                      <KPICard 
+                        label="250M Airdrop Est." 
+                        value={stats.airdropEstimates["250M"]}
+                      />
+                      <KPICard 
+                        label="300M Airdrop Est." 
+                        value={stats.airdropEstimates["300M"]}
+                      />
+                    </div>
+                  </div>
+                </Card>
               </div>
 
-              {/* Progress Chart */}
-              <ProgressChart data={historyData} loading={loading} />
+              {/* Charts Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <ProgressChart data={historyData} loading={loading} />
+                <RankChart data={historyData} loading={loading} />
+              </div>
 
               {/* Automation Info Cards */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

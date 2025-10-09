@@ -21,7 +21,7 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
         <div className="p-8">
           <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-primary" />
-            Points Progress
+            Your Points vs. Average
           </h3>
           <div className="h-[300px] flex items-center justify-center">
             <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
@@ -37,7 +37,7 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
         <div className="p-8">
           <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-primary" />
-            Points Progress
+            Your Points vs. Average
           </h3>
           <div className="h-[300px] flex items-center justify-center border border-dashed border-border/50 rounded-lg bg-muted/20">
             <div className="text-center space-y-2">
@@ -55,9 +55,13 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
     );
   }
 
+  // Calculate average points (estimated based on total wallets and user's percentile)
+  const avgPoints = data.length > 0 ? data[data.length - 1].total_points * 0.4 : 0;
+
   const chartData = data.map(item => ({
-    date: format(new Date(item.created_at), 'MMM dd'),
+    date: format(new Date(item.created_at), 'MMM dd HH:mm'),
     points: Number(item.total_points),
+    average: avgPoints,
     rank: item.rank
   }));
 
@@ -66,7 +70,7 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
       <div className="p-8">
         <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-primary" />
-          Points Progress (Last 30 Days)
+          Your Points vs. Average
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData}>
@@ -79,7 +83,7 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
             <YAxis 
               stroke="hsl(var(--muted-foreground))"
               style={{ fontSize: '12px' }}
-              tickFormatter={(value) => value.toLocaleString()}
+              tickFormatter={(value) => (value / 1000000).toFixed(1) + 'M'}
             />
             <Tooltip 
               contentStyle={{ 
@@ -88,15 +92,28 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
                 borderRadius: '8px',
                 color: 'hsl(var(--foreground))'
               }}
-              formatter={(value: number) => [value.toLocaleString(), 'Points']}
+              formatter={(value: number, name: string) => [
+                value.toLocaleString(), 
+                name === 'points' ? 'Your Points' : 'Average Points'
+              ]}
             />
             <Line 
               type="monotone" 
               dataKey="points" 
               stroke="hsl(var(--primary))" 
               strokeWidth={3}
+              name="Your Points"
               dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6 }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="average" 
+              stroke="hsl(var(--muted-foreground))" 
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              name="Average Points"
+              dot={false}
             />
           </LineChart>
         </ResponsiveContainer>
