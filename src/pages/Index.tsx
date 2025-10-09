@@ -6,6 +6,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { ProgressChart } from "@/components/ProgressChart";
 import { RankChart } from "@/components/RankChart";
 import { KPICard } from "@/components/KPICard";
+import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
 import { Sparkles, TrendingUp, Users, Award, Search, DollarSign, PieChart, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,9 +30,9 @@ const Index = () => {
     shareChange: "-",
     paceStatus: "NEUTRAL",
           airdropEstimates: {
-            "150M": "-",
-            "200M": "-",
-            "250M": "-"
+            "150M": { low: "-", high: "-" },
+            "200M": { low: "-", high: "-" },
+            "250M": { low: "-", high: "-" }
           }
   });
 
@@ -116,12 +117,24 @@ const Index = () => {
         }
 
         // Financial projections based on market share
-        // Assuming SPK token price of €1 per token
+        // Token price range: $0.05 - $0.15 per SPK
         const share = parseFloat(marketShare) / 100 || 0;
+        const lowPrice = 0.05;
+        const highPrice = 0.15;
+        
         const airdropEstimates = {
-          "150M": share > 0 ? `€${(150000000 * share * 1).toFixed(2)}` : "-",
-          "200M": share > 0 ? `€${(200000000 * share * 1).toFixed(2)}` : "-",
-          "250M": share > 0 ? `€${(250000000 * share * 1).toFixed(2)}` : "-",
+          "150M": share > 0 ? {
+            low: `$${(150000000 * share * lowPrice).toFixed(0)}`,
+            high: `$${(150000000 * share * highPrice).toFixed(0)}`
+          } : { low: "-", high: "-" },
+          "200M": share > 0 ? {
+            low: `$${(200000000 * share * lowPrice).toFixed(0)}`,
+            high: `$${(200000000 * share * highPrice).toFixed(0)}`
+          } : { low: "-", high: "-" },
+          "250M": share > 0 ? {
+            low: `$${(250000000 * share * lowPrice).toFixed(0)}`,
+            high: `$${(250000000 * share * highPrice).toFixed(0)}`
+          } : { low: "-", high: "-" }
         };
 
         // Format last updated time
@@ -162,9 +175,9 @@ const Index = () => {
           shareChange: "-",
           paceStatus: "NEUTRAL",
           airdropEstimates: {
-            "150M": "-",
-            "200M": "-",
-            "250M": "-"
+            "150M": { low: "-", high: "-" },
+            "200M": { low: "-", high: "-" },
+            "250M": { low: "-", high: "-" }
           }
         });
         setHistoryData([]);
@@ -355,17 +368,20 @@ const Index = () => {
                       <h3 className="font-bold text-lg">Financial Projections</h3>
                     </div>
                     <div className="space-y-1">
-                      <KPICard 
+                      <AirdropEstimateCard 
                         label="150M SPK Airdrop" 
-                        value={stats.airdropEstimates["150M"]}
+                        lowValue={stats.airdropEstimates["150M"].low}
+                        highValue={stats.airdropEstimates["150M"].high}
                       />
-                      <KPICard 
+                      <AirdropEstimateCard 
                         label="200M SPK Airdrop" 
-                        value={stats.airdropEstimates["200M"]}
+                        lowValue={stats.airdropEstimates["200M"].low}
+                        highValue={stats.airdropEstimates["200M"].high}
                       />
-                      <KPICard 
+                      <AirdropEstimateCard 
                         label="250M SPK Airdrop" 
-                        value={stats.airdropEstimates["250M"]}
+                        lowValue={stats.airdropEstimates["250M"].low}
+                        highValue={stats.airdropEstimates["250M"].high}
                       />
                     </div>
                   </div>
