@@ -132,7 +132,11 @@ const Index = () => {
           const growth = ((latest - previous) / previous * 100).toFixed(2);
           const growthNum = parseFloat(growth);
           pointsGrowth = growthNum > 0 ? `+${growth}%` : `${growth}%`;
-          pointsChange = pointsDiff > 0 ? `+${pointsDiff.toLocaleString()}` : pointsDiff.toLocaleString();
+          
+          // Only set pointsChange if there's an actual change
+          if (pointsDiff !== 0) {
+            pointsChange = pointsDiff > 0 ? `+${pointsDiff.toLocaleString()}` : pointsDiff.toLocaleString();
+          }
           
           // Rank change
           const latestRank = history[history.length - 1].rank;
@@ -211,10 +215,10 @@ const Index = () => {
             const shareDiff = share - prevShare;
             shareChange = shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`;
             
-            // Create change object for Pool Share indicator
+            // Create change object for Pool Share indicator - only if there's meaningful change
             if (Math.abs(shareDiff) > 0.0000001) {
               shareChangeObj = {
-                value: shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`,
+                value: `${Math.abs(shareDiff).toFixed(7)}%`,
                 direction: shareDiff > 0 ? 'up' : shareDiff < 0 ? 'down' : 'neutral'
               };
             }
@@ -493,7 +497,7 @@ const Index = () => {
                       />
                       <KPICard 
                         label="Percentile" 
-                        value={stats.percentile !== "-" ? `Top ${stats.percentile}` : "-"}
+                        value={stats.percentile !== "-" ? stats.percentile : "-"}
                         change={stats.percentileChange.value !== "-" ? stats.percentileChange : undefined}
                       />
                     </div>
