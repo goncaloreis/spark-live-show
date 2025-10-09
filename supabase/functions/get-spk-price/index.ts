@@ -114,10 +114,11 @@ serve(async (req) => {
       );
     }
     
-    // Fetch fresh price from CoinGecko using simple API (more reliable for free tier)
+    // Fetch fresh price from DefiLlama (free, no API key, better for DeFi tokens)
+    // SPK Token: 0xc20059e0317DE91738d13af027DfC4a50781b066 on Ethereum
     const timestamp = Date.now();
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=spark&vs_currencies=usd&include_24hr_change=true&precision=6&_=${timestamp}`,
+      `https://coins.llama.fi/prices/current/ethereum:0xc20059e0317DE91738d13af027DfC4a50781b066?_=${timestamp}`,
       {
         headers: {
           'Accept': 'application/json',
@@ -128,11 +129,11 @@ serve(async (req) => {
     );
 
     if (!response.ok) {
-      console.error('Error code: COINGECKO_API_ERROR', response.status, response.statusText);
+      console.error('Error code: DEFILLAMA_API_ERROR', response.status, response.statusText);
       // Return fallback price if API fails
       return new Response(
         JSON.stringify({ 
-          price: 0.0475,
+          price: 0.04,
           change_24h: 0,
           source: 'fallback'
         }),
@@ -145,12 +146,16 @@ serve(async (req) => {
 
     const data = await response.json();
 
-    // Extract price data from simple API (returns object like { "spark": { "usd": 0.04788, "usd_24h_change": 1.6 } })
-    if (!data || !data.spark || typeof data.spark.usd !== 'number') {
+    // Extract price data from DefiLlama API
+    // Returns: { "coins": { "ethereum:0xc20...": { "price": 0.04, "timestamp": 1234567890, "confidence": 0.99 } } }
+    const coinKey = 'ethereum:0xc20059e0317de91738d13af027dfc4a50781b066';
+    const coinData = data?.coins?.[coinKey];
+    
+    if (!coinData || typeof coinData.price !== 'number') {
       console.error('Error code: INVALID_PRICE_DATA', 'Data received:', JSON.stringify(data));
       return new Response(
         JSON.stringify({ 
-          price: 0.0475,
+          price: 0.04, // Updated fallback for SPK token
           change_24h: 0,
           source: 'fallback'
         }),
@@ -161,8 +166,11 @@ serve(async (req) => {
       );
     }
 
-    const currentPrice = data.spark.usd;
-    const priceChange24h = data.spark.usd_24h_change || 0;
+    const currentPrice = coinData.price;
+    
+    // DefiLlama doesn't provide 24h change in the current price endpoint
+    // We'll calculate it from historical data or set to 0
+    const priceChange24h = 0; // TODO: Could fetch from /chart endpoint if needed
 
     // Store price in cache
     await supabaseClient
@@ -170,7 +178,7 @@ serve(async (req) => {
       .insert({
         price: currentPrice,
         change_24h: priceChange24h,
-        source: 'coingecko'
+        source: 'defillama'
       });
 
     // Clean up old cache entries periodically (1% chance per request)
@@ -182,7 +190,7 @@ serve(async (req) => {
       JSON.stringify({
         price: currentPrice,
         change_24h: priceChange24h,
-        source: 'coingecko',
+        source: 'defillama',
         timestamp: new Date().toISOString()
       }),
       { 
@@ -194,10 +202,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error code: PRICE_FETCH_FAILED');
     
-    // Return fallback price on error (updated to current approximate price)
+    // Return fallback price on error
     return new Response(
       JSON.stringify({ 
-        price: 0.0477,
+        price: 0.04, // SPK token fallback
         change_24h: 0,
         source: 'fallback'
       }),
