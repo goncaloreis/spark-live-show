@@ -64,7 +64,7 @@ def scrape_spark_points(wallet_address):
     
     try:
         # Navigate to Spark Points page
-        url = f"https://app.spark.fi/points?wallet={wallet_address}"
+        url = f"https://points.spark.fi/?wallet={wallet_address}"
         print(f"Navigating to: {url}")
         driver.get(url)
         
