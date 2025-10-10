@@ -475,7 +475,7 @@ const Index = () => {
                       <div>
                         <h3 className="font-bold text-base tracking-tight text-foreground">Projections</h3>
                         <p className="text-[9px] text-muted-foreground/50 mt-0.5 whitespace-nowrap">
-                          Pool share × airdrop × live SPK
+                          Wallet share × estimated airdrop × live SPK
                         </p>
                       </div>
                     </div>
