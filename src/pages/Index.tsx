@@ -151,16 +151,10 @@ const Index = () => {
         if (history.length >= 2) {
           const latestWallets = history[history.length - 1].total_wallets;
           const prevWallets = history[history.length - 2].total_wallets;
-          console.log('Total Wallets Debug:', { latestWallets, prevWallets, historyLength: history.length });
           if (latestWallets && prevWallets) {
             const walletsDiff = latestWallets - prevWallets;
             totalWalletsChange = walletsDiff > 0 ? `+${walletsDiff}` : `${walletsDiff}`;
-            console.log('Total Wallets Change Calculated:', { walletsDiff, totalWalletsChange });
-          } else {
-            console.log('Total Wallets Missing:', { latestWallets, prevWallets });
           }
-        } else {
-          console.log('Not enough history for Total Wallets:', history.length);
         }
         
         // Calculate percentile change if we have history and rank data

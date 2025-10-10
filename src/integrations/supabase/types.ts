@@ -138,6 +138,7 @@ export type Database = {
           rank: number
           total_points: number
           total_points_pool: number
+          total_wallets: number
         }[]
       }
       trigger_scrape_spark_points: {
