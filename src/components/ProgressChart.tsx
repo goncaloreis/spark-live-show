@@ -66,11 +66,52 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
     );
   }
 
-  // Calculate average dynamically for each data point based on total pool / total wallets
-  const chartData = data.map(item => {
-    const avgForPoint = item.total_points_pool && item.total_wallets 
-      ? item.total_points_pool / item.total_wallets
-      : (item.globalAverage || 0);
+  // Calculate average dynamically, interpolating missing values
+  const chartData = data.map((item, index) => {
+    let avgForPoint: number | null = null;
+    
+    // If we have valid pool data, calculate the actual average
+    if (item.total_points_pool && item.total_wallets && item.total_points_pool > 0) {
+      avgForPoint = item.total_points_pool / item.total_wallets;
+    } else {
+      // Interpolate between previous and next valid data points
+      let prevValid: { index: number; avg: number } | null = null;
+      let nextValid: { index: number; avg: number } | null = null;
+      
+      // Find previous valid point
+      for (let i = index - 1; i >= 0; i--) {
+        if (data[i].total_points_pool && data[i].total_wallets && data[i].total_points_pool! > 0) {
+          prevValid = {
+            index: i,
+            avg: data[i].total_points_pool! / data[i].total_wallets!
+          };
+          break;
+        }
+      }
+      
+      // Find next valid point
+      for (let i = index + 1; i < data.length; i++) {
+        if (data[i].total_points_pool && data[i].total_wallets && data[i].total_points_pool! > 0) {
+          nextValid = {
+            index: i,
+            avg: data[i].total_points_pool! / data[i].total_wallets!
+          };
+          break;
+        }
+      }
+      
+      // Interpolate if we have both prev and next
+      if (prevValid && nextValid) {
+        const ratio = (index - prevValid.index) / (nextValid.index - prevValid.index);
+        avgForPoint = prevValid.avg + (nextValid.avg - prevValid.avg) * ratio;
+      } else if (prevValid) {
+        avgForPoint = prevValid.avg;
+      } else if (nextValid) {
+        avgForPoint = nextValid.avg;
+      } else {
+        avgForPoint = item.globalAverage || null;
+      }
+    }
     
     return {
       date: format(new Date(item.created_at), 'MMM dd HH:mm'),
