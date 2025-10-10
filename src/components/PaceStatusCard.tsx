@@ -31,17 +31,17 @@ export const PaceStatusCard = ({ poolShareChange }: PaceStatusCardProps) => {
   }
   
   return (
-    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 p-5">
+    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 p-4">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       
       <div className="relative flex items-center justify-between">
-        <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+        <span className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
           Pace Status
         </span>
         
-        <div className={`flex items-center gap-3 ${colorClass}`}>
+        <div className={`flex items-center gap-2.5 ${colorClass}`}>
           {icon}
-          <span className="text-lg font-bold uppercase tracking-wide">
+          <span className="text-base font-bold uppercase tracking-wide">
             {message.split(' ').map((word, idx) => {
               if (word === 'OUTPACING' || word === 'TRAILING' || word === 'KEEPING') {
                 return <span key={idx} className={colorClass}>{word} </span>;

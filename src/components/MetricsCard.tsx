@@ -13,16 +13,16 @@ const MetricRow = ({ label, value, change, suffix = "" }: MetricProps) => {
   const isPositive = change && change > 0;
   
   return (
-    <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-b-0">
-      <span className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+    <div className="flex items-center justify-between py-2.5 border-b border-white/5 last:border-b-0">
+      <span className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
         {label}
       </span>
-      <div className="flex items-center gap-3">
-        <span className="text-xl font-bold text-foreground tabular-nums">
+      <div className="flex items-center gap-2.5">
+        <span className="text-lg font-bold text-foreground tabular-nums">
           {value}{suffix}
         </span>
         {hasChange && (
-          <div className={`flex items-center gap-1 px-2.5 py-1 rounded-md ${
+          <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md ${
             isPositive 
               ? 'bg-green-500/10 border border-green-500/20' 
               : 'bg-red-500/10 border border-red-500/20'
@@ -32,7 +32,7 @@ const MetricRow = ({ label, value, change, suffix = "" }: MetricProps) => {
             ) : (
               <TrendingDown className="w-3 h-3 text-red-500" />
             )}
-            <span className={`text-xs font-bold tabular-nums ${
+            <span className={`text-[10px] font-bold tabular-nums ${
               isPositive ? 'text-green-500' : 'text-red-500'
             }`}>
               {isPositive ? '+' : ''}{typeof change === 'number' ? change.toFixed(2) : change}
@@ -76,13 +76,13 @@ export const MetricsCard = ({
 }: MetricsCardProps) => {
   return (
     <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 h-full flex flex-col">
-      <div className="p-6 sm:p-8 flex-1 flex flex-col">
+      <div className="p-5 flex-1 flex flex-col">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500">
-            <Award className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500">
+            <Award className="w-4 h-4 text-primary" />
           </div>
-          <h3 className="font-bold text-base sm:text-lg tracking-tight">Performance</h3>
+          <h3 className="font-bold text-base tracking-tight">Performance</h3>
         </div>
         
         {/* Metrics Grid */}
