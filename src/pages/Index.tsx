@@ -6,6 +6,8 @@ import { StatsCard } from "@/components/StatsCard";
 import { CombinedChart } from "@/components/CombinedChart";
 import { KPICard } from "@/components/KPICard";
 import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
+import { MetricsCard } from "@/components/MetricsCard";
+import { PaceStatusCard } from "@/components/PaceStatusCard";
 import { TrendingUp, Users, Award, Search, DollarSign, PieChart } from "lucide-react";
 import sparkLogo from "@/assets/spark-logo.svg";
 import { toast } from "sonner";
@@ -36,7 +38,11 @@ const Index = () => {
       "200M": "-",
       "250M": "-"
     },
-    spkPrice: null as number | null
+    spkPrice: null as number | null,
+    totalPointsPool: "-",
+    totalPointsPoolChange: "-",
+    totalWalletsChange: "-",
+    poolShareChangeNumeric: 0
   });
 
   const handleSearch = async () => {
@@ -88,6 +94,9 @@ const Index = () => {
         let shareChange = "-";
         let shareChangeObj = { value: "-", direction: 'neutral' as 'up' | 'down' | 'neutral' };
         let paceStatus = "NEUTRAL";
+        let totalPointsPoolChange = "-";
+        let totalWalletsChange = "-";
+        let poolShareChangeNumeric = 0;
         
         if (history.length >= 2) {
           const latest = Number(history[history.length - 1].total_points);
@@ -122,11 +131,36 @@ const Index = () => {
         
         // Find the most recent valid total_points_pool from history (not 0 or null)
         let totalPointsPool: number | null = null;
+        let prevTotalPointsPool: number | null = null;
         for (let i = history.length - 1; i >= 0; i--) {
           const poolValue = history[i].total_points_pool;
           if (poolValue && Number(poolValue) > 0) {
-            totalPointsPool = Number(poolValue);
-            break;
+            if (!totalPointsPool) {
+              totalPointsPool = Number(poolValue);
+            } else if (!prevTotalPointsPool) {
+              prevTotalPointsPool = Number(poolValue);
+              break;
+            }
+          }
+        }
+        
+        // Calculate total points pool change
+        if (totalPointsPool && prevTotalPointsPool) {
+          const poolDiff = totalPointsPool - prevTotalPointsPool;
+          if (poolDiff !== 0) {
+            totalPointsPoolChange = poolDiff > 0 ? `+${poolDiff.toLocaleString()}` : poolDiff.toLocaleString();
+          }
+        }
+        
+        // Calculate total wallets change
+        if (history.length >= 2) {
+          const latestWallets = history[history.length - 1].total_wallets;
+          const prevWallets = history[history.length - 2].total_wallets;
+          if (latestWallets && prevWallets) {
+            const walletsDiff = latestWallets - prevWallets;
+            if (walletsDiff !== 0) {
+              totalWalletsChange = walletsDiff > 0 ? `+${walletsDiff}` : `${walletsDiff}`;
+            }
           }
         }
         
@@ -174,6 +208,7 @@ const Index = () => {
           if (prevValidPool && prevValidPoints) {
             const prevShare = (prevValidPoints / prevValidPool) * 100;
             const shareDiff = share - prevShare;
+            poolShareChangeNumeric = shareDiff;
             shareChange = shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`;
             
             // Create change object for Pool Share indicator - only if there's meaningful change
@@ -240,7 +275,11 @@ const Index = () => {
           shareChangeObj,
           paceStatus,
           airdropEstimates,
-          spkPrice
+          spkPrice,
+          totalPointsPool: totalPointsPool ? totalPointsPool.toLocaleString() : '-',
+          totalPointsPoolChange,
+          totalWalletsChange,
+          poolShareChangeNumeric
         });
         
         // Update history for chart with global average
@@ -271,7 +310,11 @@ const Index = () => {
             "200M": "-",
             "250M": "-"
           },
-          spkPrice: null
+          spkPrice: null,
+          totalPointsPool: "-",
+          totalPointsPoolChange: "-",
+          totalWalletsChange: "-",
+          poolShareChangeNumeric: 0
         });
         setHistoryData([]);
       }
@@ -411,68 +454,27 @@ const Index = () => {
               )}
 
               {/* KPI Cards Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500">
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500">
-                        <Award className="w-5 h-5 text-primary" />
-                      </div>
-                      <h3 className="font-bold text-base sm:text-lg tracking-tight">Performance</h3>
-                    </div>
-                    <div className="space-y-1">
-                      <KPICard 
-                        label="Current Rank" 
-                        value={stats.rank !== "-" ? `#${stats.rank}` : "-"}
-                        change={stats.rankChange.value !== "-" ? {
-                          value: `${stats.rankChange.value} ${stats.rankChange.direction === 'up' ? 'UP' : 'DOWN'}`,
-                          direction: stats.rankChange.direction
-                        } : undefined}
-                      />
-                      <KPICard 
-                        label="Current Points" 
-                        value={stats.totalPoints}
-                        change={stats.pointsChange !== "-" ? {
-                          value: stats.pointsChange,
-                          direction: stats.pointsChange.startsWith('+') ? 'up' : stats.pointsChange.startsWith('-') ? 'down' : 'neutral'
-                        } : undefined}
-                      />
-                      <KPICard 
-                        label="Percentile" 
-                        value={stats.percentile !== "-" ? stats.percentile : "-"}
-                        change={stats.percentileChange.value !== "-" ? stats.percentileChange : undefined}
-                      />
-                    </div>
-                  </div>
-                </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                {/* Metrics Card - combines Performance & Market Position */}
+                <div className="space-y-4">
+                  <MetricsCard 
+                    totalPoints={stats.totalPointsPool}
+                    totalPointsChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
+                    walletPoints={stats.totalPoints}
+                    walletPointsChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
+                    walletRank={stats.rank !== "-" ? `#${stats.rank}` : "-"}
+                    walletRankChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
+                    totalWallets={stats.totalWallets}
+                    totalWalletsChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
+                    walletShare={stats.marketShare.replace('%', '')}
+                    walletShareChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
+                    rankPercentile={stats.percentile.replace('%', '')}
+                    rankPercentileChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
+                  />
+                  <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
+                </div>
 
-                <Card className="card-premium border-white/5 group hover:border-secondary/20 transition-all duration-500">
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-secondary/20 to-secondary/5 border border-secondary/20 group-hover:scale-110 group-hover:border-secondary/40 transition-all duration-500">
-                        <PieChart className="w-5 h-5 text-secondary" />
-                      </div>
-                      <h3 className="font-bold text-base sm:text-lg tracking-tight">Market Position</h3>
-                    </div>
-                    <div className="space-y-1">
-                      <KPICard 
-                        label="Pool Share" 
-                        value={stats.marketShare}
-                        change={stats.shareChangeObj.value !== "-" ? stats.shareChangeObj : undefined}
-                      />
-                      <KPICard 
-                        label="Pace Status" 
-                        value={stats.paceStatus}
-                        valueColor={
-                          stats.paceStatus === "GAINING" ? 'green' : 
-                          stats.paceStatus === "LOSING" ? 'red' : 
-                          'default'
-                        }
-                      />
-                    </div>
-                  </div>
-                </Card>
-
+                {/* Projections Card */}
                 <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500">
                   <div className="p-6 sm:p-8">
                     <div className="flex items-center gap-3 mb-6">
