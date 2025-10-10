@@ -458,22 +458,27 @@ const Index = () => {
               <div className="space-y-3">
                 {/* Headers Row */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                  <div className="lg:col-span-3 flex items-center gap-2.5">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
+                  <div className="lg:col-span-3 flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 transition-all duration-200 hover:scale-105">
                       <Award className="w-4 h-4 text-primary" />
                     </div>
-                    <h3 className="font-bold text-base tracking-tight">Performance</h3>
+                    <div>
+                      <h3 className="font-bold text-base tracking-tight text-foreground">Performance</h3>
+                      <p className="text-[9px] text-muted-foreground/50 mt-0.5">Real-time metrics</p>
+                    </div>
                   </div>
                   <div className="flex items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 shimmer">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 shimmer transition-all duration-200 hover:scale-105">
                         <DollarSign className="w-4 h-4 text-primary" />
                       </div>
-                      <h3 className="font-bold text-base tracking-tight">Projections</h3>
+                      <div>
+                        <h3 className="font-bold text-base tracking-tight text-foreground">Projections</h3>
+                        <p className="text-[9px] text-muted-foreground/50 mt-0.5 whitespace-nowrap">
+                          Pool share × airdrop × live SPK
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-[9px] text-muted-foreground/50 font-medium leading-tight text-right">
-                      Pool share × airdrop × live SPK
-                    </p>
                   </div>
                 </div>
 

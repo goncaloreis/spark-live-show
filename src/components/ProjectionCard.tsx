@@ -23,22 +23,22 @@ export const ProjectionCard = ({ label, value, badge, variant }: ProjectionCardP
   };
   
   return (
-    <Card className={`card-premium group transition-all duration-500 p-3 h-full ${variantStyles[variant]}`}>
+    <Card className={`card-premium group transition-all duration-300 p-4 h-full hover:shadow-lg ${variantStyles[variant]}`}>
       {variant === 'optimistic' && (
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 shimmer rounded-lg" />
       )}
       
-      <div className="relative flex items-center justify-between h-full">
-        <div className="space-y-0.5">
-          <div className="text-[10px] text-muted-foreground/60 font-medium uppercase tracking-wider">
+      <div className="relative flex flex-col justify-between h-full gap-3">
+        <div className="flex items-start justify-between">
+          <div className="metric-label text-[9px] leading-tight max-w-[70%]">
             {label}
           </div>
-          <div className="text-lg font-bold text-foreground/90 tabular-nums">
-            {hasData ? value : "-"}
+          <div className={`px-2 py-0.5 rounded-md transition-all duration-200 ${badgeStyles[variant]}`}>
+            <span className="text-[9px] font-bold text-primary uppercase tracking-wide">{badge}</span>
           </div>
         </div>
-        <div className={`px-2 py-0.5 rounded-md ${badgeStyles[variant]}`}>
-          <span className="text-[10px] font-bold text-primary uppercase tracking-wide">{badge}</span>
+        <div className="metric-value text-2xl text-foreground transition-all duration-200 group-hover:scale-105 group-hover:text-primary">
+          {hasData ? value : "-"}
         </div>
       </div>
     </Card>
