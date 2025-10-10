@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Morpho-inspired dark theme */
+    /* Spark.fi inspired dark theme */
     --background: 0 0% 4%;     /* Near black */
     --foreground: 0 0% 98%;    /* Near white */
 
@@ -18,14 +18,14 @@ All colors MUST be HSL.
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 220 100% 65%;   /* Clean blue */
+    --primary: 330 100% 70%;   /* Spark pink/magenta */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 220 100% 75%;
-    --primary-dark: 220 100% 55%;
+    --primary-glow: 330 100% 80%;
+    --primary-dark: 330 100% 60%;
 
-    --secondary: 280 60% 60%;  /* Purple accent */
+    --secondary: 15 100% 65%;  /* Spark orange accent */
     --secondary-foreground: 0 0% 100%;
-    --secondary-glow: 280 60% 70%;
+    --secondary-glow: 15 100% 75%;
 
     --success: 142 76% 45%;
     --success-foreground: 0 0% 100%;
@@ -36,7 +36,7 @@ All colors MUST be HSL.
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 220 100% 65%;
+    --accent: 330 100% 70%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 55%;
@@ -44,19 +44,19 @@ All colors MUST be HSL.
 
     --border: 0 0% 15%;
     --input: 0 0% 10%;
-    --ring: 220 100% 65%;
+    --ring: 330 100% 70%;
 
     --radius: 0.5rem;
 
-    /* Clean gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(220 100% 65%) 0%, hsl(280 60% 60%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(280 60% 60%) 0%, hsl(220 100% 65%) 100%);
-    --gradient-mesh: radial-gradient(at 20% 10%, hsl(220 100% 65% / 0.08) 0px, transparent 50%),
-                     radial-gradient(at 80% 90%, hsl(280 60% 60% / 0.08) 0px, transparent 50%);
+    /* Spark.fi gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(330 100% 70%) 0%, hsl(15 100% 65%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(15 100% 65%) 0%, hsl(330 100% 70%) 100%);
+    --gradient-mesh: radial-gradient(at 20% 10%, hsl(330 100% 70% / 0.08) 0px, transparent 50%),
+                     radial-gradient(at 80% 90%, hsl(15 100% 65% / 0.08) 0px, transparent 50%);
     --gradient-glass: linear-gradient(135deg, hsl(0 0% 7% / 0.95) 0%, hsl(0 0% 5% / 0.9) 100%);
     --gradient-card: linear-gradient(to bottom right, hsl(0 0% 8%) 0%, hsl(0 0% 6%) 100%);
     
-    --shadow-glow: 0 0 60px hsl(220 100% 65% / 0.2), 0 0 30px hsl(280 60% 60% / 0.1);
+    --shadow-glow: 0 0 60px hsl(330 100% 70% / 0.2), 0 0 30px hsl(15 100% 65% / 0.1);
     --shadow-card: 0 8px 32px hsl(0 0% 0% / 0.5), 0 2px 8px hsl(0 0% 0% / 0.3);
     --shadow-elevated: 0 16px 48px hsl(0 0% 0% / 0.6), 0 4px 16px hsl(0 0% 0% / 0.4);
     --shadow-sm: 0 1px 8px hsl(0 0% 0% / 0.2);
@@ -67,12 +67,12 @@ All colors MUST be HSL.
 
     --sidebar-background: 0 0% 7%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 220 100% 65%;
+    --sidebar-primary: 330 100% 70%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 220 100% 65%;
+    --sidebar-ring: 330 100% 70%;
   }
 }
 
@@ -109,7 +109,7 @@ All colors MUST be HSL.
   }
   
   .glass-hover:hover {
-    box-shadow: 0 8px 32px hsl(220 100% 65% / 0.2);
+    box-shadow: 0 8px 32px hsl(330 100% 70% / 0.2);
     transform: translateY(-2px);
   }
 
@@ -150,7 +150,7 @@ All colors MUST be HSL.
   .card-premium::before {
     content: '';
     @apply absolute inset-0 opacity-0 transition-opacity duration-500;
-    background: linear-gradient(135deg, hsl(220 100% 65% / 0.05) 0%, transparent 50%, hsl(280 60% 60% / 0.05) 100%);
+    background: linear-gradient(135deg, hsl(330 100% 70% / 0.05) 0%, transparent 50%, hsl(15 100% 65% / 0.05) 100%);
   }
 
   .card-premium:hover::before {
