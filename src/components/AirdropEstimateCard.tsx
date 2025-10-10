@@ -1,15 +1,12 @@
-import { TrendingUp } from "lucide-react";
-
 interface AirdropEstimateCardProps {
   values: {
     "150M": string;
     "200M": string;
     "250M": string;
   };
-  spkPrice: number | null;
 }
 
-export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardProps) => {
+export const AirdropEstimateCard = ({ values }: { values: AirdropEstimateCardProps['values'] }) => {
   const hasData = values["150M"] !== "-";
   
   return (
@@ -71,29 +68,6 @@ export const AirdropEstimateCard = ({ values, spkPrice }: AirdropEstimateCardPro
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* SPK Price Display - Moved to bottom */}
-          {spkPrice && (
-            <div className="flex items-center justify-center gap-2.5 pt-2.5 mt-2.5 border-t border-white/5">
-              <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
-                <div className="relative">
-                  <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                  <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse shadow-[0_0_6px_rgba(74,222,128,0.8)]" />
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[10px] text-muted-foreground/70 font-semibold uppercase tracking-wider">Live SPK</span>
-                  <span className="text-lg font-bold text-gradient-static tabular-nums">${spkPrice.toFixed(4)}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Footer Note */}
-          <div className="text-center pt-2">
-            <p className="text-[9px] text-muted-foreground/50 font-medium leading-tight">
-              Estimates based on your current pool share × total airdrop × live SPK price
-            </p>
           </div>
         </>
       ) : (

@@ -6,8 +6,9 @@ import { StatsCard } from "@/components/StatsCard";
 import { CombinedChart } from "@/components/CombinedChart";
 import { KPICard } from "@/components/KPICard";
 import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
-import { MetricsCard } from "@/components/MetricsCard";
+import { MetricRowCard } from "@/components/MetricRowCard";
 import { PaceStatusCard } from "@/components/PaceStatusCard";
+import { LiveSPKCard } from "@/components/LiveSPKCard";
 import { TrendingUp, Users, Award, Search, DollarSign, PieChart } from "lucide-react";
 import sparkLogo from "@/assets/spark-logo.svg";
 import { toast } from "sonner";
@@ -453,45 +454,86 @@ const Index = () => {
                 </div>
               )}
 
-              {/* KPI Cards Section - 2/3 Performance, 1/3 Projections */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                {/* Left: Performance metrics (2 columns) */}
-                <div className="lg:col-span-2 space-y-4 flex flex-col">
-                  <MetricsCard 
-                    totalPoints={stats.totalPointsPool}
-                    totalPointsChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
-                    walletPoints={stats.totalPoints}
-                    walletPointsChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
-                    walletRank={stats.rank !== "-" ? `#${stats.rank}` : "-"}
-                    walletRankChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
-                    totalWallets={stats.totalWallets}
-                    totalWalletsChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
-                    walletShare={stats.marketShare.replace('%', '')}
-                    walletShareChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
-                    rankPercentile={stats.percentile.replace('%', '')}
-                    rankPercentileChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
-                  />
-                  <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
+              {/* KPI Cards Section - Grid Layout */}
+              <div className="space-y-4">
+                {/* Performance Header */}
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
+                    <Award className="w-4 h-4 text-primary" />
+                  </div>
+                  <h3 className="font-bold text-base tracking-tight">Performance</h3>
                 </div>
 
-                {/* Right: Projections Card (1 column) */}
-                <div className="flex flex-col">
-                  <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 h-full flex flex-col">
-                    <div className="p-5 flex-1 flex flex-col">
-                      <div className="flex items-center gap-2.5 mb-4">
-                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500 shimmer">
-                          <DollarSign className="w-4 h-4 text-primary" />
+                {/* Grid: Performance Left, Projections Right */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  {/* Left Column: Performance Metrics (2 columns) */}
+                  <div className="lg:col-span-2 space-y-2.5">
+                    {/* Row 1: Total Points + Total Wallets */}
+                    <MetricRowCard 
+                      leftLabel="Total Points"
+                      leftValue={stats.totalPointsPool}
+                      leftChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
+                      rightLabel="Total Wallets"
+                      rightValue={stats.totalWallets}
+                      rightChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
+                    />
+
+                    {/* Row 2: Wallet Points + Wallet Share */}
+                    <MetricRowCard 
+                      leftLabel="Wallet Points"
+                      leftValue={stats.totalPoints}
+                      leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
+                      rightLabel="Wallet Share"
+                      rightValue={stats.marketShare.replace('%', '')}
+                      rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
+                      rightSuffix="%"
+                    />
+
+                    {/* Row 3: Wallet Rank + Rank Percentile */}
+                    <MetricRowCard 
+                      leftLabel="Wallet Rank"
+                      leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
+                      leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
+                      rightLabel="Rank Percentile"
+                      rightValue={stats.percentile.replace('%', '')}
+                      rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
+                      rightSuffix="%"
+                    />
+                  </div>
+
+                  {/* Right Column: Projections (1 column) */}
+                  <div className="flex flex-col space-y-2.5">
+                    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 flex-1 flex flex-col">
+                      <div className="p-5 flex-1 flex flex-col">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500 shimmer">
+                              <DollarSign className="w-4 h-4 text-primary" />
+                            </div>
+                            <h3 className="font-bold text-base tracking-tight">Projections</h3>
+                          </div>
+                          <p className="text-[9px] text-muted-foreground/50 font-medium leading-tight text-right">
+                            Pool share × airdrop × live SPK
+                          </p>
                         </div>
-                        <h3 className="font-bold text-base tracking-tight">Projections</h3>
+                        <div className="flex-1">
+                          <AirdropEstimateCard 
+                            values={stats.airdropEstimates}
+                          />
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <AirdropEstimateCard 
-                          values={stats.airdropEstimates}
-                          spkPrice={stats.spkPrice}
-                        />
-                      </div>
-                    </div>
-                  </Card>
+                    </Card>
+                  </div>
+                </div>
+
+                {/* Bottom Row: Pace Status + Live SPK */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2">
+                    <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
+                  </div>
+                  <div>
+                    <LiveSPKCard spkPrice={stats.spkPrice} />
+                  </div>
                 </div>
               </div>
 
