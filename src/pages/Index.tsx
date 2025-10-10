@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { StatsCard } from "@/components/StatsCard";
 import { CombinedChart } from "@/components/CombinedChart";
 import { KPICard } from "@/components/KPICard";
-import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
+import { ProjectionCard } from "@/components/ProjectionCard";
 import { MetricRowCard } from "@/components/MetricRowCard";
 import { PaceStatusCard } from "@/components/PaceStatusCard";
 import { LiveSPKCard } from "@/components/LiveSPKCard";
@@ -454,20 +454,33 @@ const Index = () => {
                 </div>
               )}
 
-              {/* KPI Cards Section - Grid Layout */}
+              {/* KPI Cards Section - Matrix Layout */}
               <div className="space-y-4">
-                {/* Performance Header */}
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
-                    <Award className="w-4 h-4 text-primary" />
+                {/* Headers Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
+                      <Award className="w-4 h-4 text-primary" />
+                    </div>
+                    <h3 className="font-bold text-base tracking-tight">Performance</h3>
                   </div>
-                  <h3 className="font-bold text-base tracking-tight">Performance</h3>
+                  <div className="flex items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 shimmer">
+                        <DollarSign className="w-4 h-4 text-primary" />
+                      </div>
+                      <h3 className="font-bold text-base tracking-tight">Projections</h3>
+                    </div>
+                    <p className="text-[9px] text-muted-foreground/50 font-medium leading-tight text-right">
+                      Pool share × airdrop × live SPK
+                    </p>
+                  </div>
                 </div>
 
-                {/* Grid: Performance Left, Projections Right */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  {/* Left Column: Performance Metrics (2 columns) */}
-                  <div className="lg:col-span-2 space-y-2.5">
+                {/* 3x2 Matrix: 3 rows x 2 columns */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
+                  {/* Left Column: Performance Metrics */}
+                  <div className="space-y-2.5">
                     {/* Row 1: Total Points + Total Wallets */}
                     <MetricRowCard 
                       leftLabel="Total Points"
@@ -501,39 +514,33 @@ const Index = () => {
                     />
                   </div>
 
-                  {/* Right Column: Projections (1 column) */}
-                  <div className="flex flex-col space-y-2.5">
-                    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 flex-1 flex flex-col">
-                      <div className="p-5 flex-1 flex flex-col">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2.5">
-                            <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500 shimmer">
-                              <DollarSign className="w-4 h-4 text-primary" />
-                            </div>
-                            <h3 className="font-bold text-base tracking-tight">Projections</h3>
-                          </div>
-                          <p className="text-[9px] text-muted-foreground/50 font-medium leading-tight text-right">
-                            Pool share × airdrop × live SPK
-                          </p>
-                        </div>
-                        <div className="flex-1">
-                          <AirdropEstimateCard 
-                            values={stats.airdropEstimates}
-                          />
-                        </div>
-                      </div>
-                    </Card>
+                  {/* Right Column: Projections */}
+                  <div className="space-y-2.5">
+                    <ProjectionCard 
+                      label="150M SPK Airdrop"
+                      value={stats.airdropEstimates["150M"]}
+                      badge="Conservative"
+                      variant="conservative"
+                    />
+                    <ProjectionCard 
+                      label="200M SPK Airdrop"
+                      value={stats.airdropEstimates["200M"]}
+                      badge="Moderate"
+                      variant="moderate"
+                    />
+                    <ProjectionCard 
+                      label="250M SPK Airdrop"
+                      value={stats.airdropEstimates["250M"]}
+                      badge="Optimistic"
+                      variant="optimistic"
+                    />
                   </div>
                 </div>
 
                 {/* Bottom Row: Pace Status + Live SPK */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <div className="lg:col-span-2">
-                    <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
-                  </div>
-                  <div>
-                    <LiveSPKCard spkPrice={stats.spkPrice} />
-                  </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
+                  <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
+                  <LiveSPKCard spkPrice={stats.spkPrice} />
                 </div>
               </div>
 
