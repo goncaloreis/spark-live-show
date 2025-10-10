@@ -431,11 +431,11 @@ const Index = () => {
         </header>
 
         {/* Main Content */}
-        <main className="container mx-auto px-4 sm:px-6 py-12 sm:py-16 max-w-7xl">
+        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
 
           {/* Stats Grid */}
           {hasSearched && (
-            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
               {/* Live Status Indicator */}
               {stats.lastUpdated !== "-" && (
                 <div className="flex justify-center animate-in fade-in duration-700">
@@ -455,9 +455,9 @@ const Index = () => {
               )}
 
               {/* KPI Cards Section - Matrix Layout */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Headers Row */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
                   <div className="lg:col-span-3 flex items-center gap-2.5">
                     <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
                       <Award className="w-4 h-4 text-primary" />
@@ -478,9 +478,9 @@ const Index = () => {
                 </div>
 
                 {/* 3x3 Matrix: 3 rows with aligned cards */}
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   {/* Row 1: Total Points + Total Wallets | Conservative */}
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2.5">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                     <div className="lg:col-span-3">
                       <MetricRowCard 
                         leftLabel="Total Points"
@@ -500,7 +500,7 @@ const Index = () => {
                   </div>
 
                   {/* Row 2: Wallet Points + Wallet Share | Moderate */}
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2.5">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                     <div className="lg:col-span-3">
                       <MetricRowCard 
                         leftLabel="Wallet Points"
@@ -521,7 +521,7 @@ const Index = () => {
                   </div>
 
                   {/* Row 3: Wallet Rank + Rank Percentile | Optimistic */}
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2.5">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                     <div className="lg:col-span-3">
                       <MetricRowCard 
                         leftLabel="Wallet Rank"
@@ -543,7 +543,7 @@ const Index = () => {
                 </div>
 
                 {/* Bottom Row: Pace Status + Live SPK */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-2.5">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                   <div className="lg:col-span-3">
                     <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
                   </div>
