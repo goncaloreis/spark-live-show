@@ -79,7 +79,7 @@ export const MetricRowCard = ({
     <Card className="card-premium border-white/5 group hover:border-primary/20 hover:shadow-lg transition-all duration-300 p-4 h-full">
       <div className="flex items-center gap-8 h-full">
         {renderMetric(leftLabel, leftValue, leftChange, leftSuffix)}
-        <div className="w-px h-10 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+        <div className="w-px self-stretch bg-gradient-to-b from-transparent via-white/10 to-transparent" />
         {renderMetric(rightLabel, rightValue, rightChange, rightSuffix)}
       </div>
     </Card>
