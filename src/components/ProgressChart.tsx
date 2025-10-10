@@ -9,6 +9,7 @@ interface HistoryData {
   created_at: string;
   globalAverage?: number;
   total_points_pool?: number;
+  total_wallets?: number;
 }
 
 interface ProgressChartProps {
@@ -65,16 +66,18 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
     );
   }
 
-  // Use global average from data (average points per wallet across all wallets)
-  const avgPoints = data.length > 0 && data[0].globalAverage 
-    ? data[0].globalAverage
-    : 0;
-
-  const chartData = data.map(item => ({
-    date: format(new Date(item.created_at), 'MMM dd HH:mm'),
-    points: Number(item.total_points),
-    average: avgPoints
-  }));
+  // Calculate average dynamically for each data point based on total pool / total wallets
+  const chartData = data.map(item => {
+    const avgForPoint = item.total_points_pool && item.total_wallets 
+      ? item.total_points_pool / item.total_wallets
+      : (item.globalAverage || 0);
+    
+    return {
+      date: format(new Date(item.created_at), 'MMM dd HH:mm'),
+      points: Number(item.total_points),
+      average: avgForPoint
+    };
+  });
 
   return (
     <Card className="card-premium border">

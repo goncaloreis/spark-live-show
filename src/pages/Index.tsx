@@ -7,7 +7,8 @@ import { ProgressChart } from "@/components/ProgressChart";
 import { RankChart } from "@/components/RankChart";
 import { KPICard } from "@/components/KPICard";
 import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
-import { Star, TrendingUp, Users, Award, Search, DollarSign, PieChart } from "lucide-react";
+import { TrendingUp, Users, Award, Search, DollarSign, PieChart } from "lucide-react";
+import sparkLogo from "@/assets/spark-logo.svg";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -299,19 +300,20 @@ const Index = () => {
           <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
             <div className="max-w-5xl mx-auto">
               {/* Logo and Title */}
-              <div className="flex items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+              <div className="flex items-center justify-center gap-4 sm:gap-5 mb-8 sm:mb-10">
                 <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-30 group-hover:opacity-50 transition-all duration-700" />
-                  <div className="relative flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl card-premium border border-border group-hover:scale-110 transition-all duration-500">
-                    <Star className="w-6 h-6 sm:w-8 sm:h-8 text-foreground fill-foreground" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-40 group-hover:opacity-60 transition-all duration-700" />
+                  <div className="relative flex items-center justify-center w-14 h-14 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-card/80 to-card/60 backdrop-blur-xl border border-white/10 group-hover:scale-105 group-hover:border-primary/30 transition-all duration-500 shadow-elevated p-3 sm:p-4">
+                    <img src={sparkLogo} alt="Spark" className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(79,172,254,0.4)]" />
                   </div>
                 </div>
                 <div className="text-center sm:text-left">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
-                    Spark Points | Season 2
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
+                    <span className="text-gradient">Spark Points</span>
+                    <span className="text-muted-foreground/60"> | Season 2</span>
                   </h1>
-                  <p className="text-muted-foreground text-xs sm:text-sm mt-1 font-normal">
-                    Track Your DeFi Performance
+                  <p className="text-muted-foreground/70 text-xs sm:text-sm mt-2 font-medium tracking-wide">
+                    Real-Time DeFi Performance Analytics
                   </p>
                 </div>
               </div>
