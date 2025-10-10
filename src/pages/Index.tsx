@@ -107,22 +107,18 @@ const Index = () => {
           const growthNum = parseFloat(growth);
           pointsGrowth = growthNum > 0 ? `+${growth}%` : `${growth}%`;
           
-          // Only set pointsChange if there's an actual change
-          if (pointsDiff !== 0) {
-            pointsChange = pointsDiff > 0 ? `+${pointsDiff.toLocaleString()}` : pointsDiff.toLocaleString();
-          }
+          // Always show pointsChange, even if 0
+          pointsChange = pointsDiff > 0 ? `+${pointsDiff.toLocaleString()}` : pointsDiff.toLocaleString();
           
           // Rank change
           const latestRank = history[history.length - 1].rank;
           const previousRank = history[history.length - 2].rank;
           if (latestRank && previousRank) {
             const rankDiff = previousRank - latestRank;
-            if (rankDiff !== 0) {
-              rankChange = {
-                value: `${Math.abs(rankDiff)}`,
-                direction: rankDiff > 0 ? 'up' : 'down'
-              };
-            }
+            rankChange = {
+              value: `${Math.abs(rankDiff)}`,
+              direction: rankDiff > 0 ? 'up' : rankDiff < 0 ? 'down' : 'neutral'
+            };
           }
         }
 
@@ -145,23 +141,19 @@ const Index = () => {
           }
         }
         
-        // Calculate total points pool change
+        // Calculate total points pool change - always show, even if 0
         if (totalPointsPool && prevTotalPointsPool) {
           const poolDiff = totalPointsPool - prevTotalPointsPool;
-          if (poolDiff !== 0) {
-            totalPointsPoolChange = poolDiff > 0 ? `+${poolDiff.toLocaleString()}` : poolDiff.toLocaleString();
-          }
+          totalPointsPoolChange = poolDiff > 0 ? `+${poolDiff.toLocaleString()}` : poolDiff.toLocaleString();
         }
         
-        // Calculate total wallets change
+        // Calculate total wallets change - always show, even if 0
         if (history.length >= 2) {
           const latestWallets = history[history.length - 1].total_wallets;
           const prevWallets = history[history.length - 2].total_wallets;
           if (latestWallets && prevWallets) {
             const walletsDiff = latestWallets - prevWallets;
-            if (walletsDiff !== 0) {
-              totalWalletsChange = walletsDiff > 0 ? `+${walletsDiff}` : `${walletsDiff}`;
-            }
+            totalWalletsChange = walletsDiff > 0 ? `+${walletsDiff}` : `${walletsDiff}`;
           }
         }
         

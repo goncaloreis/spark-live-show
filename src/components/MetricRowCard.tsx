@@ -23,8 +23,9 @@ export const MetricRowCard = ({
   rightSuffix = "",
 }: MetricRowCardProps) => {
   const renderMetric = (label: string, value: string | number, change?: number, suffix: string = "") => {
-    const hasChange = change !== undefined && change !== 0;
-    const isPositive = change && change > 0;
+    const hasChange = change !== undefined; // Show indicator even when change is 0
+    const isPositive = change !== undefined && change > 0;
+    const isNeutral = change === 0;
     
     // Format change value with thousands separators
     const formatChangeValue = (num: number) => {
@@ -53,17 +54,19 @@ export const MetricRowCard = ({
           </span>
           {hasChange && (
             <div className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition-all duration-200 ${
-              isPositive 
-                ? 'bg-green-500/10 border border-green-500/20 hover:bg-green-500/15' 
-                : 'bg-red-500/10 border border-red-500/20 hover:bg-red-500/15'
+              isNeutral
+                ? 'bg-muted/20 border border-muted/30'
+                : isPositive 
+                  ? 'bg-green-500/10 border border-green-500/20 hover:bg-green-500/15' 
+                  : 'bg-red-500/10 border border-red-500/20 hover:bg-red-500/15'
             }`}>
-              {isPositive ? (
+              {!isNeutral && (isPositive ? (
                 <TrendingUp className="w-3 h-3 text-green-500" />
               ) : (
                 <TrendingDown className="w-3 h-3 text-red-500" />
-              )}
+              ))}
               <span className={`text-[10px] font-bold tabular-nums ${
-                isPositive ? 'text-green-500' : 'text-red-500'
+                isNeutral ? 'text-muted-foreground' : isPositive ? 'text-green-500' : 'text-red-500'
               }`}>
                 {isPositive ? '+' : ''}{typeof change === 'number' ? formatChangeValue(change) : change}
                 {suffix}
