@@ -453,10 +453,10 @@ const Index = () => {
                 </div>
               )}
 
-              {/* KPI Cards Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {/* Metrics Card - combines Performance & Market Position */}
-                <div className="space-y-4">
+              {/* KPI Cards Section - 2/3 Performance, 1/3 Projections */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                {/* Left: Performance metrics (2 columns) */}
+                <div className="lg:col-span-2 space-y-4 flex flex-col">
                   <MetricsCard 
                     totalPoints={stats.totalPointsPool}
                     totalPointsChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
@@ -474,23 +474,25 @@ const Index = () => {
                   <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
                 </div>
 
-                {/* Projections Card */}
-                <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500">
-                  <div className="p-6 sm:p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500 shimmer">
-                        <DollarSign className="w-5 h-5 text-primary" />
+                {/* Right: Projections Card (1 column) */}
+                <div className="flex flex-col">
+                  <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 h-full flex flex-col">
+                    <div className="p-6 sm:p-8 flex-1 flex flex-col">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500 shimmer">
+                          <DollarSign className="w-5 h-5 text-primary" />
+                        </div>
+                        <h3 className="font-bold text-base sm:text-lg tracking-tight">Projections</h3>
                       </div>
-                      <h3 className="font-bold text-base sm:text-lg tracking-tight">Projections</h3>
+                      <div className="flex-1">
+                        <AirdropEstimateCard 
+                          values={stats.airdropEstimates}
+                          spkPrice={stats.spkPrice}
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <AirdropEstimateCard 
-                        values={stats.airdropEstimates}
-                        spkPrice={stats.spkPrice}
-                      />
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                </div>
               </div>
 
               {/* Combined Performance Chart */}

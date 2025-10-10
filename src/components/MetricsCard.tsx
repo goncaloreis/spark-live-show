@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Award } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface MetricProps {
@@ -75,48 +75,61 @@ export const MetricsCard = ({
   rankPercentileChange,
 }: MetricsCardProps) => {
   return (
-    <Card className="group relative overflow-hidden glass glass-hover shadow-card p-6">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      
-      <div className="relative grid grid-cols-2 gap-8">
-        {/* Left Column */}
-        <div className="space-y-1">
-          <MetricRow 
-            label="Total Points" 
-            value={totalPoints} 
-            change={totalPointsChange}
-          />
-          <MetricRow 
-            label="Wallet Points" 
-            value={walletPoints} 
-            change={walletPointsChange}
-          />
-          <MetricRow 
-            label="Wallet Rank" 
-            value={walletRank} 
-            change={walletRankChange}
-          />
+    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 h-full flex flex-col">
+      <div className="p-6 sm:p-8 flex-1 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 group-hover:scale-110 group-hover:border-primary/40 transition-all duration-500">
+            <Award className="w-5 h-5 text-primary" />
+          </div>
+          <h3 className="font-bold text-base sm:text-lg tracking-tight">Performance</h3>
         </div>
+        
+        {/* Metrics Grid */}
+        <div className="relative flex-1">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          
+          <div className="relative grid grid-cols-2 gap-8">
+            {/* Left Column */}
+            <div className="space-y-1">
+              <MetricRow 
+                label="Total Points" 
+                value={totalPoints} 
+                change={totalPointsChange}
+              />
+              <MetricRow 
+                label="Wallet Points" 
+                value={walletPoints} 
+                change={walletPointsChange}
+              />
+              <MetricRow 
+                label="Wallet Rank" 
+                value={walletRank} 
+                change={walletRankChange}
+              />
+            </div>
 
-        {/* Right Column */}
-        <div className="space-y-1 border-l border-white/5 pl-8">
-          <MetricRow 
-            label="Total Wallets" 
-            value={totalWallets} 
-            change={totalWalletsChange}
-          />
-          <MetricRow 
-            label="Wallet Share" 
-            value={walletShare} 
-            change={walletShareChange}
-            suffix="%"
-          />
-          <MetricRow 
-            label="Rank Percentile" 
-            value={rankPercentile} 
-            change={rankPercentileChange}
-            suffix="%"
-          />
+            {/* Right Column */}
+            <div className="space-y-1 border-l border-white/5 pl-8">
+              <MetricRow 
+                label="Total Wallets" 
+                value={totalWallets} 
+                change={totalWalletsChange}
+              />
+              <MetricRow 
+                label="Wallet Share" 
+                value={walletShare} 
+                change={walletShareChange}
+                suffix="%"
+              />
+              <MetricRow 
+                label="Rank Percentile" 
+                value={rankPercentile} 
+                change={rankPercentileChange}
+                suffix="%"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Card>

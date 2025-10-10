@@ -31,7 +31,7 @@ export const PaceStatusCard = ({ poolShareChange }: PaceStatusCardProps) => {
   }
   
   return (
-    <Card className="group relative overflow-hidden glass glass-hover shadow-card p-5">
+    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 p-5">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       
       <div className="relative flex items-center justify-between">
