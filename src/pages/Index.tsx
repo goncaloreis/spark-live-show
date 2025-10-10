@@ -477,57 +477,62 @@ const Index = () => {
                   </div>
                 </div>
 
-                {/* 3x3 Matrix: 3 rows x 3 columns (2 cols performance + 1 col projections) */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 items-start">
-                  {/* Left Column: Performance Metrics (2/3 width) */}
-                  <div className="lg:col-span-2 grid grid-cols-1 gap-2.5">
-                    {/* Row 1: Total Points + Total Wallets */}
-                    <MetricRowCard 
-                      leftLabel="Total Points"
-                      leftValue={stats.totalPointsPool}
-                      leftChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
-                      rightLabel="Total Wallets"
-                      rightValue={stats.totalWallets}
-                      rightChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
-                    />
-
-                    {/* Row 2: Wallet Points + Wallet Share */}
-                    <MetricRowCard 
-                      leftLabel="Wallet Points"
-                      leftValue={stats.totalPoints}
-                      leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
-                      rightLabel="Wallet Share"
-                      rightValue={stats.marketShare.replace('%', '')}
-                      rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
-                      rightSuffix="%"
-                    />
-
-                    {/* Row 3: Wallet Rank + Rank Percentile */}
-                    <MetricRowCard 
-                      leftLabel="Wallet Rank"
-                      leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
-                      leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
-                      rightLabel="Rank Percentile"
-                      rightValue={stats.percentile.replace('%', '')}
-                      rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
-                      rightSuffix="%"
-                    />
-                  </div>
-
-                  {/* Right Column: Projections (1/3 width) */}
-                  <div className="grid grid-cols-1 gap-2.5">
+                {/* 3x3 Matrix: 3 rows with aligned cards */}
+                <div className="space-y-2.5">
+                  {/* Row 1: Total Points + Total Wallets | Conservative */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+                    <div className="lg:col-span-2">
+                      <MetricRowCard 
+                        leftLabel="Total Points"
+                        leftValue={stats.totalPointsPool}
+                        leftChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
+                        rightLabel="Total Wallets"
+                        rightValue={stats.totalWallets}
+                        rightChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
+                      />
+                    </div>
                     <ProjectionCard 
                       label="150M SPK Airdrop"
                       value={stats.airdropEstimates["150M"]}
                       badge="Conservative"
                       variant="conservative"
                     />
+                  </div>
+
+                  {/* Row 2: Wallet Points + Wallet Share | Moderate */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+                    <div className="lg:col-span-2">
+                      <MetricRowCard 
+                        leftLabel="Wallet Points"
+                        leftValue={stats.totalPoints}
+                        leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
+                        rightLabel="Wallet Share"
+                        rightValue={stats.marketShare.replace('%', '')}
+                        rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
+                        rightSuffix="%"
+                      />
+                    </div>
                     <ProjectionCard 
                       label="200M SPK Airdrop"
                       value={stats.airdropEstimates["200M"]}
                       badge="Moderate"
                       variant="moderate"
                     />
+                  </div>
+
+                  {/* Row 3: Wallet Rank + Rank Percentile | Optimistic */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+                    <div className="lg:col-span-2">
+                      <MetricRowCard 
+                        leftLabel="Wallet Rank"
+                        leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
+                        leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
+                        rightLabel="Rank Percentile"
+                        rightValue={stats.percentile.replace('%', '')}
+                        rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
+                        rightSuffix="%"
+                      />
+                    </div>
                     <ProjectionCard 
                       label="250M SPK Airdrop"
                       value={stats.airdropEstimates["250M"]}
