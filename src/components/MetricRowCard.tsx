@@ -76,8 +76,8 @@ export const MetricRowCard = ({
   };
 
   return (
-    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 p-3">
-      <div className="flex items-center gap-8">
+    <Card className="card-premium border-white/5 group hover:border-primary/20 transition-all duration-500 p-3 h-full">
+      <div className="flex items-center gap-8 h-full">
         {renderMetric(leftLabel, leftValue, leftChange, leftSuffix)}
         <div className="w-px h-8 bg-white/5" />
         {renderMetric(rightLabel, rightValue, rightChange, rightSuffix)}

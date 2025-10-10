@@ -23,12 +23,12 @@ export const ProjectionCard = ({ label, value, badge, variant }: ProjectionCardP
   };
   
   return (
-    <Card className={`card-premium group transition-all duration-500 p-3 ${variantStyles[variant]}`}>
+    <Card className={`card-premium group transition-all duration-500 p-3 h-full ${variantStyles[variant]}`}>
       {variant === 'optimistic' && (
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 shimmer rounded-lg" />
       )}
       
-      <div className="relative flex items-center justify-between">
+      <div className="relative flex items-center justify-between h-full">
         <div className="space-y-0.5">
           <div className="text-[10px] text-muted-foreground/60 font-medium uppercase tracking-wider">
             {label}
