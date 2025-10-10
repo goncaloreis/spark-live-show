@@ -66,80 +66,19 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
     );
   }
 
-  // Calculate average dynamically, interpolating missing values
-  const chartData = data.map((item, index) => {
-    let avgForPoint: number | null = null;
-    
-    // If we have valid pool data, calculate the actual average
-    if (item.total_points_pool && item.total_wallets && item.total_points_pool > 0) {
-      avgForPoint = item.total_points_pool / item.total_wallets;
-    } else {
-      // Interpolate between previous and next valid data points
-      let prevValid: { index: number; avg: number } | null = null;
-      let nextValid: { index: number; avg: number } | null = null;
-      
-      // Find previous valid point
-      for (let i = index - 1; i >= 0; i--) {
-        if (data[i].total_points_pool && data[i].total_wallets && data[i].total_points_pool! > 0) {
-          prevValid = {
-            index: i,
-            avg: data[i].total_points_pool! / data[i].total_wallets!
-          };
-          break;
-        }
-      }
-      
-      // Find next valid point
-      for (let i = index + 1; i < data.length; i++) {
-        if (data[i].total_points_pool && data[i].total_wallets && data[i].total_points_pool! > 0) {
-          nextValid = {
-            index: i,
-            avg: data[i].total_points_pool! / data[i].total_wallets!
-          };
-          break;
-        }
-      }
-      
-      // Interpolate if we have both prev and next
-      if (prevValid && nextValid) {
-        const ratio = (index - prevValid.index) / (nextValid.index - prevValid.index);
-        avgForPoint = prevValid.avg + (nextValid.avg - prevValid.avg) * ratio;
-      } else if (prevValid) {
-        avgForPoint = prevValid.avg;
-      } else if (nextValid) {
-        avgForPoint = nextValid.avg;
-      } else {
-        avgForPoint = item.globalAverage || null;
-      }
-    }
-    
-    return {
-      date: format(new Date(item.created_at), 'MMM dd HH:mm'),
-      points: Number(item.total_points),
-      average: avgForPoint
-    };
-  });
+  const chartData = data.map(item => ({
+    date: format(new Date(item.created_at), 'MMM dd HH:mm'),
+    points: Number(item.total_points)
+  }));
 
   return (
     <Card className="card-premium border">
       <div className="p-4 sm:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-2 sm:p-2.5 rounded-xl bg-primary/10 border border-primary/20">
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-            </div>
-            <h3 className="text-base sm:text-lg font-semibold tracking-tight">Points Growth</h3>
+        <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <div className="p-2 sm:p-2.5 rounded-xl bg-primary/10 border border-primary/20">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           </div>
-          <div className="flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs font-medium">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-primary" />
-              <span className="text-muted-foreground">Your Points</span>
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-muted-foreground/40" />
-              <span className="text-muted-foreground">Average</span>
-            </div>
-          </div>
+          <h3 className="text-base sm:text-lg font-semibold tracking-tight">Points Growth</h3>
         </div>
         <ResponsiveContainer width="100%" height={250} className="sm:!h-[320px]">
           <AreaChart data={chartData}>
@@ -147,10 +86,6 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
               <linearGradient id="colorPoints" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4}/>
                 <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-              </linearGradient>
-              <linearGradient id="colorAverage" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0.15}/>
-                <stop offset="95%" stopColor="hsl(var(--muted-foreground))" stopOpacity={0}/>
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
@@ -179,19 +114,7 @@ export const ProgressChart = ({ data, loading }: ProgressChartProps) => {
                 color: 'hsl(var(--foreground))',
                 padding: '12px'
               }}
-              formatter={(value: number, name: string) => [
-                value.toLocaleString(), 
-                name === 'points' ? 'Your Points' : 'Average Points'
-              ]}
-            />
-            <Area 
-              type="monotone" 
-              dataKey="average" 
-              stroke="hsl(var(--muted-foreground))" 
-              strokeWidth={2}
-              strokeDasharray="5 5"
-              fill="url(#colorAverage)"
-              fillOpacity={1}
+              formatter={(value: number) => [value.toLocaleString(), 'Points']}
             />
             <Area 
               type="monotone" 
