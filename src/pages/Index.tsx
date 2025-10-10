@@ -69,9 +69,6 @@ const Index = () => {
                   <p className="text-muted-foreground/70 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                     {APP_CONFIG.APP_DESCRIPTION}
                   </p>
-                  <div className="mt-3">
-                    <SeasonCountdown />
-                  </div>
                 </div>
               </div>
 
@@ -145,6 +142,13 @@ const Index = () => {
             </div>
           </div>
         </header>
+
+        {/* Season Countdown Banner */}
+        <div className="container mx-auto px-4 sm:px-6 -mt-4 sm:-mt-6 relative z-20">
+          <div className="max-w-5xl mx-auto">
+            <SeasonCountdown />
+          </div>
+        </div>
 
         {/* Main Content */}
         <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 max-w-7xl">
