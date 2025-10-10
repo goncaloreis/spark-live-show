@@ -457,8 +457,8 @@ const Index = () => {
               {/* KPI Cards Section - Matrix Layout */}
               <div className="space-y-4">
                 {/* Headers Row */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2.5">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2 flex items-center gap-2.5">
                     <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
                       <Award className="w-4 h-4 text-primary" />
                     </div>
@@ -477,10 +477,10 @@ const Index = () => {
                   </div>
                 </div>
 
-                {/* 3x2 Matrix: 3 rows x 2 columns */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
-                  {/* Left Column: Performance Metrics */}
-                  <div className="space-y-2.5">
+                {/* 3x3 Matrix: 3 rows x 3 columns (2 cols performance + 1 col projections) */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5 items-start">
+                  {/* Left Column: Performance Metrics (2/3 width) */}
+                  <div className="lg:col-span-2 grid grid-cols-1 gap-2.5">
                     {/* Row 1: Total Points + Total Wallets */}
                     <MetricRowCard 
                       leftLabel="Total Points"
@@ -514,8 +514,8 @@ const Index = () => {
                     />
                   </div>
 
-                  {/* Right Column: Projections */}
-                  <div className="space-y-2.5">
+                  {/* Right Column: Projections (1/3 width) */}
+                  <div className="grid grid-cols-1 gap-2.5">
                     <ProjectionCard 
                       label="150M SPK Airdrop"
                       value={stats.airdropEstimates["150M"]}
@@ -538,8 +538,10 @@ const Index = () => {
                 </div>
 
                 {/* Bottom Row: Pace Status + Live SPK */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5">
-                  <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2.5">
+                  <div className="lg:col-span-2">
+                    <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
+                  </div>
                   <LiveSPKCard spkPrice={stats.spkPrice} />
                 </div>
               </div>

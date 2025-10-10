@@ -26,6 +26,22 @@ export const MetricRowCard = ({
     const hasChange = change !== undefined && change !== 0;
     const isPositive = change && change > 0;
     
+    // Format change value with thousands separators
+    const formatChangeValue = (num: number) => {
+      const absNum = Math.abs(num);
+      if (suffix === '%') {
+        return absNum.toFixed(2);
+      }
+      // For large numbers, use toLocaleString with 2 decimal places
+      if (absNum >= 1000) {
+        return absNum.toLocaleString('en-US', { 
+          minimumFractionDigits: 2, 
+          maximumFractionDigits: 2 
+        });
+      }
+      return absNum.toFixed(2);
+    };
+    
     return (
       <div className="flex items-center justify-between flex-1">
         <span className="text-xs text-muted-foreground/60 font-medium uppercase tracking-wider">
@@ -49,7 +65,7 @@ export const MetricRowCard = ({
               <span className={`text-[10px] font-bold tabular-nums ${
                 isPositive ? 'text-green-500' : 'text-red-500'
               }`}>
-                {isPositive ? '+' : ''}{typeof change === 'number' ? change.toFixed(2) : change}
+                {isPositive ? '+' : ''}{typeof change === 'number' ? formatChangeValue(change) : change}
                 {suffix}
               </span>
             </div>
