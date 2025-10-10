@@ -58,6 +58,59 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+/**
+ * SECURITY NOTE: This function uses dangerouslySetInnerHTML to inject CSS styles.
+ * 
+ * CRITICAL REQUIREMENTS:
+ * 1. Chart config MUST NEVER accept user-provided input
+ * 2. All color values MUST be controlled by developers in code
+ * 3. Theme configuration MUST be static and predefined
+ * 4. Never load theme values from external sources or user input
+ * 
+ * The sanitizeColor function provides defensive validation, but this does NOT
+ * make it safe to accept user input. It only protects against accidental injection
+ * if the codebase is modified incorrectly in the future.
+ */
+
+/**
+ * Sanitizes CSS color values to prevent injection attacks.
+ * Only allows safe color formats: hex, rgb, rgba, hsl, hsla, and named colors.
+ * 
+ * @param color - The color value to sanitize
+ * @returns The sanitized color or 'transparent' if invalid
+ */
+const sanitizeColor = (color: string | undefined): string => {
+  if (!color) return 'transparent';
+  
+  // Remove whitespace and convert to lowercase for validation
+  const trimmed = color.trim().toLowerCase();
+  
+  // Allow hex colors (#RGB, #RRGGBB, #RRGGBBAA)
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/.test(trimmed)) {
+    return trimmed;
+  }
+  
+  // Allow rgb/rgba functions
+  if (/^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(,\s*[\d.]+\s*)?\)$/.test(trimmed)) {
+    return trimmed;
+  }
+  
+  // Allow hsl/hsla functions (including CSS custom properties)
+  if (/^hsla?\([\s\d.%,var()+-]+\)$/.test(trimmed)) {
+    return trimmed;
+  }
+  
+  // Allow named CSS colors (basic list - extend if needed)
+  const namedColors = ['transparent', 'currentcolor', 'inherit', 'initial', 'unset'];
+  if (namedColors.includes(trimmed)) {
+    return trimmed;
+  }
+  
+  // If validation fails, return transparent instead of potentially malicious value
+  console.warn(`[Chart Security] Invalid color value blocked: ${color}`);
+  return 'transparent';
+};
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
 
@@ -74,8 +127,9 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
+    const rawColor = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+    const color = sanitizeColor(rawColor);
+    return color && color !== 'transparent' ? `  --color-${key}: ${color};` : null;
   })
   .join("\n")}
 }
