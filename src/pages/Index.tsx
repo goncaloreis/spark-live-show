@@ -311,10 +311,10 @@ const Index = () => {
                 
                 <Card className="p-6 text-center border-border/50 hover:border-primary/30 transition-colors">
                   <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                    <TrendingUp className="w-6 h-6 text-primary" />
+                    <DollarSign className="w-6 h-6 text-primary" />
                   </div>
-                  <h4 className="font-semibold mb-2">Automated Updates</h4>
-                  <p className="text-sm text-muted-foreground">Hourly tracking via GitHub Actions automation</p>
+                  <h4 className="font-semibold mb-2">Airdrop Projections</h4>
+                  <p className="text-sm text-muted-foreground">Estimate your potential SPK rewards across multiple scenarios</p>
                 </Card>
               </div>
             </div>
