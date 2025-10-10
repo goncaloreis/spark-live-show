@@ -1,4 +1,10 @@
-# Spark Points Tracker - Season 2
+# Spark Points Tracker - Season 2 (LEGACY VERSION)
+
+> **⚠️ MIGRATION IN PROGRESS**  
+> This is the **legacy free public dashboard** version. See [`docs/PROJECT_STRATEGY.md`](docs/PROJECT_STRATEGY.md) for the new **pay-to-track monetization strategy** for Season 2.
+>
+> **New Repository**: `spark-points-season2` (coming soon)  
+> **Migration Docs**: [`docs/MIGRATION_CHECKLIST.md`](docs/MIGRATION_CHECKLIST.md)
 
 A production-ready, real-time DeFi analytics dashboard for tracking Spark Protocol points, rankings, and airdrop estimates.
 
