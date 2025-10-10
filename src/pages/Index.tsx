@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { StatsCard } from "@/components/StatsCard";
-import { ProgressChart } from "@/components/ProgressChart";
-import { RankChart } from "@/components/RankChart";
+import { CombinedChart } from "@/components/CombinedChart";
 import { KPICard } from "@/components/KPICard";
 import { AirdropEstimateCard } from "@/components/AirdropEstimateCard";
 import { TrendingUp, Users, Award, Search, DollarSign, PieChart } from "lucide-react";
@@ -492,10 +491,9 @@ const Index = () => {
                 </Card>
               </div>
 
-              {/* Charts Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 animate-in fade-in duration-700 delay-200">
-                <ProgressChart data={historyData} loading={loading} />
-                <RankChart data={historyData} loading={loading} />
+              {/* Combined Performance Chart */}
+              <div className="animate-in fade-in duration-700 delay-200">
+                <CombinedChart data={historyData} loading={loading} />
               </div>
 
             </div>
