@@ -12,6 +12,7 @@ import { ProjectionCard } from "@/components/ProjectionCard";
 import { MetricRowCard } from "@/components/MetricRowCard";
 import { PaceStatusCard } from "@/components/PaceStatusCard";
 import { LiveSPKCard } from "@/components/LiveSPKCard";
+import { SeasonCountdown } from "@/components/SeasonCountdown";
 import { Search, Award, DollarSign, TrendingUp } from "lucide-react";
 import sparkLogo from "@/assets/spark-logo.svg";
 import { useWalletData } from "@/hooks/useWalletData";
@@ -68,6 +69,9 @@ const Index = () => {
                   <p className="text-muted-foreground/70 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                     {APP_CONFIG.APP_DESCRIPTION}
                   </p>
+                  <div className="mt-3">
+                    <SeasonCountdown />
+                  </div>
                 </div>
               </div>
 
