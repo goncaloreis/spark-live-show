@@ -68,8 +68,8 @@ def scrape_spark_points(wallet_address):
     driver = setup_firefox_driver()
     
     try:
-        # Navigate to Spark Points page with URL encoding
-        url = f"https://points.spark.fi/?wallet={quote(wallet_address)}"
+        # Navigate to Spark Points leaderboard page
+        url = f"https://points.spark.fi/"
         print(f"Navigating to: {url}")
         driver.get(url)
         
@@ -92,23 +92,19 @@ def scrape_spark_points(wallet_address):
         try:
             print("Searching for total points pool...")
             total_points_pool = 0
-            pool_elements = driver.find_elements(By.XPATH, "//*[contains(text(), 'Total Points')]/following-sibling::*")
             
-            for elem in pool_elements:
-                text = elem.text.strip().replace(',', '')
-                try:
-                    # The pool is a very large number (145B+)
-                    if text.replace('.', '').isdigit():
-                        value = float(text)
-                        if value > 1000000000:  # Greater than 1 billion
-                            total_points_pool = value
-                            print(f"✓ Found total points pool: {total_points_pool}")
-                            break
-                except ValueError:
-                    continue
+            # Look for "Total Points" header and its value
+            pool_xpath = "//*[contains(text(), 'Total Points')]/following-sibling::*[1]"
+            pool_element = wait.until(EC.presence_of_element_located((By.XPATH, pool_xpath)))
+            
+            pool_text = pool_element.text.strip().replace(',', '')
+            print(f"Total Points text found: {pool_text}")
+            
+            # Parse using scientific notation (B for billion, M for million)
+            pool_converted = pool_text.replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
+            total_points_pool = float(pool_converted)
+            print(f"✓ Found total points pool: {total_points_pool}")
                     
-            if total_points_pool == 0:
-                print("Warning: Total points pool not found")
         except Exception as e:
             print(f"Error finding total points pool: {e}")
             total_points_pool = 0
@@ -116,81 +112,75 @@ def scrape_spark_points(wallet_address):
         # Extract Total Wallets from the header
         try:
             print("Searching for total wallets...")
-            total_wallets = 0
-            wallet_elements = driver.find_elements(By.XPATH, "//*[contains(text(), 'N° of Wallets') or contains(text(), 'of Wallets')]/following-sibling::*")
             
-            for elem in wallet_elements:
-                text = elem.text.strip().replace(',', '')
-                try:
-                    if text.isdigit():
-                        value = int(text)
-                        if 1000 <= value <= 100000:  # Between 1K and 100K
-                            total_wallets = value
-                            print(f"✓ Found total wallets: {total_wallets}")
-                            break
-                except ValueError:
-                    continue
+            # Look for "N° of Wallets" header and its value
+            wallets_xpath = "//*[contains(text(), 'N° of Wallets') or contains(text(), 'of Wallets')]/following-sibling::*[1]"
+            wallets_element = wait.until(EC.presence_of_element_located((By.XPATH, wallets_xpath)))
+            
+            wallets_text = wallets_element.text.strip().replace(',', '')
+            total_wallets = int(wallets_text)
+            print(f"✓ Found total wallets: {total_wallets}")
                     
-            if total_wallets == 0:
-                print("Warning: Total wallets not found")
         except Exception as e:
             print(f"Error finding total wallets: {e}")
             total_wallets = 0
         
-        # Use the search box to find the wallet (using working approach from original script)
+        # Use the search box to find the wallet
         try:
             print(f"Using search box to find wallet {wallet_address}...")
             
-            # Find the search input box using a more flexible selector
+            # Find the search input box - look for "Search by wallet"
             search_input = wait.until(
-                EC.visibility_of_element_located((By.CSS_SELECTOR, "input[placeholder*='Search']"))
+                EC.visibility_of_element_located((By.CSS_SELECTOR, "input[placeholder*='wallet']"))
             )
             
             print("✓ Found search input")
             
-            # Clear and enter wallet address, then press Enter
+            # Clear and enter wallet address
             search_input.clear()
             search_input.send_keys(wallet_address)
-            search_input.send_keys(Keys.ENTER)
-            print(f"✓ Entered wallet address and pressed Enter")
+            print(f"✓ Entered wallet address")
             
             # Wait for search results to load
-            time.sleep(3)
+            time.sleep(5)
             
             # Take screenshot after search
             driver.save_screenshot('/tmp/spark_page_search.png')
             print("Screenshot saved to /tmp/spark_page_search.png")
             
-            # Find the wallet row using the shortened format (like original script)
-            wallet_substring = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
-            print(f"Looking for wallet substring: {wallet_substring}")
+            # Find the table row containing the wallet
+            # The wallet shows as shortened: 0xf20b...0704
+            wallet_short = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
+            print(f"Looking for wallet format: {wallet_short}")
             
-            your_row_xpath = f"//div[contains(., '{wallet_substring}')]/ancestor::div[@name='tableRow']"
-            your_row_element = wait.until(
-                EC.visibility_of_element_located((By.XPATH, your_row_xpath))
+            # Find the row in the table
+            row_xpath = f"//td[contains(text(), '{wallet_short}')]/parent::tr"
+            wallet_row = wait.until(
+                EC.visibility_of_element_located((By.XPATH, row_xpath))
             )
             print(f"✓ Found wallet row")
             
-            # Extract rank using class selector (from original script)
+            # Extract rank and points from the row
             rank = 0
             total_points = 0
             
             try:
-                rank_element = your_row_element.find_element(By.XPATH, ".//div[contains(@class, 'elVobP')]")
-                rank_text = rank_element.text.strip()
-                rank = int(rank_text.replace('#', '').replace(',', ''))
+                # Rank is in the first column
+                rank_cell = wallet_row.find_element(By.XPATH, "./td[1]")
+                rank_text = rank_cell.text.strip()
+                rank = int(rank_text.replace(',', ''))
                 print(f"✓ Found rank: {rank}")
             except Exception as e:
                 print(f"Could not extract rank: {e}")
             
-            # Extract points using class selector (from original script)
+            # Extract points from the last column
             try:
-                points_element = your_row_element.find_element(By.XPATH, ".//div[contains(@class, 'bASAzC')]")
-                points_text = points_element.text.strip()
+                points_cell = wallet_row.find_element(By.XPATH, "./td[last()]")
+                points_text = points_cell.text.strip()
                 
-                # Parse using scientific notation method (from original script)
-                points_text_converted = points_text.replace(',', '').replace('\n', '').replace('M', 'e6').replace('K', 'e3').replace('B', 'e9')
-                total_points = float(points_text_converted)
+                # Parse using scientific notation (B for billion, M for million)
+                points_converted = points_text.replace(',', '').replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
+                total_points = float(points_converted)
                 print(f"✓ Found total points: {total_points} (from text: {points_text})")
             except Exception as e:
                 print(f"Could not extract points: {e}")
