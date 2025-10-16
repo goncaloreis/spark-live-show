@@ -93,16 +93,14 @@ def scrape_spark_points(wallet_address):
             print("Searching for total points pool...")
             total_points_pool = 0
             
-            # Look for "Total Points" header and its value
-            pool_xpath = "//*[contains(text(), 'Total Points')]/following-sibling::*[1]"
+            # Look for the card containing "Total Points"
+            pool_xpath = "//div[contains(text(), 'Total Points')]/following-sibling::div[1]"
             pool_element = wait.until(EC.presence_of_element_located((By.XPATH, pool_xpath)))
             
-            pool_text = pool_element.text.strip().replace(',', '')
+            pool_text = pool_element.text.strip().replace(',', '').split('.')[0]  # Remove commas and decimal part
             print(f"Total Points text found: {pool_text}")
             
-            # Parse using scientific notation (B for billion, M for million)
-            pool_converted = pool_text.replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
-            total_points_pool = float(pool_converted)
+            total_points_pool = float(pool_text)
             print(f"✓ Found total points pool: {total_points_pool}")
                     
         except Exception as e:
@@ -113,8 +111,8 @@ def scrape_spark_points(wallet_address):
         try:
             print("Searching for total wallets...")
             
-            # Look for "N° of Wallets" header and its value
-            wallets_xpath = "//*[contains(text(), 'N° of Wallets') or contains(text(), 'of Wallets')]/following-sibling::*[1]"
+            # Look for the card containing "N° of Wallets"
+            wallets_xpath = "//div[contains(text(), 'of Wallets')]/following-sibling::div[1]"
             wallets_element = wait.until(EC.presence_of_element_located((By.XPATH, wallets_xpath)))
             
             wallets_text = wallets_element.text.strip().replace(',', '')
