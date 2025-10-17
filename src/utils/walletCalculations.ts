@@ -10,7 +10,7 @@ import { HistoryDataPoint, ChangeIndicator, AirdropEstimates } from '@/types/wal
  */
 export const CALCULATION_CONSTANTS = {
   SHARE_CHANGE_THRESHOLD: 0.0000001,
-  PERCENTILE_THRESHOLD: 0.01,
+  PERCENTILE_THRESHOLD: 0.0001, // More sensitive threshold for rank changes
   FALLBACK_SPK_PRICE: 0.07,
 } as const;
 
