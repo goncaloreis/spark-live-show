@@ -141,33 +141,62 @@ def scrape_spark_points(wallet_address):
             print(f"✓ Entered wallet address")
             
             # Wait for search results to load and table to update
-            time.sleep(8)
+            time.sleep(10)
             
             # Take screenshot after search
             driver.save_screenshot('/tmp/spark_page_search.png')
             print("Screenshot saved to /tmp/spark_page_search.png")
+            
+            # Get page HTML after search to debug
+            with open('/tmp/page_after_search.html', 'w', encoding='utf-8') as f:
+                f.write(driver.page_source)
+            print("Page HTML saved to /tmp/page_after_search.html")
             
             # Find the table row containing the wallet
             # The wallet shows as shortened: 0xf20b...0704
             wallet_short = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
             print(f"Looking for wallet format: {wallet_short}")
             
-            # Try multiple selectors to find the wallet row
-            # First try: Look for any element containing the shortened wallet
+            # Try multiple approaches to find the wallet row
+            wallet_row = None
+            
+            # Approach 1: Find by table body and iterate rows
             try:
-                row_xpath = f"//*[contains(translate(text(), 'ABCDEF', 'abcdef'), '{wallet_short}')]/ancestor::tr"
-                wallet_row = wait.until(
-                    EC.visibility_of_element_located((By.XPATH, row_xpath))
-                )
-                print(f"✓ Found wallet row")
-            except:
-                # Fallback: Try finding by partial text match in any column
-                print("Trying fallback selector...")
-                row_xpath = f"//tr[contains(., '{wallet_short}')]"
-                wallet_row = wait.until(
-                    EC.visibility_of_element_located((By.XPATH, row_xpath))
-                )
-                print(f"✓ Found wallet row (fallback)")
+                print("Approach 1: Finding table rows...")
+                tbody = driver.find_element(By.TAG_NAME, "tbody")
+                rows = tbody.find_elements(By.TAG_NAME, "tr")
+                print(f"Found {len(rows)} rows in table")
+                
+                for row in rows:
+                    row_text = row.text.lower()
+                    if wallet_short in row_text:
+                        wallet_row = row
+                        print(f"✓ Found wallet row (approach 1)")
+                        break
+            except Exception as e:
+                print(f"Approach 1 failed: {e}")
+            
+            # Approach 2: CSS selector
+            if not wallet_row:
+                try:
+                    print("Approach 2: CSS selector...")
+                    wallet_row = driver.find_element(By.CSS_SELECTOR, f"tr:has(*:contains('{wallet_short}'))")
+                    print(f"✓ Found wallet row (approach 2)")
+                except Exception as e:
+                    print(f"Approach 2 failed: {e}")
+            
+            # Approach 3: XPath with case-insensitive search
+            if not wallet_row:
+                try:
+                    print("Approach 3: XPath case-insensitive...")
+                    row_xpath = f"//tr[contains(translate(., 'ABCDEF', 'abcdef'), '{wallet_short}')]"
+                    wallet_row = driver.find_element(By.XPATH, row_xpath)
+                    print(f"✓ Found wallet row (approach 3)")
+                except Exception as e:
+                    print(f"Approach 3 failed: {e}")
+            
+            if not wallet_row:
+                raise Exception(f"Could not find wallet {wallet_short} in table after search")
             
             # Extract rank and points from the row
             rank = 0
