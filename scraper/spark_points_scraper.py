@@ -177,9 +177,22 @@ def scrape_spark_points(wallet_address):
                 wallet_row = wallet_element.find_element(By.XPATH, "./parent::*")
                 print(f"✓ Using direct parent as wallet row")
             
+            # Debug: print the row text
+            row_text = wallet_row.text
+            print(f"Row text: {row_text}")
+            parts = [p.strip() for p in row_text.split('\n') if p.strip()]
+            print(f"Text parts: {parts}")
+            
             # Extract rank and points from the row
             rank = 0
             total_points = 0
+            
+            # Find wallet position in parts
+            wallet_idx = None
+            for i, part in enumerate(parts):
+                if wallet_short in part.lower():
+                    wallet_idx = i
+                    break
             
             try:
                 # Try traditional table structure first (td elements)
@@ -189,17 +202,15 @@ def scrape_spark_points(wallet_address):
                     rank = int(rank_text.replace(',', ''))
                     print(f"✓ Found rank: {rank}")
                 except:
-                    # Fallback: parse from text content
-                    row_text = wallet_row.text
-                    parts = [p.strip() for p in row_text.split('\n') if p.strip()]
-                    # First part that's a pure integer is likely the rank
-                    for part in parts:
-                        try:
-                            rank = int(part.replace(',', ''))
-                            print(f"✓ Found rank: {rank}")
-                            break
-                        except:
-                            continue
+                    # Fallback: parse from text content - rank is before wallet
+                    if wallet_idx is not None:
+                        for i in range(wallet_idx - 1, -1, -1):
+                            try:
+                                rank = int(parts[i].replace(',', ''))
+                                print(f"✓ Found rank: {rank} at index {i}")
+                                break
+                            except:
+                                continue
             except Exception as e:
                 print(f"Could not extract rank: {e}")
             
@@ -209,14 +220,34 @@ def scrape_spark_points(wallet_address):
                     points_cell = wallet_row.find_element(By.XPATH, "./td[last()]")
                     points_text = points_cell.text.strip()
                 except:
-                    # Fallback: find text ending with B/M/K
-                    row_text = wallet_row.text
-                    parts = [p.strip() for p in row_text.split('\n') if p.strip()]
+                    # Fallback: find text ending with B/M/K after wallet
                     points_text = None
-                    for part in parts:
-                        if any(part.endswith(suffix) for suffix in ['B', 'M', 'K']):
-                            points_text = part
-                            break
+                    if wallet_idx is not None:
+                        # Look for suffix (B/M/K) after wallet
+                        for i in range(wallet_idx + 1, len(parts)):
+                            if any(parts[i].endswith(suffix) for suffix in ['B', 'M', 'K']):
+                                # Collect number parts before suffix
+                                # Could be "9.97M" or separate "9" "." "97" "M"
+                                suffix_idx = i
+                                number_parts = []
+                                
+                                # Work backwards from suffix to collect number
+                                for j in range(suffix_idx, wallet_idx, -1):
+                                    part = parts[j]
+                                    # Check if it's a number, decimal, or has the suffix
+                                    if part.replace('.', '').replace(',', '').replace('B', '').replace('M', '').replace('K', '').isdigit() or part == '.':
+                                        number_parts.insert(0, part)
+                                    elif any(part.endswith(s) for s in ['B', 'M', 'K']):
+                                        # Extract number from part with suffix
+                                        num_part = part[:-1]
+                                        if num_part:
+                                            number_parts.insert(0, num_part)
+                                        number_parts.append(part[-1])  # Add suffix
+                                        break
+                                
+                                points_text = ''.join(number_parts)
+                                break
+                    
                     if not points_text:
                         raise Exception("Could not find points text")
                 
