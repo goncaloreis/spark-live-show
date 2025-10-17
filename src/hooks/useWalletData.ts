@@ -80,8 +80,8 @@ export function useWalletData() {
     const totalWallets = latest.total_wallets || 0;
     const currentPoints = Number(latest.total_points);
     
-    // Use latest.total_points_pool as the current pool value (most recent)
-    const currentTotalPointsPool = latest.total_points_pool ? Number(latest.total_points_pool) : null;
+    // Use latest.total_points_pool as the current pool value (most recent), rounded to remove decimals
+    const currentTotalPointsPool = latest.total_points_pool ? Math.round(Number(latest.total_points_pool)) : null;
 
     // Initialize variables
     let pointsGrowth = '-';
@@ -165,7 +165,7 @@ export function useWalletData() {
       paceStatus,
       airdropEstimates,
       spkPrice,
-      totalPointsPool: currentTotalPointsPool ? Math.round(currentTotalPointsPool).toLocaleString() : '-',
+      totalPointsPool: currentTotalPointsPool ? currentTotalPointsPool.toLocaleString() : '-',
       totalPointsPoolChange,
       totalWalletsChange,
       poolShareChangeNumeric: marketShareData.poolShareChangeNumeric
