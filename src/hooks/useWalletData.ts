@@ -165,7 +165,7 @@ export function useWalletData() {
       paceStatus,
       airdropEstimates,
       spkPrice,
-      totalPointsPool: currentTotalPointsPool ? currentTotalPointsPool.toLocaleString() : '-',
+      totalPointsPool: currentTotalPointsPool ? Math.round(currentTotalPointsPool).toLocaleString() : '-',
       totalPointsPoolChange,
       totalWalletsChange,
       poolShareChangeNumeric: marketShareData.poolShareChangeNumeric
