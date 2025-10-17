@@ -215,6 +215,68 @@ serve(async (req) => {
         );
       }
 
+      // Input validation for numeric bounds
+      if (total_points < 0 || total_points > 1e15) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid total_points value' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (rank && (rank < 1 || rank > 1000000)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid rank value' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (percentile && !/^\d+\.\d+%$/.test(percentile)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid percentile format' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (total_wallets && (total_wallets < 1 || total_wallets > 10000000)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid total_wallets value' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (total_points_pool && (total_points_pool < 0 || total_points_pool > 1e18)) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid total_points_pool value' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Add wallet-based rate limiting to prevent IP rotation bypass
+      const walletLimit = await checkRateLimit(
+        supabaseClient,
+        wallet_address,
+        'store_wallet',
+        2, // Only 2 stores per hour per wallet
+        60
+      );
+
+      if (!walletLimit.allowed) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'This wallet has been updated too recently. Please try again later.',
+            retry_after: walletLimit.retryAfter 
+          }),
+          { 
+            status: 429, 
+            headers: { 
+              ...corsHeaders, 
+              'Content-Type': 'application/json',
+              'Retry-After': String(walletLimit.retryAfter || 3600)
+            } 
+          }
+        );
+      }
+
       const { data, error } = await supabaseClient
         .from('wallet_tracking')
         .insert({

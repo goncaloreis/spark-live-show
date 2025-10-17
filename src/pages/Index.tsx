@@ -316,18 +316,29 @@ const Index = () => {
         {/* Footer */}
         <footer className="border-t border-border/50 mt-20 backdrop-blur-xl bg-background/80">
           <div className="container mx-auto px-4 py-8">
-            <div className="text-center text-sm text-muted-foreground">
-              <p>
-                Built for tracking Spark protocol points •{" "}
-                <a 
-                  href="https://github.com/goncaloreis/spark-points-agent" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:text-primary-glow transition-colors"
-                >
-                  View on GitHub
-                </a>
-              </p>
+            <div className="text-center space-y-4">
+              <div className="text-sm text-muted-foreground">
+                <p>
+                  Built for tracking Spark protocol points •{" "}
+                  <a 
+                    href="https://github.com/goncaloreis/spark-points-agent" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-primary-glow transition-colors"
+                  >
+                    View on GitHub
+                  </a>
+                </p>
+              </div>
+              <div className="text-xs text-muted-foreground/70 max-w-2xl mx-auto">
+                <p className="font-medium text-muted-foreground/90 mb-1">Privacy Notice</p>
+                <p>
+                  All wallet addresses and points data tracked on this platform are publicly visible. 
+                  By searching a wallet, you acknowledge that its activity and rankings will be stored 
+                  and displayed as part of the public leaderboard. This is similar to how the official 
+                  Spark.fi leaderboard operates.
+                </p>
+              </div>
             </div>
           </div>
         </footer>

@@ -57,9 +57,15 @@ def setup_firefox_driver():
         print(f"Firefox driver initialized with explicit binary path")
         return driver
 
+def mask_wallet(address):
+    """Mask wallet address for logging (show first 6 and last 4 chars)"""
+    if not address or len(address) < 10:
+        return "invalid_address"
+    return f"{address[:6]}...{address[-4:]}"
+
 def scrape_spark_points(wallet_address):
     """Scrape Spark Points data for the given wallet"""
-    print(f"Starting scrape for wallet: {wallet_address}")
+    print(f"Starting scrape for wallet: {mask_wallet(wallet_address)}")
     
     # Sanitize wallet address
     from urllib.parse import quote
@@ -333,7 +339,8 @@ def store_data_in_supabase(wallet_address, data):
         **data
     }
     
-    print(f"Calling track-wallet function with payload: {payload}")
+    # Log without sensitive data
+    print(f"Calling track-wallet function for wallet: {mask_wallet(wallet_address)}")
     
     response = requests.post(url, json=payload, headers=headers)
     
@@ -354,8 +361,15 @@ def main():
     print("=" * 60)
     
     # Validate environment variables
-    if not SUPABASE_URL or not SUPABASE_ANON_KEY or not WALLET_ADDRESS:
-        print("ERROR: Missing required environment variables")
+    try:
+        if not SUPABASE_URL:
+            raise ValueError("SUPABASE_URL not set")
+        if not SUPABASE_ANON_KEY:
+            raise ValueError("SUPABASE_ANON_KEY not set")
+        if not WALLET_ADDRESS:
+            raise ValueError("WALLET_ADDRESS not set")
+    except ValueError as e:
+        print(f"ERROR: {e}")
         sys.exit(1)
     
     try:
