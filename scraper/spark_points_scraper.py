@@ -229,30 +229,45 @@ def scrape_spark_points(wallet_address):
                     # Fallback: find text ending with B/M/K after wallet
                     points_text = None
                     if wallet_idx is not None:
-                        # Look for suffix (B/M/K) after wallet
+                        # Look for suffix (B/M/K) after wallet, skip '-' separator
+                        # Collect consecutive numeric parts (digits, decimals, suffix)
+                        number_parts = []
+                        found_start = False
+                        
                         for i in range(wallet_idx + 1, len(parts)):
-                            if any(parts[i].endswith(suffix) for suffix in ['B', 'M', 'K']):
-                                # Collect number parts before suffix
-                                # Could be "9.97M" or separate "9" "." "97" "M"
-                                suffix_idx = i
-                                number_parts = []
-                                
-                                # Work backwards from suffix to collect number
-                                for j in range(suffix_idx, wallet_idx, -1):
-                                    part = parts[j]
-                                    # Check if it's a number, decimal, or has the suffix
-                                    if part.replace('.', '').replace(',', '').replace('B', '').replace('M', '').replace('K', '').isdigit() or part == '.':
-                                        number_parts.insert(0, part)
-                                    elif any(part.endswith(s) for s in ['B', 'M', 'K']):
-                                        # Extract number from part with suffix
-                                        num_part = part[:-1]
-                                        if num_part:
-                                            number_parts.insert(0, num_part)
-                                        number_parts.append(part[-1])  # Add suffix
-                                        break
-                                
-                                points_text = ''.join(number_parts)
+                            part = parts[i]
+                            
+                            # Skip separators like '-'
+                            if part == '-' or part == '—':
+                                continue
+                            
+                            # Check if this is a numeric part, decimal, or has suffix
+                            is_numeric = part.replace('.', '').replace(',', '').isdigit()
+                            is_decimal = part == '.'
+                            has_suffix = any(part.endswith(s) for s in ['B', 'M', 'K'])
+                            
+                            if is_numeric or is_decimal:
+                                number_parts.append(part)
+                                found_start = True
+                            elif has_suffix:
+                                # Could be just 'M' or '98M'
+                                if len(part) > 1:
+                                    # Has digits before suffix, split them
+                                    num_part = part[:-1]
+                                    suffix = part[-1]
+                                    number_parts.append(num_part)
+                                    number_parts.append(suffix)
+                                else:
+                                    # Just the suffix
+                                    number_parts.append(part)
+                                found_start = True
                                 break
+                            elif found_start:
+                                # We've started collecting numbers but hit something else
+                                break
+                        
+                        if number_parts:
+                            points_text = ''.join(number_parts)
                     
                     if not points_text:
                         raise Exception("Could not find points text")
