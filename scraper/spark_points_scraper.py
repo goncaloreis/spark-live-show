@@ -97,7 +97,8 @@ def scrape_spark_points(wallet_address):
             pool_xpath = "//div[contains(text(), 'Total Points')]/following-sibling::div[1]"
             pool_element = wait.until(EC.presence_of_element_located((By.XPATH, pool_xpath)))
             
-            pool_text = pool_element.text.strip().replace(',', '')  # Remove commas, keep decimals
+            # Remove commas, newlines, and whitespace - the DOM splits numbers across lines
+            pool_text = pool_element.text.strip().replace(',', '').replace('\n', '').replace(' ', '')
             print(f"Total Points text found: {pool_text}")
             
             total_points_pool = float(pool_text)
@@ -139,8 +140,8 @@ def scrape_spark_points(wallet_address):
             search_input.send_keys(wallet_address)
             print(f"✓ Entered wallet address")
             
-            # Wait for search results to load
-            time.sleep(5)
+            # Wait for search results to load and table to update
+            time.sleep(8)
             
             # Take screenshot after search
             driver.save_screenshot('/tmp/spark_page_search.png')
@@ -151,12 +152,22 @@ def scrape_spark_points(wallet_address):
             wallet_short = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
             print(f"Looking for wallet format: {wallet_short}")
             
-            # Find the row in the table
-            row_xpath = f"//td[contains(text(), '{wallet_short}')]/parent::tr"
-            wallet_row = wait.until(
-                EC.visibility_of_element_located((By.XPATH, row_xpath))
-            )
-            print(f"✓ Found wallet row")
+            # Try multiple selectors to find the wallet row
+            # First try: Look for any element containing the shortened wallet
+            try:
+                row_xpath = f"//*[contains(translate(text(), 'ABCDEF', 'abcdef'), '{wallet_short}')]/ancestor::tr"
+                wallet_row = wait.until(
+                    EC.visibility_of_element_located((By.XPATH, row_xpath))
+                )
+                print(f"✓ Found wallet row")
+            except:
+                # Fallback: Try finding by partial text match in any column
+                print("Trying fallback selector...")
+                row_xpath = f"//tr[contains(., '{wallet_short}')]"
+                wallet_row = wait.until(
+                    EC.visibility_of_element_located((By.XPATH, row_xpath))
+                )
+                print(f"✓ Found wallet row (fallback)")
             
             # Extract rank and points from the row
             rank = 0
