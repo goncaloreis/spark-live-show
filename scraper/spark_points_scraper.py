@@ -152,30 +152,73 @@ def scrape_spark_points(wallet_address):
             wallet_short = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
             print(f"Looking for wallet format: {wallet_short}")
             
-            # Find the row in the table
-            row_xpath = f"//td[contains(text(), '{wallet_short}')]/parent::tr"
-            wallet_row = wait.until(
-                EC.visibility_of_element_located((By.XPATH, row_xpath))
+            # Find any element containing the wallet text (more flexible than td-only)
+            wallet_xpath = f"//*[contains(translate(text(), 'ABCDEF', 'abcdef'), '{wallet_short}')]"
+            wallet_element = wait.until(
+                EC.visibility_of_element_located((By.XPATH, wallet_xpath))
             )
-            print(f"✓ Found wallet row")
+            
+            # Get the parent row (could be tr, div, or any container element)
+            # Try different parent levels to find the actual row
+            wallet_row = None
+            for ancestor_level in range(1, 5):  # Try up to 4 levels up
+                try:
+                    parent = wallet_element.find_element(By.XPATH, f"./ancestor::*[{ancestor_level}]")
+                    parent_text = parent.text
+                    # Check if this parent has the rank AND points (contains both wallet and numbers)
+                    if wallet_short in parent_text.lower() and any(c in parent_text for c in ['B', 'M', 'K']):
+                        wallet_row = parent
+                        print(f"✓ Found wallet row at ancestor level {ancestor_level}")
+                        break
+                except:
+                    continue
+            
+            if not wallet_row:
+                wallet_row = wallet_element.find_element(By.XPATH, "./parent::*")
+                print(f"✓ Using direct parent as wallet row")
             
             # Extract rank and points from the row
             rank = 0
             total_points = 0
             
             try:
-                # Rank is in the first column
-                rank_cell = wallet_row.find_element(By.XPATH, "./td[1]")
-                rank_text = rank_cell.text.strip()
-                rank = int(rank_text.replace(',', ''))
-                print(f"✓ Found rank: {rank}")
+                # Try traditional table structure first (td elements)
+                try:
+                    rank_cell = wallet_row.find_element(By.XPATH, "./td[1]")
+                    rank_text = rank_cell.text.strip()
+                    rank = int(rank_text.replace(',', ''))
+                    print(f"✓ Found rank: {rank}")
+                except:
+                    # Fallback: parse from text content
+                    row_text = wallet_row.text
+                    parts = [p.strip() for p in row_text.split('\n') if p.strip()]
+                    # First part that's a pure integer is likely the rank
+                    for part in parts:
+                        try:
+                            rank = int(part.replace(',', ''))
+                            print(f"✓ Found rank: {rank}")
+                            break
+                        except:
+                            continue
             except Exception as e:
                 print(f"Could not extract rank: {e}")
             
             # Extract points from the last column
             try:
-                points_cell = wallet_row.find_element(By.XPATH, "./td[last()]")
-                points_text = points_cell.text.strip()
+                try:
+                    points_cell = wallet_row.find_element(By.XPATH, "./td[last()]")
+                    points_text = points_cell.text.strip()
+                except:
+                    # Fallback: find text ending with B/M/K
+                    row_text = wallet_row.text
+                    parts = [p.strip() for p in row_text.split('\n') if p.strip()]
+                    points_text = None
+                    for part in parts:
+                        if any(part.endswith(suffix) for suffix in ['B', 'M', 'K']):
+                            points_text = part
+                            break
+                    if not points_text:
+                        raise Exception("Could not find points text")
                 
                 # Parse using scientific notation (B for billion, M for million)
                 points_converted = points_text.replace(',', '').replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
