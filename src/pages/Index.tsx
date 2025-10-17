@@ -261,7 +261,7 @@ const Index = () => {
                   {/* Row 4: Pace Status + Live SPK */}
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                     <div className="lg:col-span-3">
-                      <PaceStatusCard poolShareChange={stats.poolShareChangeNumeric} />
+                      <PaceStatusCard shareChangeDirection={stats.shareChangeObj.direction} />
                     </div>
                     <LiveSPKCard spkPrice={stats.spkPrice} />
                   </div>

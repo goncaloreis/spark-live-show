@@ -1,24 +1,23 @@
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { ChangeIndicator } from "@/types/wallet";
 
 interface PaceStatusCardProps {
-  poolShareChange: number;
+  shareChangeDirection: ChangeIndicator['direction'];
 }
 
-export const PaceStatusCard = ({ poolShareChange }: PaceStatusCardProps) => {
-  const threshold = 0.0001; // Consider changes smaller than this as "keeping pace"
-  
+export const PaceStatusCard = ({ shareChangeDirection }: PaceStatusCardProps) => {
   let status: 'outpacing' | 'trailing' | 'keeping-pace';
   let message: string;
   let icon: React.ReactNode;
   let colorClass: string;
   
-  if (poolShareChange > threshold) {
+  if (shareChangeDirection === 'up') {
     status = 'outpacing';
     message = 'Wallet Share is OUTPACING the Total Points Pool';
     icon = <TrendingUp className="w-5 h-5" />;
     colorClass = 'text-green-500';
-  } else if (poolShareChange < -threshold) {
+  } else if (shareChangeDirection === 'down') {
     status = 'trailing';
     message = 'Wallet Share is TRAILING the Total Points Pool';
     icon = <TrendingDown className="w-5 h-5" />;

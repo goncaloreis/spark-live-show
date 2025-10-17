@@ -11,7 +11,6 @@ import { HistoryDataPoint, ChangeIndicator, AirdropEstimates } from '@/types/wal
 export const CALCULATION_CONSTANTS = {
   SHARE_CHANGE_THRESHOLD: 0.0000001,
   PERCENTILE_THRESHOLD: 0.01,
-  PACE_THRESHOLD: 0.0001,
   FALLBACK_SPK_PRICE: 0.07,
 } as const;
 
@@ -111,14 +110,12 @@ export function calculateMarketShare(
   share: string;
   shareChange: string;
   shareChangeObj: ChangeIndicator;
-  poolShareChangeNumeric: number;
 } {
   if (!totalPointsPool || totalPointsPool === 0) {
     return {
       share: '-',
       shareChange: '-',
-      shareChangeObj: { value: '-', direction: 'neutral' },
-      poolShareChangeNumeric: 0
+      shareChangeObj: { value: '-', direction: 'neutral' }
     };
   }
   
@@ -142,8 +139,7 @@ export function calculateMarketShare(
     return {
       share: shareFormatted,
       shareChange: '-',
-      shareChangeObj: { value: '-', direction: 'neutral' },
-      poolShareChangeNumeric: 0
+      shareChangeObj: { value: '-', direction: 'neutral' }
     };
   }
   
@@ -160,21 +156,8 @@ export function calculateMarketShare(
   return {
     share: shareFormatted,
     shareChange: shareDiff >= 0 ? `+${shareDiff.toFixed(7)}%` : `${shareDiff.toFixed(7)}%`,
-    shareChangeObj,
-    poolShareChangeNumeric: shareDiff
+    shareChangeObj
   };
-}
-
-/**
- * Calculate pace status based on pool share changes
- */
-export function calculatePaceStatus(poolShareChange: number): string {
-  if (poolShareChange > CALCULATION_CONSTANTS.PACE_THRESHOLD) {
-    return 'GAINING';
-  } else if (poolShareChange < -CALCULATION_CONSTANTS.PACE_THRESHOLD) {
-    return 'LOSING';
-  }
-  return 'STABLE';
 }
 
 /**

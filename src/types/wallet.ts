@@ -45,13 +45,11 @@ export interface WalletStats {
   marketShare: string;
   shareChange: string;
   shareChangeObj: ChangeIndicator;
-  paceStatus: string;
   airdropEstimates: AirdropEstimates;
   spkPrice: number | null;
   totalPointsPool: string;
   totalPointsPoolChange: string;
   totalWalletsChange: string;
-  poolShareChangeNumeric: number;
 }
 
 export interface WalletResponse {

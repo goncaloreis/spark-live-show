@@ -12,7 +12,6 @@ import {
   calculatePercentileChange,
   findValidPoolValues,
   calculateMarketShare,
-  calculatePaceStatus,
   calculateAirdropEstimates,
   calculateSimpleChange,
   formatTimestamp
@@ -31,13 +30,11 @@ const INITIAL_STATS: WalletStats = {
   marketShare: '-',
   shareChange: '-',
   shareChangeObj: { value: '-', direction: 'neutral' },
-  paceStatus: 'NEUTRAL',
   airdropEstimates: { '150M': '-', '200M': '-', '250M': '-' },
   spkPrice: null,
   totalPointsPool: '-',
   totalPointsPoolChange: '-',
-  totalWalletsChange: '-',
-  poolShareChangeNumeric: 0
+  totalWalletsChange: '-'
 };
 
 /**
@@ -134,9 +131,6 @@ export function useWalletData() {
     // Calculate market share metrics using current points and current pool (both from latest)
     const marketShareData = calculateMarketShare(currentPoints, currentTotalPointsPool, history);
 
-    // Calculate pace status
-    const paceStatus = calculatePaceStatus(marketShareData.poolShareChangeNumeric);
-
     // Fetch SPK price
     const spkPrice = await fetchSPKPrice();
 
@@ -162,13 +156,11 @@ export function useWalletData() {
       marketShare: marketShareData.share,
       shareChange: marketShareData.shareChange,
       shareChangeObj: marketShareData.shareChangeObj,
-      paceStatus,
       airdropEstimates,
       spkPrice,
       totalPointsPool: currentTotalPointsPool ? currentTotalPointsPool.toLocaleString() : '-',
       totalPointsPoolChange,
-      totalWalletsChange,
-      poolShareChangeNumeric: marketShareData.poolShareChangeNumeric
+      totalWalletsChange
     });
 
     // Update history with global average
