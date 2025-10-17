@@ -161,12 +161,17 @@ def scrape_spark_points(wallet_address):
             # Get the parent row (could be tr, div, or any container element)
             # Try different parent levels to find the actual row
             wallet_row = None
-            for ancestor_level in range(1, 5):  # Try up to 4 levels up
+            for ancestor_level in range(1, 8):  # Try up to 7 levels up
                 try:
                     parent = wallet_element.find_element(By.XPATH, f"./ancestor::*[{ancestor_level}]")
                     parent_text = parent.text
-                    # Check if this parent has the rank AND points (contains both wallet and numbers)
-                    if wallet_short in parent_text.lower() and any(c in parent_text for c in ['B', 'M', 'K']):
+                    # Check if this parent has rank AND points
+                    # Must contain wallet, have sufficient length, and have number indicators
+                    has_wallet = wallet_short in parent_text.lower()
+                    has_numbers = any(c in parent_text for c in ['B', 'M', 'K']) or any(char.isdigit() for char in parent_text)
+                    is_substantial = len(parent_text.strip()) > 20  # More than just the wallet
+                    
+                    if has_wallet and has_numbers and is_substantial:
                         wallet_row = parent
                         print(f"✓ Found wallet row at ancestor level {ancestor_level}")
                         break
@@ -174,8 +179,9 @@ def scrape_spark_points(wallet_address):
                     continue
             
             if not wallet_row:
-                wallet_row = wallet_element.find_element(By.XPATH, "./parent::*")
-                print(f"✓ Using direct parent as wallet row")
+                # Last resort: go up 5 levels
+                wallet_row = wallet_element.find_element(By.XPATH, "./ancestor::*[5]")
+                print(f"✓ Using ancestor level 5 as wallet row")
             
             # Debug: print the row text
             row_text = wallet_row.text
