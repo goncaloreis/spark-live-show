@@ -27,20 +27,14 @@ export const MetricRowCard = ({
     const isPositive = change !== undefined && change > 0;
     const isNeutral = change === 0;
     
-    // Format change value with thousands separators
+    // Format change value with thousands separators (no decimals)
     const formatChangeValue = (num: number) => {
       const absNum = Math.abs(num);
       if (suffix === '%') {
-        return absNum.toFixed(2);
+        return Math.round(absNum).toString();
       }
-      // For large numbers, use toLocaleString with 2 decimal places
-      if (absNum >= 1000) {
-        return absNum.toLocaleString('en-US', { 
-          minimumFractionDigits: 2, 
-          maximumFractionDigits: 2 
-        });
-      }
-      return absNum.toFixed(2);
+      // Use toLocaleString without decimals
+      return Math.round(absNum).toLocaleString('en-US');
     };
     
     return (
