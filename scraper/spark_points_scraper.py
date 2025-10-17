@@ -97,7 +97,7 @@ def scrape_spark_points(wallet_address):
             pool_xpath = "//div[contains(text(), 'Total Points')]/following-sibling::div[1]"
             pool_element = wait.until(EC.presence_of_element_located((By.XPATH, pool_xpath)))
             
-            pool_text = pool_element.text.strip().replace(',', '').split('.')[0]  # Remove commas and decimal part
+            pool_text = pool_element.text.strip().replace(',', '')  # Remove commas, keep decimals
             print(f"Total Points text found: {pool_text}")
             
             total_points_pool = float(pool_text)
