@@ -224,7 +224,7 @@ const Index = () => {
                         leftValue={stats.totalPoints}
                         leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
                         rightLabel="Wallet Share"
-                        rightValue={stats.marketShare.replace('%', '')}
+                        rightValue={stats.marketShare !== "-" ? parseFloat(stats.marketShare.replace('%', '')).toFixed(0) : "-"}
                         rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
                         rightSuffix="%"
                       />
@@ -245,7 +245,7 @@ const Index = () => {
                         leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
                         leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
                         rightLabel="Rank Percentile"
-                        rightValue={stats.percentile.replace('%', '')}
+                        rightValue={stats.percentile !== "-" ? parseFloat(stats.percentile.replace('%', '')).toFixed(0) : "-"}
                         rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
                         rightSuffix="%"
                       />
