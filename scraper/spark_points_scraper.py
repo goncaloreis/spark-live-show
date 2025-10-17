@@ -140,100 +140,49 @@ def scrape_spark_points(wallet_address):
             search_input.send_keys(wallet_address)
             print(f"✓ Entered wallet address")
             
-            # Wait for search results to load and table to update
-            time.sleep(12)  # Longer wait for React to re-render
+            # Wait for search results to load
+            time.sleep(5)
             
             # Take screenshot after search
             driver.save_screenshot('/tmp/spark_page_search.png')
             print("Screenshot saved to /tmp/spark_page_search.png")
             
-            # Find the wallet data - search for shortened wallet format anywhere on page
+            # Find the table row containing the wallet
+            # The wallet shows as shortened: 0xf20b...0704
             wallet_short = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
             print(f"Looking for wallet format: {wallet_short}")
             
-            # Try to find ANY element containing the wallet address
-            wallet_elements = driver.find_elements(By.XPATH, f"//*[contains(translate(text(), 'ABCDEF', 'abcdef'), '{wallet_short}')]")
-            
-            if not wallet_elements:
-                print(f"ERROR: Wallet {wallet_short} not found on page after search")
-                print("Checking if search returned results...")
-                page_text = driver.find_element(By.TAG_NAME, "body").text.lower()
-                if "no" in page_text and "found" in page_text:
-                    print("Search returned no results")
-                raise Exception(f"Wallet {wallet_short} not found in search results")
-            
-            print(f"✓ Found {len(wallet_elements)} elements containing wallet")
-            
-            # Find the parent row/container with all the data
-            # Look for the element that contains both the wallet AND numeric data
-            wallet_row = None
-            for elem in wallet_elements:
-                try:
-                    # Get the parent that likely contains all row data
-                    parent = elem.find_element(By.XPATH, "./ancestor::*[contains(@class, 'row') or contains(@class, 'item') or self::tr or self::div[count(*)>2]]")
-                    parent_text = parent.text
-                    # Check if this parent contains numbers (rank/points)
-                    if any(char.isdigit() for char in parent_text):
-                        wallet_row = parent
-                        print(f"✓ Found wallet row/container")
-                        print(f"Row text: {parent_text[:200]}")
-                        break
-                except:
-                    continue
-            
-            if not wallet_row:
-                # Fallback: just use the first element and try to find data nearby
-                wallet_row = wallet_elements[0].find_element(By.XPATH, "./ancestor::*[1]")
-                print(f"Using fallback: first wallet element's parent")
+            # Find the row in the table
+            row_xpath = f"//td[contains(text(), '{wallet_short}')]/parent::tr"
+            wallet_row = wait.until(
+                EC.visibility_of_element_located((By.XPATH, row_xpath))
+            )
+            print(f"✓ Found wallet row")
             
             # Extract rank and points from the row
             rank = 0
             total_points = 0
             
             try:
-                # Get all text from the wallet container
-                row_text = wallet_row.text
-                print(f"Extracting data from: {row_text}")
-                
-                # Split by newlines or spaces to get individual values
-                parts = row_text.replace('\n', ' ').split()
-                print(f"Text parts: {parts}")
-                
-                # Try to find rank (first number) and points (last number with B/M/K)
-                numbers_found = []
-                for i, part in enumerate(parts):
-                    part_clean = part.replace(',', '').strip()
-                    # Check if it's a rank (pure integer)
-                    try:
-                        num = int(part_clean)
-                        numbers_found.append(('rank', num, i))
-                    except:
-                        pass
-                    # Check if it's points (ends with B/M/K)
-                    if any(part_clean.endswith(suffix) for suffix in ['B', 'M', 'K']):
-                        numbers_found.append(('points', part_clean, i))
-                
-                print(f"Numbers found: {numbers_found}")
-                
-                # First integer is likely rank
-                rank_candidates = [n for n in numbers_found if n[0] == 'rank']
-                if rank_candidates:
-                    rank = rank_candidates[0][1]
-                    print(f"✓ Found rank: {rank}")
-                
-                # Last number with suffix is points
-                points_candidates = [n for n in numbers_found if n[0] == 'points']
-                if points_candidates:
-                    points_text = points_candidates[-1][1]
-                    # Convert B/M/K to actual number
-                    points_converted = points_text.replace(',', '').replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
-                    total_points = float(points_converted)
-                    print(f"✓ Found total points: {total_points} (from text: {points_text})")
-                
+                # Rank is in the first column
+                rank_cell = wallet_row.find_element(By.XPATH, "./td[1]")
+                rank_text = rank_cell.text.strip()
+                rank = int(rank_text.replace(',', ''))
+                print(f"✓ Found rank: {rank}")
             except Exception as e:
-                print(f"Could not extract rank/points: {e}")
-                import traceback
-                traceback.print_exc()
+                print(f"Could not extract rank: {e}")
+            
+            # Extract points from the last column
+            try:
+                points_cell = wallet_row.find_element(By.XPATH, "./td[last()]")
+                points_text = points_cell.text.strip()
+                
+                # Parse using scientific notation (B for billion, M for million)
+                points_converted = points_text.replace(',', '').replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
+                total_points = float(points_converted)
+                print(f"✓ Found total points: {total_points} (from text: {points_text})")
+            except Exception as e:
+                print(f"Could not extract points: {e}")
             
             if total_points == 0 or rank == 0:
                 print("Warning: Could not extract valid wallet data")
