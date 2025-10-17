@@ -79,6 +79,9 @@ export function useWalletData() {
     const { latest, history } = data;
     const totalWallets = latest.total_wallets || 0;
     const currentPoints = Number(latest.total_points);
+    
+    // Use latest.total_points_pool as the current pool value (most recent)
+    const currentTotalPointsPool = latest.total_points_pool ? Number(latest.total_points_pool) : null;
 
     // Initialize variables
     let pointsGrowth = '-';
@@ -120,16 +123,16 @@ export function useWalletData() {
       }
     }
 
-    // Find valid pool values
-    const { current: totalPointsPool, previous: prevTotalPointsPool } = findValidPoolValues(history);
+    // Find previous pool value from history for change calculation
+    const { previous: prevTotalPointsPool } = findValidPoolValues(history);
 
-    // Calculate pool change
-    if (totalPointsPool && prevTotalPointsPool) {
-      totalPointsPoolChange = calculateSimpleChange(totalPointsPool, prevTotalPointsPool);
+    // Calculate pool change using current (from latest) and previous (from history)
+    if (currentTotalPointsPool && prevTotalPointsPool) {
+      totalPointsPoolChange = calculateSimpleChange(currentTotalPointsPool, prevTotalPointsPool);
     }
 
-    // Calculate market share metrics
-    const marketShareData = calculateMarketShare(currentPoints, totalPointsPool, history);
+    // Calculate market share metrics using current points and current pool (both from latest)
+    const marketShareData = calculateMarketShare(currentPoints, currentTotalPointsPool, history);
 
     // Calculate pace status
     const paceStatus = calculatePaceStatus(marketShareData.poolShareChangeNumeric);
@@ -140,9 +143,9 @@ export function useWalletData() {
     // Calculate airdrop estimates
     const airdropEstimates = calculateAirdropEstimates(marketShareData.share, spkPrice);
 
-    // Calculate global average
-    const globalAverage = totalPointsPool && totalWallets > 0 
-      ? totalPointsPool / totalWallets 
+    // Calculate global average using current pool value
+    const globalAverage = currentTotalPointsPool && totalWallets > 0 
+      ? currentTotalPointsPool / totalWallets 
       : 0;
 
     // Update stats
@@ -162,7 +165,7 @@ export function useWalletData() {
       paceStatus,
       airdropEstimates,
       spkPrice,
-      totalPointsPool: totalPointsPool ? totalPointsPool.toLocaleString() : '-',
+      totalPointsPool: currentTotalPointsPool ? currentTotalPointsPool.toLocaleString() : '-',
       totalPointsPoolChange,
       totalWalletsChange,
       poolShareChangeNumeric: marketShareData.poolShareChangeNumeric
