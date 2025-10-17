@@ -208,6 +208,19 @@ serve(async (req) => {
       );
     } else if (action === 'store') {
       // Store wallet data (called by Python agent or manual entry)
+      
+      // Check scraper secret authentication
+      const scraperSecret = req.headers.get('x-scraper-secret');
+      const expectedSecret = Deno.env.get('SCRAPER_SECRET');
+      
+      if (!scraperSecret || scraperSecret !== expectedSecret) {
+        console.error('Unauthorized store attempt - invalid or missing secret');
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       if (!total_points) {
         return new Response(
           JSON.stringify({ error: 'total_points is required' }),

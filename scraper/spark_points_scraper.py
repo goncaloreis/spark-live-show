@@ -326,11 +326,17 @@ def store_data_in_supabase(wallet_address, data):
     """Store scraped data in Supabase via track-wallet function"""
     print("Storing data in Supabase...")
     
+    scraper_secret = os.environ.get('SCRAPER_SECRET')
+    if not scraper_secret:
+        print("ERROR: Missing SCRAPER_SECRET environment variable")
+        return False
+    
     url = f"{SUPABASE_URL}/functions/v1/track-wallet"
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {SUPABASE_ANON_KEY}',
-        'apikey': SUPABASE_ANON_KEY
+        'apikey': SUPABASE_ANON_KEY,
+        'x-scraper-secret': scraper_secret
     }
     
     payload = {
