@@ -141,87 +141,99 @@ def scrape_spark_points(wallet_address):
             print(f"✓ Entered wallet address")
             
             # Wait for search results to load and table to update
-            time.sleep(10)
+            time.sleep(12)  # Longer wait for React to re-render
             
             # Take screenshot after search
             driver.save_screenshot('/tmp/spark_page_search.png')
             print("Screenshot saved to /tmp/spark_page_search.png")
             
-            # Get page HTML after search to debug
-            with open('/tmp/page_after_search.html', 'w', encoding='utf-8') as f:
-                f.write(driver.page_source)
-            print("Page HTML saved to /tmp/page_after_search.html")
-            
-            # Find the table row containing the wallet
-            # The wallet shows as shortened: 0xf20b...0704
+            # Find the wallet data - search for shortened wallet format anywhere on page
             wallet_short = f"{wallet_address[:6]}...{wallet_address[-4:]}".lower()
             print(f"Looking for wallet format: {wallet_short}")
             
-            # Try multiple approaches to find the wallet row
+            # Try to find ANY element containing the wallet address
+            wallet_elements = driver.find_elements(By.XPATH, f"//*[contains(translate(text(), 'ABCDEF', 'abcdef'), '{wallet_short}')]")
+            
+            if not wallet_elements:
+                print(f"ERROR: Wallet {wallet_short} not found on page after search")
+                print("Checking if search returned results...")
+                page_text = driver.find_element(By.TAG_NAME, "body").text.lower()
+                if "no" in page_text and "found" in page_text:
+                    print("Search returned no results")
+                raise Exception(f"Wallet {wallet_short} not found in search results")
+            
+            print(f"✓ Found {len(wallet_elements)} elements containing wallet")
+            
+            # Find the parent row/container with all the data
+            # Look for the element that contains both the wallet AND numeric data
             wallet_row = None
-            
-            # Approach 1: Find by table body and iterate rows
-            try:
-                print("Approach 1: Finding table rows...")
-                tbody = driver.find_element(By.TAG_NAME, "tbody")
-                rows = tbody.find_elements(By.TAG_NAME, "tr")
-                print(f"Found {len(rows)} rows in table")
-                
-                for row in rows:
-                    row_text = row.text.lower()
-                    if wallet_short in row_text:
-                        wallet_row = row
-                        print(f"✓ Found wallet row (approach 1)")
+            for elem in wallet_elements:
+                try:
+                    # Get the parent that likely contains all row data
+                    parent = elem.find_element(By.XPATH, "./ancestor::*[contains(@class, 'row') or contains(@class, 'item') or self::tr or self::div[count(*)>2]]")
+                    parent_text = parent.text
+                    # Check if this parent contains numbers (rank/points)
+                    if any(char.isdigit() for char in parent_text):
+                        wallet_row = parent
+                        print(f"✓ Found wallet row/container")
+                        print(f"Row text: {parent_text[:200]}")
                         break
-            except Exception as e:
-                print(f"Approach 1 failed: {e}")
-            
-            # Approach 2: CSS selector
-            if not wallet_row:
-                try:
-                    print("Approach 2: CSS selector...")
-                    wallet_row = driver.find_element(By.CSS_SELECTOR, f"tr:has(*:contains('{wallet_short}'))")
-                    print(f"✓ Found wallet row (approach 2)")
-                except Exception as e:
-                    print(f"Approach 2 failed: {e}")
-            
-            # Approach 3: XPath with case-insensitive search
-            if not wallet_row:
-                try:
-                    print("Approach 3: XPath case-insensitive...")
-                    row_xpath = f"//tr[contains(translate(., 'ABCDEF', 'abcdef'), '{wallet_short}')]"
-                    wallet_row = driver.find_element(By.XPATH, row_xpath)
-                    print(f"✓ Found wallet row (approach 3)")
-                except Exception as e:
-                    print(f"Approach 3 failed: {e}")
+                except:
+                    continue
             
             if not wallet_row:
-                raise Exception(f"Could not find wallet {wallet_short} in table after search")
+                # Fallback: just use the first element and try to find data nearby
+                wallet_row = wallet_elements[0].find_element(By.XPATH, "./ancestor::*[1]")
+                print(f"Using fallback: first wallet element's parent")
             
             # Extract rank and points from the row
             rank = 0
             total_points = 0
             
             try:
-                # Rank is in the first column
-                rank_cell = wallet_row.find_element(By.XPATH, "./td[1]")
-                rank_text = rank_cell.text.strip()
-                rank = int(rank_text.replace(',', ''))
-                print(f"✓ Found rank: {rank}")
-            except Exception as e:
-                print(f"Could not extract rank: {e}")
-            
-            # Extract points from the last column
-            try:
-                points_cell = wallet_row.find_element(By.XPATH, "./td[last()]")
-                points_text = points_cell.text.strip()
+                # Get all text from the wallet container
+                row_text = wallet_row.text
+                print(f"Extracting data from: {row_text}")
                 
-                # Parse using scientific notation (B for billion, M for million)
-                points_converted = points_text.replace(',', '').replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
-                total_points = float(points_converted)
-                print(f"✓ Found total points: {total_points} (from text: {points_text})")
+                # Split by newlines or spaces to get individual values
+                parts = row_text.replace('\n', ' ').split()
+                print(f"Text parts: {parts}")
+                
+                # Try to find rank (first number) and points (last number with B/M/K)
+                numbers_found = []
+                for i, part in enumerate(parts):
+                    part_clean = part.replace(',', '').strip()
+                    # Check if it's a rank (pure integer)
+                    try:
+                        num = int(part_clean)
+                        numbers_found.append(('rank', num, i))
+                    except:
+                        pass
+                    # Check if it's points (ends with B/M/K)
+                    if any(part_clean.endswith(suffix) for suffix in ['B', 'M', 'K']):
+                        numbers_found.append(('points', part_clean, i))
+                
+                print(f"Numbers found: {numbers_found}")
+                
+                # First integer is likely rank
+                rank_candidates = [n for n in numbers_found if n[0] == 'rank']
+                if rank_candidates:
+                    rank = rank_candidates[0][1]
+                    print(f"✓ Found rank: {rank}")
+                
+                # Last number with suffix is points
+                points_candidates = [n for n in numbers_found if n[0] == 'points']
+                if points_candidates:
+                    points_text = points_candidates[-1][1]
+                    # Convert B/M/K to actual number
+                    points_converted = points_text.replace(',', '').replace('B', 'e9').replace('M', 'e6').replace('K', 'e3')
+                    total_points = float(points_converted)
+                    print(f"✓ Found total points: {total_points} (from text: {points_text})")
+                
             except Exception as e:
-                print(f"Could not extract points: {e}")
+                print(f"Could not extract rank/points: {e}")
+                import traceback
+                traceback.print_exc()
             
             if total_points == 0 or rank == 0:
                 print("Warning: Could not extract valid wallet data")
