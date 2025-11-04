@@ -23,20 +23,12 @@ import { APP_CONFIG, VALIDATION, UI_TEXT } from "@/utils/constants";
  */
 const Index = () => {
   const {
-    walletAddress,
-    setWalletAddress,
     loading,
     hasSearched,
     stats,
     historyData,
     searchWallet
   } = useWalletData();
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !loading) {
-      searchWallet();
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -77,40 +69,32 @@ const Index = () => {
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-10 group-hover:opacity-20 transition-all duration-700 pointer-events-none" />
                 <Card className="relative card-premium border shadow-elevated">
                   <div className="p-6 sm:p-8">
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 relative z-30">
-                      <div className="flex-1">
-                        <Input
-                          type="text"
-                          placeholder={VALIDATION.WALLET_ADDRESS_PLACEHOLDER}
-                          value={walletAddress}
-                          onChange={(e) => setWalletAddress(e.target.value)}
-                          onKeyDown={handleKeyPress}
-                          className="h-12 sm:h-14 text-sm sm:text-base focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300"
-                          autoComplete="off"
-                        />
-                      </div>
-                      <div className="flex gap-3">
+                    <div className="flex flex-col gap-4 relative z-30">
+                      <div className="flex justify-center">
                         <Button 
                           onClick={() => !loading && searchWallet()}
                           disabled={loading}
                           type="button"
                           size="lg"
-                          className="flex-1 sm:flex-none h-12 sm:h-14 px-8 sm:px-10 text-sm sm:text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                          className="h-14 px-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         >
                           {loading ? (
                             <>
-                              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
-                              <span className="hidden sm:inline">{UI_TEXT.LOADING_TEXT}</span>
-                              <span className="sm:hidden">{UI_TEXT.LOADING_TEXT_SHORT}</span>
+                              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                              <span>{UI_TEXT.LOADING_TEXT}</span>
                             </>
                           ) : (
                             <>
-                              <Search className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                              <span className="hidden sm:inline">{UI_TEXT.SEARCH_BUTTON}</span>
-                              <span className="sm:hidden">{UI_TEXT.SEARCH_BUTTON_SHORT}</span>
+                              <Search className="w-5 h-5 mr-2" />
+                              <span>{UI_TEXT.SEARCH_BUTTON}</span>
                             </>
                           )}
                         </Button>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground/60 font-mono">
+                          Tracking: {APP_CONFIG.DEFAULT_WALLET_ADDRESS.slice(0, 6)}...{APP_CONFIG.DEFAULT_WALLET_ADDRESS.slice(-4)}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center justify-center gap-2 mt-5">

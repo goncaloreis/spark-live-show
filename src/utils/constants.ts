@@ -7,7 +7,8 @@ export const APP_CONFIG = {
   APP_DESCRIPTION: 'Real-Time DeFi Performance Analytics',
   SEASON: 'Season 2',
   POWERED_BY_URL: 'https://points.spark.fi/',
-  POWERED_BY_TEXT: 'points.spark.fi'
+  POWERED_BY_TEXT: 'points.spark.fi',
+  DEFAULT_WALLET_ADDRESS: import.meta.env.VITE_WALLET_ADDRESS || '0x0000000000000000000000000000000000000000'
 } as const;
 
 export const VALIDATION = {

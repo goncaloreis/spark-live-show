@@ -16,6 +16,7 @@ import {
   calculateSimpleChange,
   formatTimestamp
 } from '@/utils/walletCalculations';
+import { APP_CONFIG } from '@/utils/constants';
 
 const INITIAL_STATS: WalletStats = {
   totalPoints: '0',
@@ -48,7 +49,6 @@ function isValidWalletAddress(address: string): boolean {
  * Hook for managing wallet data fetching and calculations
  */
 export function useWalletData() {
-  const [walletAddress, setWalletAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [stats, setStats] = useState<WalletStats>(INITIAL_STATS);
@@ -171,15 +171,18 @@ export function useWalletData() {
    * Search for wallet data
    */
   const searchWallet = async (): Promise<void> => {
+    // Use configured wallet address
+    const walletAddress = APP_CONFIG.DEFAULT_WALLET_ADDRESS;
+    
     // Validation
     if (!walletAddress) {
-      toast.error('Please enter a wallet address');
+      toast.error('Wallet address not configured');
       return;
     }
 
     const sanitizedAddress = walletAddress.trim().toLowerCase();
     if (!isValidWalletAddress(sanitizedAddress)) {
-      toast.error('Invalid wallet address format');
+      toast.error('Invalid wallet address configured');
       return;
     }
 
@@ -213,8 +216,6 @@ export function useWalletData() {
   };
 
   return {
-    walletAddress,
-    setWalletAddress,
     loading,
     hasSearched,
     stats,
