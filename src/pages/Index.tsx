@@ -70,14 +70,13 @@ const Index = () => {
                 <Card className="relative card-premium border shadow-elevated">
                   <div className="p-6 sm:p-8">
                     <div className="flex flex-col gap-4 relative z-30">
-                      <div className="flex justify-center">
-                        <Button 
-                          onClick={() => !loading && searchWallet()}
-                          disabled={loading}
-                          type="button"
-                          size="lg"
-                          className="h-14 px-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        >
+                      <Button 
+                        onClick={() => !loading && searchWallet()}
+                        disabled={loading}
+                        type="button"
+                        size="lg"
+                        className="w-full h-14 px-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
                           {loading ? (
                             <>
                               <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
@@ -89,8 +88,7 @@ const Index = () => {
                               <span>{UI_TEXT.SEARCH_BUTTON}</span>
                             </>
                           )}
-                        </Button>
-                      </div>
+                      </Button>
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground/60 font-mono">
                           Tracking: {APP_CONFIG.DEFAULT_WALLET_ADDRESS.slice(0, 6)}...{APP_CONFIG.DEFAULT_WALLET_ADDRESS.slice(-4)}
