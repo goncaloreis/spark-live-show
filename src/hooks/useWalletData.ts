@@ -168,21 +168,18 @@ export function useWalletData() {
   };
 
   /**
-   * Search for wallet data
+   * Search for wallet data by address
    */
-  const searchWallet = async (): Promise<void> => {
-    // Use configured wallet address
-    const walletAddress = APP_CONFIG.DEFAULT_WALLET_ADDRESS;
-    
+  const searchWallet = async (walletAddress: string): Promise<void> => {
     // Validation
     if (!walletAddress) {
-      toast.error('Wallet address not configured');
+      toast.error('Wallet address not provided');
       return;
     }
 
     const sanitizedAddress = walletAddress.trim().toLowerCase();
     if (!isValidWalletAddress(sanitizedAddress)) {
-      toast.error('Invalid wallet address configured');
+      toast.error('Invalid wallet address format');
       return;
     }
 

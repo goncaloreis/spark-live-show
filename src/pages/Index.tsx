@@ -3,26 +3,26 @@
  * Displays wallet tracking data and analytics
  */
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { CombinedChart } from "@/components/CombinedChart";
-
-import { KPICard } from "@/components/KPICard";
 import { ProjectionCard } from "@/components/ProjectionCard";
 import { MetricRowCard } from "@/components/MetricRowCard";
 import { PaceStatusCard } from "@/components/PaceStatusCard";
 import { LiveSPKCard } from "@/components/LiveSPKCard";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
+import { WalletSelector } from "@/components/WalletSelector";
 import { Search, Award, DollarSign, TrendingUp } from "lucide-react";
 import sparkLogo from "@/assets/spark-logo.svg";
 import { useWalletData } from "@/hooks/useWalletData";
-import { APP_CONFIG, VALIDATION, UI_TEXT } from "@/utils/constants";
+import { APP_CONFIG, UI_TEXT } from "@/utils/constants";
 
 /**
  * Main application page component
  */
 const Index = () => {
+  const [selectedWallet, setSelectedWallet] = useState<string>("");
   const {
     loading,
     hasSearched,
@@ -30,6 +30,13 @@ const Index = () => {
     historyData,
     searchWallet
   } = useWalletData();
+
+  // Auto-search when wallet is selected
+  useEffect(() => {
+    if (selectedWallet) {
+      searchWallet(selectedWallet);
+    }
+  }, [selectedWallet]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -65,15 +72,19 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Premium Search Interface */}
+              {/* Wallet Selector */}
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-10 group-hover:opacity-20 transition-all duration-700 pointer-events-none" />
                 <Card className="relative card-premium border shadow-elevated">
                   <div className="p-6 sm:p-8">
-                    <div className="flex flex-col gap-4 relative z-30">
+                    <div className="flex flex-col items-center gap-6 relative z-30">
+                      <WalletSelector 
+                        selectedWallet={selectedWallet}
+                        onWalletChange={setSelectedWallet}
+                      />
                       <Button 
-                        onClick={() => !loading && searchWallet()}
-                        disabled={loading}
+                        onClick={() => selectedWallet && !loading && searchWallet(selectedWallet)}
+                        disabled={loading || !selectedWallet}
                         type="button"
                         size="lg"
                         className="w-full h-14 px-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
@@ -90,11 +101,6 @@ const Index = () => {
                             </>
                           )}
                       </Button>
-                      <div className="text-center">
-                        <p className="text-xs text-muted-foreground/60 font-mono">
-                          Tracking: {APP_CONFIG.DEFAULT_WALLET_ADDRESS.slice(0, 6)}...{APP_CONFIG.DEFAULT_WALLET_ADDRESS.slice(-4)}
-                        </p>
-                      </div>
                     </div>
                     <div className="flex items-center justify-center gap-2 mt-5">
                       <div className="h-px w-8 bg-gradient-to-r from-transparent via-border to-transparent" />

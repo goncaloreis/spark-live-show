@@ -65,6 +65,33 @@ export type Database = {
         }
         Relationships: []
       }
+      tracked_wallets: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       wallet_tracking: {
         Row: {
           created_at: string | null
@@ -105,6 +132,12 @@ export type Database = {
     Functions: {
       cleanup_old_price_cache: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
+      get_active_tracked_wallets: {
+        Args: never
+        Returns: {
+          wallet_address: string
+        }[]
+      }
       get_latest_spk_price: {
         Args: never
         Returns: {
