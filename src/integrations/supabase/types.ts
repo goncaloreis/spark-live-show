@@ -103,16 +103,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      cleanup_old_price_cache: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_rate_limits: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_old_price_cache: { Args: never; Returns: undefined }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       get_latest_spk_price: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           change_24h: number
           created_at: string
@@ -141,10 +135,7 @@ export type Database = {
           total_wallets: number
         }[]
       }
-      trigger_scrape_spark_points: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      trigger_scrape_spark_points: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

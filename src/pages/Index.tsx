@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { CombinedChart } from "@/components/CombinedChart";
-import { WalletShareChart } from "@/components/WalletShareChart";
+
 import { KPICard } from "@/components/KPICard";
 import { ProjectionCard } from "@/components/ProjectionCard";
 import { MetricRowCard } from "@/components/MetricRowCard";
@@ -256,10 +256,6 @@ const Index = () => {
                 <CombinedChart data={historyData} loading={loading} />
               </div>
 
-              {/* Wallet Share Progression Chart */}
-              <div className="animate-in fade-in duration-700 delay-300">
-                <WalletShareChart data={historyData} loading={loading} />
-              </div>
 
             </div>
           )}
