@@ -2,6 +2,7 @@
 """
 Spark Points Scraper for GitHub Actions
 Scrapes wallet data from app.spark.fi/points and stores in Supabase
+Now supports multiple wallet tracking via tracked_wallets table
 """
 
 import os
@@ -21,7 +22,6 @@ from datetime import datetime
 # Configuration from environment variables
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY')
-WALLET_ADDRESS = os.environ.get('WALLET_ADDRESS')
 
 def setup_firefox_driver():
     """Configure Firefox driver for headless operation"""
@@ -359,10 +359,35 @@ def store_data_in_supabase(wallet_address, data):
         print(f"Response: {response.text}")
         return False
 
+def get_tracked_wallets():
+    """Fetch all active tracked wallets from Supabase"""
+    print("Fetching tracked wallets from database...")
+    url = f"{SUPABASE_URL}/rest/v1/rpc/get_active_tracked_wallets"
+    headers = {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        response = requests.post(url, json={}, headers=headers)
+        
+        if response.status_code == 200:
+            wallets = response.json()
+            print(f"Found {len(wallets)} active tracked wallet(s)")
+            return [w['wallet_address'] for w in wallets]
+        else:
+            print(f"Error fetching wallets: {response.status_code}")
+            print(f"Response: {response.text}")
+            return []
+    except Exception as e:
+        print(f"Exception fetching wallets: {e}")
+        return []
+
 def main():
-    """Main execution function"""
+    """Main execution function - loops through all tracked wallets"""
     print("=" * 60)
-    print("Spark Points Scraper - GitHub Actions")
+    print("Spark Points Scraper - Multi-Wallet Support")
     print(f"Timestamp: {datetime.now().isoformat()}")
     print("=" * 60)
     
@@ -372,25 +397,69 @@ def main():
             raise ValueError("SUPABASE_URL not set")
         if not SUPABASE_ANON_KEY:
             raise ValueError("SUPABASE_ANON_KEY not set")
-        if not WALLET_ADDRESS:
-            raise ValueError("WALLET_ADDRESS not set")
     except ValueError as e:
         print(f"ERROR: {e}")
         sys.exit(1)
     
     try:
-        # Scrape data
-        data = scrape_spark_points(WALLET_ADDRESS)
+        # Get all tracked wallets
+        wallets = get_tracked_wallets()
         
-        # Store in Supabase
-        success = store_data_in_supabase(WALLET_ADDRESS, data)
-        
-        if success:
-            print("\n✓ Scraping completed successfully!")
+        if not wallets:
+            print("No tracked wallets found. Exiting.")
             sys.exit(0)
-        else:
-            print("\n✗ Failed to store data")
+        
+        # Track results
+        successful = 0
+        failed = 0
+        
+        # Loop through each wallet
+        for wallet_address in wallets:
+            print(f"\n{'='*60}")
+            print(f"Processing wallet: {mask_wallet(wallet_address)}")
+            print(f"{'='*60}")
+            
+            try:
+                # Scrape data
+                data = scrape_spark_points(wallet_address)
+                
+                # Store in Supabase
+                success = store_data_in_supabase(wallet_address, data)
+                
+                if success:
+                    print(f"✓ Successfully processed {mask_wallet(wallet_address)}")
+                    successful += 1
+                else:
+                    print(f"✗ Failed to store data for {mask_wallet(wallet_address)}")
+                    failed += 1
+                    
+            except Exception as e:
+                print(f"✗ Error processing {mask_wallet(wallet_address)}: {e}")
+                import traceback
+                traceback.print_exc()
+                failed += 1
+            
+            # Small delay between wallets to avoid rate limiting
+            if wallet_address != wallets[-1]:
+                print("\nWaiting 5 seconds before next wallet...")
+                time.sleep(5)
+        
+        # Print summary
+        print(f"\n{'='*60}")
+        print(f"SUMMARY")
+        print(f"{'='*60}")
+        print(f"Total wallets: {len(wallets)}")
+        print(f"Successful: {successful}")
+        print(f"Failed: {failed}")
+        print(f"{'='*60}")
+        
+        # Exit with appropriate code
+        if failed > 0:
+            print("\n⚠ Some wallets failed to process")
             sys.exit(1)
+        else:
+            print("\n✓ All wallets processed successfully!")
+            sys.exit(0)
             
     except Exception as e:
         print(f"\n✗ Scraping failed: {e}")
