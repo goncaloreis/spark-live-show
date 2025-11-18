@@ -48,7 +48,7 @@ function isValidWalletAddress(address: string): boolean {
 /**
  * Hook for managing wallet data fetching and calculations
  */
-export function useWalletData() {
+export function useWalletData(walletAddress?: string) {
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [stats, setStats] = useState<WalletStats>(INITIAL_STATS);
