@@ -36,7 +36,7 @@ const Index = () => {
     if (selectedWallet) {
       searchWallet(selectedWallet);
     }
-  }, [selectedWallet, searchWallet]);
+  }, [selectedWallet]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
