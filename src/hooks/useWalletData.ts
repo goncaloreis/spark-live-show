@@ -2,7 +2,7 @@
  * Custom hook for fetching and managing wallet data
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { WalletStats, WalletResponse, HistoryDataPoint } from '@/types/wallet';
@@ -53,6 +53,7 @@ export function useWalletData(walletAddress?: string) {
   const [hasSearched, setHasSearched] = useState(false);
   const [stats, setStats] = useState<WalletStats>(INITIAL_STATS);
   const [historyData, setHistoryData] = useState<HistoryDataPoint[]>([]);
+  const lastSearchedWallet = useRef<string | null>(null);
 
   /**
    * Fetch SPK price from backend
@@ -178,11 +179,18 @@ export function useWalletData(walletAddress?: string) {
     }
 
     const sanitizedAddress = walletAddress.trim().toLowerCase();
+    
+    // Prevent duplicate searches
+    if (lastSearchedWallet.current === sanitizedAddress) {
+      return;
+    }
+    
     if (!isValidWalletAddress(sanitizedAddress)) {
       toast.error('Invalid wallet address format');
       return;
     }
 
+    lastSearchedWallet.current = sanitizedAddress;
     setLoading(true);
     setHasSearched(true);
 
