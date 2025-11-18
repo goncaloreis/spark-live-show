@@ -2,7 +2,7 @@
  * Custom hook for fetching and managing wallet data
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { WalletStats, WalletResponse, HistoryDataPoint } from '@/types/wallet';
@@ -170,7 +170,7 @@ export function useWalletData(walletAddress?: string) {
   /**
    * Search for wallet data by address
    */
-  const searchWallet = async (walletAddress: string): Promise<void> => {
+  const searchWallet = useCallback(async (walletAddress: string): Promise<void> => {
     // Validation
     if (!walletAddress) {
       toast.error('Wallet address not provided');
@@ -210,7 +210,7 @@ export function useWalletData(walletAddress?: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return {
     loading,
