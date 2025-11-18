@@ -33,7 +33,7 @@ const Index = () => {
 
   // Auto-search when wallet is selected
   useEffect(() => {
-    if (selectedWallet) {
+    if (selectedWallet && !loading) {
       searchWallet(selectedWallet);
     }
   }, [selectedWallet]);
