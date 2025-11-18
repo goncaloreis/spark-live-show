@@ -171,6 +171,7 @@ export function useWalletData(walletAddress?: string) {
 
   /**
    * Search for wallet data by address
+   * Memoized to prevent unnecessary re-renders
    */
   const searchWallet = useCallback(async (walletAddress: string): Promise<void> => {
     // Validation

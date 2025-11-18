@@ -17,9 +17,9 @@ interface WalletData {
 
 // Rate limiting configuration
 const RATE_LIMITS = {
-  get: { requests: 20, windowMinutes: 1 },  // 20 requests per minute for GET
-  store: { requests: 10, windowMinutes: 1 }, // 10 requests per minute for STORE
-  global: { requests: 100, windowMinutes: 60 } // 100 requests per hour per IP
+  get: { requests: 30, windowMinutes: 1 },  // 30 requests per minute for GET
+  store: { requests: 20, windowMinutes: 1 }, // 20 requests per minute for STORE (scraper)
+  global: { requests: 1000, windowMinutes: 60 } // 1000 requests per hour per IP (relaxed for development)
 };
 
 async function checkRateLimit(

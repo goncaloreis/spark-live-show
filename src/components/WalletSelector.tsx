@@ -30,11 +30,7 @@ export const WalletSelector = ({ selectedWallet, onWalletChange }: WalletSelecto
         
         if (data && data.length > 0) {
           setWallets(data);
-          
-          // If no wallet is selected or selected wallet is not in the list, select the first one
-          if (!selectedWallet || !data.some(w => w.wallet_address === selectedWallet)) {
-            onWalletChange(data[0].wallet_address);
-          }
+          // Don't auto-select - let user choose to avoid unnecessary API calls
         }
       } catch (error) {
         console.error('Error fetching tracked wallets:', error);
@@ -51,11 +47,20 @@ export const WalletSelector = ({ selectedWallet, onWalletChange }: WalletSelecto
     return notes ? `${short} - ${notes}` : short;
   };
 
-  if (loading || wallets.length === 0) {
+  if (loading) {
     return (
       <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-card/50">
         <Wallet className="w-4 h-4 text-muted-foreground animate-pulse" />
         <span className="text-sm text-muted-foreground">Loading wallets...</span>
+      </div>
+    );
+  }
+
+  if (wallets.length === 0) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 bg-card/50">
+        <Wallet className="w-4 h-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">No tracked wallets found</span>
       </div>
     );
   }
@@ -68,7 +73,7 @@ export const WalletSelector = ({ selectedWallet, onWalletChange }: WalletSelecto
       </div>
       <Select value={selectedWallet} onValueChange={onWalletChange}>
         <SelectTrigger className="w-[280px] border-primary/20 bg-card/80 backdrop-blur-xl hover:border-primary/40 transition-colors">
-          <SelectValue />
+          <SelectValue placeholder="Select a wallet to track..." />
         </SelectTrigger>
         <SelectContent className="bg-card border-border backdrop-blur-xl">
           {wallets.map((wallet) => (
