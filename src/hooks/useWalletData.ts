@@ -54,6 +54,7 @@ export function useWalletData(walletAddress?: string) {
   const [stats, setStats] = useState<WalletStats>(INITIAL_STATS);
   const [historyData, setHistoryData] = useState<HistoryDataPoint[]>([]);
   const lastSearchedWallet = useRef<string | null>(null);
+  const rateLimitUntil = useRef<number>(0);
 
   /**
    * Fetch SPK price from backend
@@ -180,6 +181,14 @@ export function useWalletData(walletAddress?: string) {
 
     const sanitizedAddress = walletAddress.trim().toLowerCase();
     
+    // Check if we're currently rate limited
+    const now = Date.now();
+    if (rateLimitUntil.current > now) {
+      const secondsLeft = Math.ceil((rateLimitUntil.current - now) / 1000);
+      toast.error(`Rate limited. Please wait ${secondsLeft} seconds before trying again.`);
+      return;
+    }
+    
     // Prevent duplicate searches
     if (lastSearchedWallet.current === sanitizedAddress) {
       return;
@@ -206,8 +215,26 @@ export function useWalletData(walletAddress?: string) {
       if (error) {
         // Handle rate limit errors specifically
         if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
-          toast.error('Too many requests. Please wait a moment before trying again.');
-          lastSearchedWallet.current = null; // Reset to allow retry later
+          // Try to parse retry_after from the error
+          let retryAfter = 60; // Default to 60 seconds
+          
+          // The error might have the response data in different places
+          try {
+            const errorBody = (error as any).context?.body;
+            if (errorBody && typeof errorBody === 'string') {
+              const parsed = JSON.parse(errorBody);
+              retryAfter = parsed.retry_after || 60;
+            } else if (errorBody?.retry_after) {
+              retryAfter = errorBody.retry_after;
+            }
+          } catch (e) {
+            console.error('Could not parse retry_after from error:', e);
+          }
+          
+          rateLimitUntil.current = Date.now() + (retryAfter * 1000);
+          const minutes = Math.ceil(retryAfter / 60);
+          toast.error(`Rate limited. Please wait ${minutes} minute${minutes > 1 ? 's' : ''} before trying again.`);
+          lastSearchedWallet.current = null;
           return;
         }
         throw error;
