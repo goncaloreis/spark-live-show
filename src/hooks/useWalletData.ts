@@ -203,7 +203,15 @@ export function useWalletData(walletAddress?: string) {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Handle rate limit errors specifically
+        if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
+          toast.error('Too many requests. Please wait a moment before trying again.');
+          lastSearchedWallet.current = null; // Reset to allow retry later
+          return;
+        }
+        throw error;
+      }
 
       if (data?.has_data && data.latest) {
         await processWalletData(data);
@@ -214,7 +222,9 @@ export function useWalletData(walletAddress?: string) {
         setHistoryData([]);
       }
     } catch (error) {
+      console.error('Wallet search error:', error);
       toast.error('Unable to load wallet data. Please try again.');
+      lastSearchedWallet.current = null; // Reset on error to allow retry
     } finally {
       setLoading(false);
     }
