@@ -31,12 +31,12 @@ const Index = () => {
     searchWallet
   } = useWalletData(selectedWallet);
 
-  // Auto-search when wallet is selected
+  // Search when wallet is selected (only once per wallet change)
   useEffect(() => {
-    if (selectedWallet && !loading) {
+    if (selectedWallet) {
       searchWallet(selectedWallet);
     }
-  }, [selectedWallet]);
+  }, [selectedWallet, searchWallet]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
