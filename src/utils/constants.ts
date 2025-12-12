@@ -5,8 +5,8 @@
 export const APP_CONFIG = {
   APP_NAME: 'Spark Points Tracker',
   APP_DESCRIPTION: 'Real-Time DeFi Performance Analytics',
-  SEASON: 'Season 2',
-  SEASON_END_DATE: new Date("2025-12-12T14:00:00Z"),
+  SEASON: 'Season 3',
+  SEASON_END_DATE: new Date("2026-04-12T14:00:00Z"),
   POWERED_BY_URL: 'https://points.spark.fi/',
   POWERED_BY_TEXT: 'points.spark.fi',
 } as const;
