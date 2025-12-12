@@ -16,8 +16,8 @@ interface TimeRemaining {
  * Calculates time remaining until the target date
  */
 const calculateTimeRemaining = (): TimeRemaining => {
-  // Season 2 ends on December 12, 2025 at 2pm UTC
-  const targetDate = new Date('2025-12-12T14:00:00Z');
+  // Season 3 ends on April 12, 2026 at 2pm UTC (4 months from Dec 12, 2025)
+  const targetDate = new Date('2026-04-12T14:00:00Z');
   const now = new Date();
   const difference = targetDate.getTime() - now.getTime();
 
@@ -74,10 +74,10 @@ export const SeasonCountdown = () => {
         <div className="relative glass border border-primary/20 rounded-xl p-3 sm:p-4 backdrop-blur-3xl">
           <div className="text-center mb-2 sm:mb-3">
             <h3 className="text-xs sm:text-sm font-bold text-foreground mb-0.5">
-              Season 2 Ends In
+              Season 3 Ends In
             </h3>
             <p className="text-[9px] sm:text-[10px] text-muted-foreground/70">
-              December 12, 2025 at 14:00 UTC
+              April 12, 2026 at 14:00 UTC
             </p>
           </div>
           
