@@ -7,13 +7,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CombinedChart } from "@/components/CombinedChart";
-import { ProjectionCard } from "@/components/ProjectionCard";
 import { MetricRowCard } from "@/components/MetricRowCard";
 import { PaceStatusCard } from "@/components/PaceStatusCard";
-import { LiveSPKCard } from "@/components/LiveSPKCard";
+import { AirdropProjectionCard } from "@/components/AirdropProjectionCard";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
 import { WalletSelector } from "@/components/WalletSelector";
-import { Search, Award, DollarSign, TrendingUp } from "lucide-react";
+import { Search, Award, TrendingUp, DollarSign } from "lucide-react";
 import sparkLogo from "@/assets/spark-logo.svg";
 import { useWalletData } from "@/hooks/useWalletData";
 import { APP_CONFIG, UI_TEXT } from "@/utils/constants";
@@ -155,106 +154,64 @@ const Index = () => {
                 </div>
               )}
 
-              {/* KPI Cards Section - Matrix Layout */}
+              {/* Performance Section - Full Width */}
               <div className="space-y-3">
-                {/* Headers Row */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                  <div className="lg:col-span-3 flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 transition-all duration-200 hover:scale-105">
-                      <Award className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-base tracking-tight text-foreground">Performance</h3>
-                      <p className="text-[9px] text-muted-foreground/50 mt-0.5">Real-time metrics</p>
-                    </div>
+                {/* Performance Header */}
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 transition-all duration-200 hover:scale-105">
+                    <Award className="w-4 h-4 text-primary" />
                   </div>
-                  <div className="flex items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 via-secondary/20 to-primary/20 border border-primary/20 shimmer transition-all duration-200 hover:scale-105">
-                        <DollarSign className="w-4 h-4 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-base tracking-tight text-foreground">Projections</h3>
-                        <p className="text-[9px] text-muted-foreground/50 mt-0.5 whitespace-nowrap">
-                          Wallet share × estimated airdrop × live SPK
-                        </p>
-                      </div>
-                    </div>
+                  <div>
+                    <h3 className="font-bold text-base tracking-tight text-foreground">Performance</h3>
+                    <p className="text-[9px] text-muted-foreground/50 mt-0.5">Real-time metrics</p>
                   </div>
                 </div>
 
-                {/* 3x3 Matrix: 3 rows with aligned cards */}
-                <div className="space-y-2">
-                  {/* Row 1: Total Points + Total Wallets | Conservative */}
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-                    <div className="lg:col-span-3">
-                      <MetricRowCard 
-                        leftLabel="Total Points"
-                        leftValue={stats.totalPointsPool}
-                        leftChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
-                        rightLabel="Total Wallets"
-                        rightValue={stats.totalWallets}
-                        rightChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
-                      />
-                    </div>
-                    <ProjectionCard 
-                      label="150M SPK Airdrop"
-                      value={stats.airdropEstimates["150M"]}
-                      badge="Conservative"
-                      variant="conservative"
-                    />
-                  </div>
-
-                  {/* Row 2: Wallet Points + Wallet Share | Moderate */}
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-                    <div className="lg:col-span-3">
-                      <MetricRowCard 
-                        leftLabel="Wallet Points"
-                        leftValue={stats.totalPoints}
-                        leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
-                        rightLabel="Wallet Share"
-                        rightValue={stats.marketShare.replace('%', '')}
-                        rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
-                        rightSuffix="%"
-                      />
-                    </div>
-                    <ProjectionCard 
-                      label="200M SPK Airdrop"
-                      value={stats.airdropEstimates["200M"]}
-                      badge="Moderate"
-                      variant="moderate"
-                    />
-                  </div>
-
-                  {/* Row 3: Wallet Rank + Rank Percentile | Optimistic */}
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-                    <div className="lg:col-span-3">
-                      <MetricRowCard 
-                        leftLabel="Wallet Rank"
-                        leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
-                        leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
-                        rightLabel="Rank Percentile"
-                        rightValue={stats.percentile.replace('%', '')}
-                        rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
-                        rightSuffix="%"
-                      />
-                    </div>
-                    <ProjectionCard 
-                      label="250M SPK Airdrop"
-                      value={stats.airdropEstimates["250M"]}
-                      badge="Optimistic"
-                      variant="optimistic"
-                    />
-                  </div>
-
-                  {/* Row 4: Pace Status + Live SPK */}
-                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-                    <div className="lg:col-span-3">
-                      <PaceStatusCard shareChangeDirection={stats.shareChangeObj.direction} />
-                    </div>
-                    <LiveSPKCard spkPrice={stats.spkPrice} />
-                  </div>
+                {/* Performance Metrics - 2 Column Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                  {/* Row 1: Total Points + Total Wallets */}
+                  <MetricRowCard 
+                    leftLabel="Total Points"
+                    leftValue={stats.totalPointsPool}
+                    leftChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
+                    rightLabel="Total Wallets"
+                    rightValue={stats.totalWallets}
+                    rightChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
+                  />
+                  
+                  {/* Row 1: Wallet Points + Wallet Share */}
+                  <MetricRowCard 
+                    leftLabel="Wallet Points"
+                    leftValue={stats.totalPoints}
+                    leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
+                    rightLabel="Wallet Share"
+                    rightValue={stats.marketShare.replace('%', '')}
+                    rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
+                    rightSuffix="%"
+                  />
+                  
+                  {/* Row 2: Wallet Rank + Rank Percentile */}
+                  <MetricRowCard 
+                    leftLabel="Wallet Rank"
+                    leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
+                    leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
+                    rightLabel="Rank Percentile"
+                    rightValue={stats.percentile.replace('%', '')}
+                    rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
+                    rightSuffix="%"
+                  />
+                  
+                  {/* Row 2: Pace Status */}
+                  <PaceStatusCard shareChangeDirection={stats.shareChangeObj.direction} />
                 </div>
+              </div>
+
+              {/* Projections Section - Full Width */}
+              <div className="animate-in fade-in duration-700 delay-100">
+                <AirdropProjectionCard 
+                  walletPoints={parseFloat(stats.totalPoints.replace(/,/g, '')) || 0}
+                  spkPrice={stats.spkPrice}
+                />
               </div>
 
               {/* Combined Performance Chart */}

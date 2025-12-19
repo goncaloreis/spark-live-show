@@ -162,6 +162,7 @@ export function calculateMarketShare(
 
 /**
  * Calculate airdrop estimates based on market share and SPK price
+ * @deprecated Use calculateSPKProjection instead for Season 3
  */
 export function calculateAirdropEstimates(
   marketShare: string,
@@ -184,6 +185,36 @@ export function calculateAirdropEstimates(
     '200M': `$${Math.round(200000000 * share * effectivePrice).toLocaleString()}`,
     '250M': `$${Math.round(250000000 * share * effectivePrice).toLocaleString()}`
   };
+}
+
+/**
+ * Calculate SPK projection based on conversion rate model
+ * Formula: (walletPoints / 1,000,000) × conversionRate × spkPrice
+ */
+export function calculateSPKProjection(
+  walletPoints: number,
+  conversionRate: number,
+  spkPrice: number | null
+): { spkTokens: number; dollarValue: number | null } {
+  const spkTokens = (walletPoints / 1_000_000) * conversionRate;
+  const dollarValue = spkPrice ? spkTokens * spkPrice : null;
+  return { spkTokens, dollarValue };
+}
+
+/**
+ * Format large numbers for display in projections
+ */
+export function formatProjectionNumber(value: number): string {
+  if (value >= 1_000_000_000) {
+    return `${(value / 1_000_000_000).toFixed(2)}B`;
+  }
+  if (value >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(2)}M`;
+  }
+  if (value >= 1_000) {
+    return `${(value / 1_000).toFixed(2)}K`;
+  }
+  return value.toFixed(2);
 }
 
 /**
