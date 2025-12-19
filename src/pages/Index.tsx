@@ -154,65 +154,57 @@ const Index = () => {
                 </div>
               )}
 
-              {/* Performance Section - Full Width */}
-              <div className="space-y-3">
+              {/* Performance Section - Full Width Stack */}
+              <div className="space-y-2">
                 {/* Performance Header */}
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 transition-all duration-200 hover:scale-105">
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
                     <Award className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base tracking-tight text-foreground">Performance</h3>
-                    <p className="text-[9px] text-muted-foreground/50 mt-0.5">Real-time metrics</p>
+                    <h3 className="font-bold text-sm tracking-tight text-foreground">Performance</h3>
+                    <p className="text-[9px] text-muted-foreground/50">Real-time metrics</p>
                   </div>
                 </div>
 
-                {/* Performance Metrics - 2 Column Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-                  {/* Row 1: Total Points + Total Wallets */}
-                  <MetricRowCard 
-                    leftLabel="Total Points"
-                    leftValue={stats.totalPointsPool}
-                    leftChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
-                    rightLabel="Total Wallets"
-                    rightValue={stats.totalWallets}
-                    rightChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
-                  />
-                  
-                  {/* Row 1: Wallet Points + Wallet Share */}
-                  <MetricRowCard 
-                    leftLabel="Wallet Points"
-                    leftValue={stats.totalPoints}
-                    leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
-                    rightLabel="Wallet Share"
-                    rightValue={stats.marketShare.replace('%', '')}
-                    rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
-                    rightSuffix="%"
-                  />
-                  
-                  {/* Row 2: Wallet Rank + Rank Percentile */}
-                  <MetricRowCard 
-                    leftLabel="Wallet Rank"
-                    leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
-                    leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
-                    rightLabel="Rank Percentile"
-                    rightValue={stats.percentile.replace('%', '')}
-                    rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
-                    rightSuffix="%"
-                  />
-                  
-                  {/* Row 2: Pace Status */}
-                  <PaceStatusCard shareChangeDirection={stats.shareChangeObj.direction} />
-                </div>
+                {/* Performance Metrics - Stacked Full Width */}
+                <MetricRowCard 
+                  leftLabel="Total Points"
+                  leftValue={stats.totalPointsPool}
+                  leftChange={stats.totalPointsPoolChange !== "-" ? parseFloat(stats.totalPointsPoolChange.replace(/,/g, '')) : undefined}
+                  rightLabel="Total Wallets"
+                  rightValue={stats.totalWallets}
+                  rightChange={stats.totalWalletsChange !== "-" ? parseFloat(stats.totalWalletsChange) : undefined}
+                />
+                
+                <MetricRowCard 
+                  leftLabel="Wallet Points"
+                  leftValue={stats.totalPoints}
+                  leftChange={stats.pointsChange !== "-" ? parseFloat(stats.pointsChange.replace(/,/g, '')) : undefined}
+                  rightLabel="Wallet Share"
+                  rightValue={stats.marketShare.replace('%', '')}
+                  rightChange={stats.shareChangeObj.value !== "-" ? parseFloat(stats.shareChangeObj.value.replace('%', '')) * (stats.shareChangeObj.direction === 'down' ? -1 : 1) : undefined}
+                  rightSuffix="%"
+                />
+                
+                <MetricRowCard 
+                  leftLabel="Wallet Rank"
+                  leftValue={stats.rank !== "-" ? `#${stats.rank}` : "-"}
+                  leftChange={stats.rankChange.value !== "-" ? parseFloat(stats.rankChange.value) * (stats.rankChange.direction === 'down' ? -1 : 1) : undefined}
+                  rightLabel="Rank Percentile"
+                  rightValue={stats.percentile.replace('%', '')}
+                  rightChange={stats.percentileChange.value !== "-" ? parseFloat(stats.percentileChange.value.replace('%', '')) * (stats.percentileChange.direction === 'down' ? -1 : 1) : undefined}
+                  rightSuffix="%"
+                />
+                
+                <PaceStatusCard shareChangeDirection={stats.shareChangeObj.direction} />
               </div>
 
               {/* Projections Section - Full Width */}
-              <div className="animate-in fade-in duration-700 delay-100">
-                <AirdropProjectionCard 
-                  walletPoints={parseFloat(stats.totalPoints.replace(/,/g, '')) || 0}
-                  spkPrice={stats.spkPrice}
-                />
-              </div>
+              <AirdropProjectionCard 
+                walletPoints={parseFloat(stats.totalPoints.replace(/,/g, '')) || 0}
+                spkPrice={stats.spkPrice}
+              />
 
               {/* Combined Performance Chart */}
               <div className="animate-in fade-in duration-700 delay-200">
