@@ -168,7 +168,6 @@ export type Database = {
           total_wallets: number
         }[]
       }
-      trigger_scrape_spark_points: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
