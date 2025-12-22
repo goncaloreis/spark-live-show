@@ -3,8 +3,7 @@
  * Displays wallet tracking data and analytics
  */
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { CombinedChart } from "@/components/CombinedChart";
 import { MetricRowCard } from "@/components/MetricRowCard";
@@ -12,10 +11,10 @@ import { PaceStatusCard } from "@/components/PaceStatusCard";
 import { AirdropProjectionCard } from "@/components/AirdropProjectionCard";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
 import { WalletSelector } from "@/components/WalletSelector";
-import { Search, Award, TrendingUp, DollarSign } from "lucide-react";
+import { Award, TrendingUp, DollarSign } from "lucide-react";
 import sparkLogo from "@/assets/spark-logo.svg";
 import { useWalletData } from "@/hooks/useWalletData";
-import { APP_CONFIG, UI_TEXT } from "@/utils/constants";
+import { APP_CONFIG } from "@/utils/constants";
 
 /**
  * Main application page component
@@ -30,12 +29,10 @@ const Index = () => {
     searchWallet
   } = useWalletData(selectedWallet);
 
-  // Search when wallet is selected (only once per wallet change)
-  useEffect(() => {
-    if (selectedWallet) {
-      searchWallet(selectedWallet);
-    }
-  }, [selectedWallet, searchWallet]);
+  const handleWalletLoad = useCallback((wallet: string) => {
+    setSelectedWallet(wallet);
+    searchWallet(wallet);
+  }, [searchWallet]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -72,52 +69,8 @@ const Index = () => {
               </div>
 
               {/* Wallet Selector */}
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-glow to-secondary rounded-2xl blur-2xl opacity-10 group-hover:opacity-20 transition-all duration-700 pointer-events-none" />
-                <Card className="relative card-premium border shadow-elevated">
-                  <div className="p-6 sm:p-8">
-                    <div className="flex flex-col items-center gap-6 relative z-30">
-                      <WalletSelector 
-                        selectedWallet={selectedWallet}
-                        onWalletChange={setSelectedWallet}
-                      />
-                      <Button 
-                        onClick={() => selectedWallet && !loading && searchWallet(selectedWallet)}
-                        disabled={loading || !selectedWallet}
-                        type="button"
-                        size="lg"
-                        className="w-full h-14 px-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground border-0 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                          {loading ? (
-                            <>
-                              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
-                              <span>{UI_TEXT.LOADING_TEXT}</span>
-                            </>
-                          ) : (
-                            <>
-                              <Search className="w-5 h-5 mr-2" />
-                              <span>{UI_TEXT.SEARCH_BUTTON}</span>
-                            </>
-                          )}
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 mt-5">
-                      <div className="h-px w-8 bg-gradient-to-r from-transparent via-border to-transparent" />
-                      <p className="text-[10px] sm:text-xs text-muted-foreground/50 font-medium">
-                        Powered by{" "}
-                        <a 
-                          href={APP_CONFIG.POWERED_BY_URL}
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary/80 hover:text-primary transition-colors font-semibold"
-                        >
-                          {APP_CONFIG.POWERED_BY_TEXT}
-                        </a>
-                      </p>
-                      <div className="h-px w-8 bg-gradient-to-l from-transparent via-border to-transparent" />
-                    </div>
-                  </div>
-                </Card>
+              <div className="flex justify-center">
+                <WalletSelector onWalletLoad={handleWalletLoad} />
               </div>
             </div>
           </div>

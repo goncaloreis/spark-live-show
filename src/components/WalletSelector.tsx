@@ -1,36 +1,32 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Wallet, Loader2 } from "lucide-react";
 
-interface TrackedWallet {
-  wallet_address: string;
-  notes: string | null;
-}
-
 interface WalletSelectorProps {
-  selectedWallet: string;
-  onWalletChange: (wallet: string) => void;
+  onWalletLoad: (wallet: string) => void;
 }
 
-export const WalletSelector = ({ selectedWallet, onWalletChange }: WalletSelectorProps) => {
-  const [wallet, setWallet] = useState<TrackedWallet | null>(null);
+export const WalletSelector = ({ onWalletLoad }: WalletSelectorProps) => {
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tracking, setTracking] = useState(false);
 
   useEffect(() => {
-    const fetchTrackedWallet = async () => {
+    const fetchAndLoadWallet = async () => {
       try {
         const { data, error } = await supabase
           .from('tracked_wallets')
-          .select('wallet_address, notes')
+          .select('wallet_address')
           .eq('is_active', true)
           .order('created_at', { ascending: true })
           .limit(1)
           .single();
 
         if (error) throw error;
-        setWallet(data);
+        
+        if (data) {
+          setWalletAddress(data.wallet_address);
+          onWalletLoad(data.wallet_address);
+        }
       } catch (error) {
         console.error('Error fetching tracked wallet:', error);
       } finally {
@@ -38,57 +34,34 @@ export const WalletSelector = ({ selectedWallet, onWalletChange }: WalletSelecto
       }
     };
 
-    fetchTrackedWallet();
-  }, []);
-
-  const handleTrackWallet = () => {
-    if (wallet) {
-      setTracking(true);
-      onWalletChange(wallet.wallet_address);
-      // Reset tracking state after a brief moment
-      setTimeout(() => setTracking(false), 1000);
-    }
-  };
-
-  const isTracking = selectedWallet === wallet?.wallet_address;
+    fetchAndLoadWallet();
+  }, [onWalletLoad]);
 
   if (loading) {
     return (
-      <Button variant="outline" disabled className="gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
-        Loading...
-      </Button>
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-border/50 bg-card/50 backdrop-blur-xl">
+        <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+        <span className="text-sm text-muted-foreground">Loading wallet...</span>
+      </div>
     );
   }
 
-  if (!wallet) {
+  if (!walletAddress) {
     return (
-      <Button variant="outline" disabled className="gap-2">
-        <Wallet className="w-4 h-4" />
-        No wallet configured
-      </Button>
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-border/50 bg-card/50 backdrop-blur-xl">
+        <Wallet className="w-4 h-4 text-muted-foreground" />
+        <span className="text-sm text-muted-foreground">No wallet configured</span>
+      </div>
     );
   }
 
   return (
-    <Button 
-      onClick={handleTrackWallet}
-      disabled={tracking}
-      variant={isTracking ? "default" : "outline"}
-      className="gap-2"
-    >
-      {tracking ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <Wallet className="w-4 h-4" />
-      )}
-      {isTracking ? (
-        <span className="font-mono text-xs">
-          {wallet.wallet_address.slice(0, 6)}...{wallet.wallet_address.slice(-4)}
-        </span>
-      ) : (
-        "Track Wallet"
-      )}
-    </Button>
+    <div className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-xl">
+      <Wallet className="w-4 h-4 text-primary" />
+      <span className="text-sm font-medium text-muted-foreground">Tracking:</span>
+      <span className="font-mono text-sm font-semibold text-foreground">
+        {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+      </span>
+    </div>
   );
 };
