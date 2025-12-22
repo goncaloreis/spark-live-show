@@ -68,10 +68,20 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Wallet Selector */}
-              <div className="flex justify-center">
-                <WalletSelector onWalletLoad={handleWalletLoad} />
-              </div>
+              {/* Hidden wallet loader - auto-fetches on mount */}
+              <WalletSelector onWalletLoad={handleWalletLoad} />
+              
+              {/* Wallet address display */}
+              {selectedWallet && (
+                <div className="flex justify-center">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-border/30 bg-card/30 backdrop-blur-xl">
+                    <span className="text-xs text-muted-foreground">Wallet:</span>
+                    <span className="font-mono text-xs font-medium text-foreground">
+                      {selectedWallet.slice(0, 6)}...{selectedWallet.slice(-4)}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
