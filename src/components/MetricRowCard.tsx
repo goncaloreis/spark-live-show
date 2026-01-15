@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
@@ -12,7 +13,7 @@ interface MetricRowCardProps {
   rightSuffix?: string;
 }
 
-export const MetricRowCard = ({
+export const MetricRowCard = memo(({
   leftLabel,
   leftValue,
   leftChange,
@@ -74,4 +75,4 @@ export const MetricRowCard = ({
       </div>
     </Card>
   );
-};
+});

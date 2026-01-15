@@ -16,6 +16,8 @@ interface WalletData {
 }
 
 // Rate limiting configuration
+// TODO: Consider moving to Redis or in-memory cache for better performance
+// Current implementation uses PostgreSQL which adds ~50ms per rate limit check
 const RATE_LIMITS = {
   get: { requests: 30, windowMinutes: 1 },  // 30 requests per minute for GET
   store: { requests: 20, windowMinutes: 1 }, // 20 requests per minute for STORE (scraper)
@@ -175,34 +177,35 @@ serve(async (req) => {
     }
 
     // Periodically cleanup old rate limit records (1% chance per request)
+    // TODO: Move to scheduled Supabase function for better performance
     if (Math.random() < 0.01) {
       supabaseClient.rpc('cleanup_old_rate_limits').then(() => {
         console.log('Rate limit cleanup triggered');
+      }).catch((err) => {
+        console.error('Rate limit cleanup failed:', err);
       });
     }
 
     if (action === 'get') {
-      // Get latest data for wallet
-      const { data: latestData, error: latestError } = await supabaseClient
-        .rpc('get_latest_wallet_data', { wallet_addr: wallet_address });
+      // Fetch latest and historical data in parallel for faster response
+      const [latestResult, historyResult] = await Promise.all([
+        supabaseClient.rpc('get_latest_wallet_data', { wallet_addr: wallet_address }),
+        supabaseClient.rpc('get_wallet_history', { wallet_addr: wallet_address, days_back: 30 })
+      ]);
 
-      if (latestError) {
+      if (latestResult.error) {
         console.error('Error code: DB_QUERY_FAILED');
       }
 
-      // Get historical data for charts
-      const { data: historyData, error: historyError } = await supabaseClient
-        .rpc('get_wallet_history', { wallet_addr: wallet_address, days_back: 30 });
-
-      if (historyError) {
+      if (historyResult.error) {
         console.error('Error code: DB_QUERY_FAILED');
       }
 
       return new Response(
         JSON.stringify({
-          latest: latestData?.[0] || null,
-          history: historyData || [],
-          has_data: latestData && latestData.length > 0
+          latest: latestResult.data?.[0] || null,
+          history: historyResult.data || [],
+          has_data: latestResult.data && latestResult.data.length > 0
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
