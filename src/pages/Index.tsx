@@ -3,18 +3,21 @@
  * Displays wallet tracking data and analytics
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, lazy, Suspense } from "react";
 import { Card } from "@/components/ui/card";
-import { CombinedChart } from "@/components/CombinedChart";
 import { MetricRowCard } from "@/components/MetricRowCard";
 import { PaceStatusCard } from "@/components/PaceStatusCard";
 import { AirdropProjectionCard } from "@/components/AirdropProjectionCard";
 import { SeasonCountdown } from "@/components/SeasonCountdown";
 import { WalletSelector } from "@/components/WalletSelector";
+import { MetricRowSkeleton, ChartSkeleton, ProjectionSkeleton } from "@/components/LoadingSkeleton";
 import { Award, TrendingUp, DollarSign } from "lucide-react";
 import sparkLogo from "@/assets/spark-logo.svg";
 import { useWalletData } from "@/hooks/useWalletData";
 import { APP_CONFIG } from "@/utils/constants";
+
+// Lazy load heavy chart component to reduce initial bundle size
+const CombinedChart = lazy(() => import("@/components/CombinedChart").then(module => ({ default: module.CombinedChart })));
 
 /**
  * Main application page component
@@ -171,7 +174,9 @@ const Index = () => {
 
               {/* Combined Performance Chart */}
               <div className="animate-in fade-in duration-700 delay-200">
-                <CombinedChart data={historyData} loading={loading} />
+                <Suspense fallback={<ChartSkeleton />}>
+                  <CombinedChart data={historyData} loading={loading} />
+                </Suspense>
               </div>
 
 

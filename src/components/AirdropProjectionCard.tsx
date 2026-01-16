@@ -3,7 +3,7 @@
  * Calculates SPK tokens based on: (walletPoints / 1M) × conversionRate × spkPrice
  */
 
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { DollarSign, TrendingUp, Coins } from "lucide-react";
@@ -14,7 +14,7 @@ interface AirdropProjectionCardProps {
   spkPrice: number | null;
 }
 
-export const AirdropProjectionCard = ({ walletPoints, spkPrice }: AirdropProjectionCardProps) => {
+export const AirdropProjectionCard = memo(({ walletPoints, spkPrice }: AirdropProjectionCardProps) => {
   const [conversionRate, setConversionRate] = useState(112.5);
   
   const { spkTokens, dollarValue } = calculateSPKProjection(
@@ -119,4 +119,4 @@ export const AirdropProjectionCard = ({ walletPoints, spkPrice }: AirdropProject
       </div>
     </Card>
   );
-};
+});
