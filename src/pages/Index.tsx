@@ -71,8 +71,8 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Hidden wallet loader - auto-fetches on mount */}
-              <WalletSelector onWalletLoad={handleWalletLoad} />
+              {/* Manual wallet tracker button */}
+              <WalletSelector onWalletLoad={handleWalletLoad} loading={loading} />
               
               {/* Wallet address display */}
               {selectedWallet && (
@@ -188,7 +188,7 @@ const Index = () => {
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12 animate-in fade-in duration-700">
                 <h3 className="text-2xl font-semibold mb-2">Why Track Your Spark Points?</h3>
-                <p className="text-muted-foreground">Real-time insights into your DeFi performance</p>
+                <p className="text-muted-foreground">Click "Track Wallet" above to view your real-time DeFi performance</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">

@@ -1,35 +1,34 @@
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Search, Loader2 } from "lucide-react";
 
 interface WalletSelectorProps {
   onWalletLoad: (wallet: string) => void;
+  loading?: boolean;
 }
 
-export const WalletSelector = ({ onWalletLoad }: WalletSelectorProps) => {
-  useEffect(() => {
-    const fetchAndLoadWallet = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('tracked_wallets')
-          .select('wallet_address')
-          .eq('is_active', true)
-          .order('created_at', { ascending: true })
-          .limit(1)
-          .maybeSingle();
+export const WalletSelector = ({ onWalletLoad, loading }: WalletSelectorProps) => {
+  // Read wallet address from environment variable
+  const walletAddress = import.meta.env.VITE_WALLET_ADDRESS;
 
-        if (error) throw error;
-        
-        if (data) {
-          onWalletLoad(data.wallet_address);
-        }
-      } catch (error) {
-        console.error('Error fetching tracked wallet:', error);
-      }
-    };
+  const handleTrack = () => {
+    if (walletAddress) {
+      onWalletLoad(walletAddress);
+    }
+  };
 
-    fetchAndLoadWallet();
-  }, [onWalletLoad]);
-
-  // No visible UI - just loads wallet data on mount
-  return null;
+  return (
+    <Button
+      onClick={handleTrack}
+      disabled={loading || !walletAddress}
+      className="backdrop-blur-xl bg-primary/90 hover:bg-primary border border-primary/50 hover:border-primary transition-all duration-300"
+      size="lg"
+    >
+      {loading ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : (
+        <Search className="mr-2 h-4 w-4" />
+      )}
+      {loading ? "Loading..." : "Track Wallet"}
+    </Button>
+  );
 };
