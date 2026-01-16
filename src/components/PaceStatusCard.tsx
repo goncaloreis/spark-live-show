@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { ChangeIndicator } from "@/types/wallet";
@@ -6,7 +7,7 @@ interface PaceStatusCardProps {
   shareChangeDirection: ChangeIndicator['direction'];
 }
 
-export const PaceStatusCard = ({ shareChangeDirection }: PaceStatusCardProps) => {
+export const PaceStatusCard = memo(({ shareChangeDirection }: PaceStatusCardProps) => {
   let message: string;
   let icon: React.ReactNode;
   let colorClass: string;
@@ -48,4 +49,4 @@ export const PaceStatusCard = ({ shareChangeDirection }: PaceStatusCardProps) =>
       </div>
     </Card>
   );
-};
+});

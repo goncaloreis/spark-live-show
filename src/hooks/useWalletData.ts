@@ -73,12 +73,13 @@ export function useWalletData(walletAddress?: string) {
 
   /**
    * Process wallet data and calculate all metrics
+   * Memoized to prevent unnecessary recalculations
    */
-  const processWalletData = async (data: WalletResponse): Promise<void> => {
+  const processWalletData = useCallback(async (data: WalletResponse, spkPrice: number | null): Promise<void> => {
     const { latest, history } = data;
     const totalWallets = latest.total_wallets || 0;
     const currentPoints = Number(latest.total_points);
-    
+
     // Use latest.total_points_pool as the current pool value (most recent), rounded to remove decimals
     const currentTotalPointsPool = latest.total_points_pool ? Math.round(Number(latest.total_points_pool)) : null;
 
@@ -133,15 +134,12 @@ export function useWalletData(walletAddress?: string) {
     // Calculate market share metrics using current points and current pool (both from latest)
     const marketShareData = calculateMarketShare(currentPoints, currentTotalPointsPool, history);
 
-    // Fetch SPK price
-    const spkPrice = await fetchSPKPrice();
-
     // Calculate airdrop estimates
     const airdropEstimates = calculateAirdropEstimates(marketShareData.share, spkPrice);
 
     // Calculate global average using current pool value
-    const globalAverage = currentTotalPointsPool && totalWallets > 0 
-      ? currentTotalPointsPool / totalWallets 
+    const globalAverage = currentTotalPointsPool && totalWallets > 0
+      ? currentTotalPointsPool / totalWallets
       : 0;
 
     // Update stats
@@ -167,7 +165,7 @@ export function useWalletData(walletAddress?: string) {
 
     // Update history with global average
     setHistoryData(history.map(item => ({ ...item, globalAverage })));
-  };
+  }, []);
 
   /**
    * Search for wallet data by address
@@ -205,20 +203,25 @@ export function useWalletData(walletAddress?: string) {
     setHasSearched(true);
 
     try {
-      // Fetch wallet data
-      const { data, error } = await supabase.functions.invoke<WalletResponse>('track-wallet', {
-        body: {
-          wallet_address: sanitizedAddress,
-          action: 'get'
-        }
-      });
+      // Fetch wallet data and SPK price in parallel for faster loading
+      const [walletResponse, spkPrice] = await Promise.all([
+        supabase.functions.invoke<WalletResponse>('track-wallet', {
+          body: {
+            wallet_address: sanitizedAddress,
+            action: 'get'
+          }
+        }),
+        fetchSPKPrice()
+      ]);
+
+      const { data, error } = walletResponse;
 
       if (error) {
         // Handle rate limit errors specifically
         if (error.message?.includes('429') || error.message?.includes('Rate limit')) {
           // Try to parse retry_after from the error
           let retryAfter = 60; // Default to 60 seconds
-          
+
           // The error might have the response data in different places
           try {
             const errorBody = (error as any).context?.body;
@@ -231,7 +234,7 @@ export function useWalletData(walletAddress?: string) {
           } catch (e) {
             console.error('Could not parse retry_after from error:', e);
           }
-          
+
           rateLimitUntil.current = Date.now() + (retryAfter * 1000);
           const minutes = Math.ceil(retryAfter / 60);
           toast.error(`Rate limited. Please wait ${minutes} minute${minutes > 1 ? 's' : ''} before trying again.`);
@@ -242,7 +245,7 @@ export function useWalletData(walletAddress?: string) {
       }
 
       if (data?.has_data && data.latest) {
-        await processWalletData(data);
+        await processWalletData(data, spkPrice);
         toast.success('Wallet data loaded successfully');
       } else {
         toast.info('No data found for this wallet yet. Connect your Python agent to start tracking!');
