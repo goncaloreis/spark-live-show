@@ -187,16 +187,14 @@ export function useWalletData(walletAddress?: string) {
       toast.error(`Rate limited. Please wait ${secondsLeft} seconds before trying again.`);
       return;
     }
-    
-    // Prevent duplicate searches
-    if (lastSearchedWallet.current === sanitizedAddress) {
-      return;
-    }
-    
+
     if (!isValidWalletAddress(sanitizedAddress)) {
       toast.error('Invalid wallet address format');
       return;
     }
+
+    // Allow refetching the same wallet (user explicitly clicked button)
+    // Note: React Query cache will handle preventing unnecessary network requests
 
     lastSearchedWallet.current = sanitizedAddress;
     setLoading(true);
