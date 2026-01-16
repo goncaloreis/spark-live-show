@@ -20,7 +20,7 @@ export const WalletSelector = ({ onWalletLoad, loading }: WalletSelectorProps) =
     <Button
       onClick={handleTrack}
       disabled={loading || !walletAddress}
-      className="backdrop-blur-xl bg-primary/90 hover:bg-primary border border-primary/50 hover:border-primary transition-all duration-300"
+      className="backdrop-blur-xl bg-primary/90 hover:bg-primary border border-primary/50 hover:border-primary transition-all duration-300 w-full sm:w-auto sm:min-w-[200px]"
       size="lg"
     >
       {loading ? (

@@ -72,7 +72,9 @@ const Index = () => {
               </div>
 
               {/* Manual wallet tracker button */}
-              <WalletSelector onWalletLoad={handleWalletLoad} loading={loading} />
+              <div className="flex justify-center">
+                <WalletSelector onWalletLoad={handleWalletLoad} loading={loading} />
+              </div>
               
               {/* Wallet address display */}
               {selectedWallet && (
