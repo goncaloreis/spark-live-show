@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, RefreshCw } from "lucide-react";
 
 interface WalletSelectorProps {
   onWalletLoad: (wallet: string) => void;
   loading?: boolean;
+  hasData?: boolean;
 }
 
-export const WalletSelector = ({ onWalletLoad, loading }: WalletSelectorProps) => {
+export const WalletSelector = ({ onWalletLoad, loading, hasData }: WalletSelectorProps) => {
   // Read wallet address from environment variable
   const walletAddress = import.meta.env.VITE_WALLET_ADDRESS;
 
@@ -25,10 +26,12 @@ export const WalletSelector = ({ onWalletLoad, loading }: WalletSelectorProps) =
     >
       {loading ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : hasData ? (
+        <RefreshCw className="mr-2 h-4 w-4" />
       ) : (
         <Search className="mr-2 h-4 w-4" />
       )}
-      {loading ? "Loading..." : "Track Wallet"}
+      {loading ? "Loading..." : hasData ? "Refresh Data" : "Track Wallet"}
     </Button>
   );
 };
