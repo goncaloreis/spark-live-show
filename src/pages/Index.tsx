@@ -127,15 +127,15 @@ const Index = () => {
               )}
 
               {/* Performance Section - Full Width Stack */}
-              <div className="space-y-2">
+              <div className="space-y-2 sm:space-y-3">
                 {/* Performance Header */}
-                <div className="flex items-center gap-3 mb-1">
+                <div className="flex items-center gap-3 mb-2 sm:mb-3">
                   <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20">
                     <Award className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm tracking-tight text-foreground">Performance</h3>
-                    <p className="text-[9px] text-muted-foreground/50">Real-time metrics</p>
+                    <h3 className="font-bold text-sm sm:text-base tracking-tight text-foreground">Performance</h3>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground/50">Real-time metrics</p>
                   </div>
                 </div>
 
