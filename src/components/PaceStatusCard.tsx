@@ -29,8 +29,8 @@ export const PaceStatusCard = memo(({ shareChangeDirection }: PaceStatusCardProp
   }
   
   return (
-    <Card className="card-premium border-white/5 hover:border-primary/20 transition-all duration-300 p-3">
-      <div className="flex items-center justify-between">
+    <Card className="card-premium border-white/5 hover:border-primary/20 transition-all duration-300 p-3 sm:p-4">
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <div className={`relative ${colorClass}`}>
             {icon}
@@ -38,12 +38,12 @@ export const PaceStatusCard = memo(({ shareChangeDirection }: PaceStatusCardProp
               <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
             )}
           </div>
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+          <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-wider whitespace-nowrap">
             Pace Status
           </span>
         </div>
-        
-        <span className={`text-sm font-bold ${colorClass}`}>
+
+        <span className={`text-xs sm:text-sm font-bold ${colorClass} text-right`}>
           {message}
         </span>
       </div>

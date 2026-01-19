@@ -27,7 +27,7 @@ export const MetricRowCard = memo(({
     const hasChange = change !== undefined;
     const isPositive = change !== undefined && change > 0;
     const isNeutral = change === 0;
-    
+
     const formatChangeValue = (num: number) => {
       const absNum = Math.abs(num);
       if (suffix === '%') {
@@ -35,22 +35,22 @@ export const MetricRowCard = memo(({
       }
       return Math.round(absNum).toLocaleString('en-US');
     };
-    
+
     return (
-      <div className="flex items-center justify-between flex-1 group/metric">
-        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+        <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-wider truncate">
           {label}
         </span>
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-foreground tabular-nums">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="text-base sm:text-lg font-bold text-foreground tabular-nums">
             {value}{suffix}
           </span>
           {hasChange && (
-            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold tabular-nums ${
+            <div className={`flex items-center gap-0.5 sm:gap-1 px-1 sm:px-1.5 py-0.5 rounded-md text-[9px] font-bold tabular-nums whitespace-nowrap ${
               isNeutral
                 ? 'bg-muted/20 text-muted-foreground'
-                : isPositive 
-                  ? 'bg-green-500/10 text-green-500' 
+                : isPositive
+                  ? 'bg-green-500/10 text-green-500'
                   : 'bg-red-500/10 text-red-500'
             }`}>
               {!isNeutral && (isPositive ? (
@@ -67,10 +67,10 @@ export const MetricRowCard = memo(({
   };
 
   return (
-    <Card className="card-premium border-white/5 hover:border-primary/20 transition-all duration-300 p-3">
-      <div className="flex items-center gap-6">
+    <Card className="card-premium border-white/5 hover:border-primary/20 transition-all duration-300 p-3 sm:p-4">
+      <div className="flex items-stretch gap-4 sm:gap-6">
         {renderMetric(leftLabel, leftValue, leftChange, leftSuffix)}
-        <div className="w-px h-6 bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+        <div className="w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
         {renderMetric(rightLabel, rightValue, rightChange, rightSuffix)}
       </div>
     </Card>
