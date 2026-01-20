@@ -41,12 +41,12 @@ export const MetricRowCard = memo(({
         <span className="text-[10px] sm:text-[11px] text-muted-foreground uppercase tracking-wider truncate">
           {label}
         </span>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <span className="text-base sm:text-lg font-bold text-foreground tabular-nums">
+        <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+          <span className="text-sm sm:text-base md:text-lg font-bold text-foreground tabular-nums truncate flex-shrink">
             {value}{suffix}
           </span>
           {hasChange && (
-            <div className={`flex items-center gap-0.5 sm:gap-1 px-1 sm:px-1.5 py-0.5 rounded-md text-[9px] font-bold tabular-nums whitespace-nowrap ${
+            <div className={`flex items-center gap-0.5 sm:gap-1 px-1 sm:px-1.5 py-0.5 rounded-md text-[9px] font-bold tabular-nums whitespace-nowrap flex-shrink-0 ${
               isNeutral
                 ? 'bg-muted/20 text-muted-foreground'
                 : isPositive
@@ -68,9 +68,9 @@ export const MetricRowCard = memo(({
 
   return (
     <Card className="card-premium border-white/5 hover:border-primary/20 transition-all duration-300 p-3 sm:p-4">
-      <div className="flex items-stretch gap-4 sm:gap-6">
+      <div className="flex items-stretch gap-3 sm:gap-4 md:gap-6">
         {renderMetric(leftLabel, leftValue, leftChange, leftSuffix)}
-        <div className="w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+        <div className="w-px bg-gradient-to-b from-transparent via-white/10 to-transparent flex-shrink-0" />
         {renderMetric(rightLabel, rightValue, rightChange, rightSuffix)}
       </div>
     </Card>

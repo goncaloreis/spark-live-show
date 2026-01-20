@@ -61,10 +61,14 @@ const Index = () => {
                   </div>
                 </div>
                 <div className="text-center sm:text-left">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
-                    <span className="text-gradient">{APP_CONFIG.APP_NAME.split(' ').slice(0, 2).join(' ')}</span>
-                    <span className="text-muted-foreground/60"> | {APP_CONFIG.SEASON}</span>
-                  </h1>
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gradient">
+                      {APP_CONFIG.APP_NAME.split(' ').slice(0, 2).join(' ')}
+                    </h1>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-sm sm:text-base font-semibold text-foreground/80">
+                      {APP_CONFIG.SEASON}
+                    </span>
+                  </div>
                   <p className="text-muted-foreground/70 text-xs sm:text-sm mt-2 font-medium tracking-wide">
                     {APP_CONFIG.APP_DESCRIPTION}
                   </p>
